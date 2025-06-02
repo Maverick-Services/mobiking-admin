@@ -45,12 +45,6 @@ export const ADMIN_SIDEBAR_LINKS = [
         href: '/admin/customers',
         icon: <FaUserFriends />,
     },
-    // {
-    //     key: 'payments',
-    //     label: 'Payments',
-    //     href: '/admin/payments',
-    //     icon: <FaMoneyCheckAlt />,
-    // },
     {
         key: 'notifications',
         label: 'Notifications',
@@ -81,54 +75,12 @@ export const ADMIN_SIDEBAR_LINKS = [
         href: '/admin/employees',
         icon: <FaUsersCog />,
     },
-    // {
-    //     key: 'transactions',
-    //     label: 'Transactions',
-    //     href: '/admin/transactions',
-    //     icon: <FaExchangeAlt />,
-    // },
-    // {
-    //     key: 'reports',
-    //     label: 'Reports',
-    //     href: '/admin/reports',
-    //     icon: <FaChartLine />,
-    // },
-    // {
-    //     key: 'banners',
-    //     label: 'Banners',
-    //     href: '/admin/banners',
-    //     icon: <FaPaintBrush />,
-    // },
-    // {
-    //     key: 'coupons',
-    //     label: 'Coupons',
-    //     href: '/admin/coupons',
-    //     icon: <FaFileInvoiceDollar />,
-    // },
-    // {
-    //     key: 'design-studio',
-    //     label: 'Design Studio',
-    //     href: '/admin/design-studio',
-    //     icon: <FaPaintBrush />,
-    // },
-    // {
-    //     key: 'billing',
-    //     label: 'Billing',
-    //     href: '/admin/billing',
-    //     icon: <FaFileInvoiceDollar />,
-    // },
     {
         key: 'settings',
         label: 'Settings',
         href: '/admin/settings',
         icon: <FaCogs />,
     },
-    // {
-    //     key: 'app-releases',
-    //     label: 'App Releases',
-    //     href: '/admin/app-releases',
-    //     icon: <FaRocket />,
-    // },
     {
         key: 'policies',
         label: 'Policies',
@@ -148,3 +100,53 @@ export const ADMIN_SIDEBAR_LINKS = [
         icon: <FaPhoneAlt />,
     },
 ];
+
+
+// {
+//     key: 'payments',
+//     label: 'Payments',
+//     href: '/admin/payments',
+//     icon: <FaMoneyCheckAlt />,
+// },
+// {
+//     key: 'app-releases',
+//     label: 'App Releases',
+//     href: '/admin/app-releases',
+//     icon: <FaRocket />,
+// },
+// {
+//     key: 'transactions',
+//     label: 'Transactions',
+//     href: '/admin/transactions',
+//     icon: <FaExchangeAlt />,
+// },
+// {
+//     key: 'reports',
+//     label: 'Reports',
+//     href: '/admin/reports',
+//     icon: <FaChartLine />,
+// },
+// {
+//     key: 'banners',
+//     label: 'Banners',
+//     href: '/admin/banners',
+//     icon: <FaPaintBrush />,
+// },
+// {
+//     key: 'coupons',
+//     label: 'Coupons',
+//     href: '/admin/coupons',
+//     icon: <FaFileInvoiceDollar />,
+// },
+// {
+//     key: 'design-studio',
+//     label: 'Design Studio',
+//     href: '/admin/design-studio',
+//     icon: <FaPaintBrush />,
+// },
+// {
+//     key: 'billing',
+//     label: 'Billing',
+//     href: '/admin/billing',
+//     icon: <FaFileInvoiceDollar />,
+// },
