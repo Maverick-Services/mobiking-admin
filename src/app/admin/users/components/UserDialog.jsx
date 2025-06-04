@@ -80,12 +80,15 @@ export default function UserDialog({ open, onOpenChange, selectedUser, onCreate,
     const onSubmit = async (data) => {
         try {
             // const permissions = data.permissions;
+            const fd = { ...data, departments: ["Human Resource"], }
 
-            const { password, ...rest } = data;
+            const { password, ...rest } = fd;
 
             const userData = selectedUser
                 ? rest
                 : { ...rest, password };
+
+            console.log(userData);
 
             if (selectedUser?._id) {
                 await onUpdate({ id: selectedUser._id, data: userData });

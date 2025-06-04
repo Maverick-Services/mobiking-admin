@@ -29,7 +29,7 @@ api.interceptors.response.use(
 
         if (error.response?.status === 401) {
             // Clear state & redirect
-            authStore.getState().clearAuth(); // <- Clear auth store
+            useAuthStore.getState().clearAuth(); // <- Clear auth store
             if (typeof window !== "undefined") {
                 window.location.href = "/";
             }
