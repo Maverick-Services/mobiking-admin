@@ -70,9 +70,9 @@ export const ADMIN_SIDEBAR_LINKS = [
         icon: <FaCaretSquareDown />,
     },
     {
-        key: 'employees',
-        label: 'Employees',
-        href: '/admin/employees',
+        key: 'users',
+        label: 'Users',
+        href: '/admin/users',
         icon: <FaUsersCog />,
     },
     {

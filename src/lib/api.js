@@ -1,49 +1,47 @@
 // lib/api.js
 import axios from 'axios';
-import { getSession, signOut } from 'next-auth/react';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const api = axios.create({
-    baseURL: '/api',
+    baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-// Request interceptor - Add auth token
-api.interceptors.request.use(async (config) => {
-    try {
-        const session = await getSession()
-        if (session?.accessToken) {
-            config.headers.Authorization = `Bearer ${session.accessToken}`
+// Request interceptor - Add token from Zustand
+api.interceptors.request.use(
+    (config) => {
+        const token = useAuthStore.getState().accessToken; // <- Get token from store
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
         }
-    } catch (error) {
-        console.error('Error getting session:', error)
-    }
-    return config
-})
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
 
-// Response interceptor - Handle auth errors
+// Response interceptor
 api.interceptors.response.use(
     (response) => response.data,
     async (error) => {
-        const message = error.response?.data?.error || error.message
+        const message = error.response?.data?.error || error.message;
 
-        // Handle authentication errors
         if (error.response?.status === 401) {
-            // Token expired or invalid - sign out user
-            await signOut({ redirect: false })
-            window.location.href = '/'
-            return Promise.reject(new Error('Session expired. Please login again.'))
+            // Clear state & redirect
+            authStore.getState().clearAuth(); // <- Clear auth store
+            if (typeof window !== "undefined") {
+                window.location.href = "/";
+            }
+            return Promise.reject(new Error("Session expired. Please login again."));
         }
 
-        // Handle permission errors
         if (error.response?.status === 403) {
-            return Promise.reject(new Error('You don\'t have permission to perform this action.'))
+            return Promise.reject(new Error("You don’t have permission to perform this action."));
         }
 
-        return Promise.reject(new Error(message))
+        return Promise.reject(new Error(message));
     }
-)
+);
 
 export default api;
-
