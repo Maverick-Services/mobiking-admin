@@ -34,7 +34,7 @@ export default function Sidebar({ isOpen, setIsSidebarOpen }) {
     async function handleLogout() {
         try {
             const res = await fetch(
-                "http://mobiking-e-commerce-backend.vercel.app/api/v1/users/logout",
+                process.env.NEXT_PUBLIC_BACKEND_URL + "/users/logout",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
