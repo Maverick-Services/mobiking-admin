@@ -1,4 +1,4 @@
-// File: app/admin/layout.jsx
+// File:  app/admin/layout.jsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -9,52 +9,79 @@ import { Toaster } from "react-hot-toast";
 import LayoutDashboard from "@/components/dashboard/LayoutDashboard";
 import { useAuthStore } from "@/store/useAuthStore";
 
+
+function getTokenExpiry(token) {
+    try {
+        const payloadBase64 = token.split(".")[1];
+        const decoded = atob(payloadBase64.replace(/-/g, "+").replace(/_/g, "/"));
+        const obj = JSON.parse(decoded);
+        return obj.exp;
+    } catch {
+        return null;
+    }
+}
+
 export default function AdminLayout({ children }) {
-    // 1) Create QueryClient unconditionally
     const [queryClient] = useState(
         () =>
             new QueryClient({
                 defaultOptions: {
                     queries: {
-                        staleTime: 60 * 1000, // 1 minute
+                        staleTime: 60 * 1000,
                         retry: false,
                     },
                 },
             })
     );
 
-    // 2) Zustand + router + checking flag
+    // 2) Grab Zustand store actions & state, plus router
+    const initializeAuth = useAuthStore((state) => state.initializeAuth);
+    const refreshAccessToken = useAuthStore((state) => state.refreshAccessToken);
+    const clearAuth = useAuthStore((state) => state.clearAuth);
     const user = useAuthStore((state) => state.user);
-    const setUser = useAuthStore((state) => state.setUser);
     const router = useRouter();
-    const [isChecking, setIsChecking] = useState(true);
 
-    // 3) On mount, rehydrate user via /api/auth/me
+    // 3) Local UI state: whether we’re still validating auth
+    const [checkingAuth, setCheckingAuth] = useState(true);
+
+    // 4) On mount, rehydrate + validate tokens
     useEffect(() => {
-        // Only fetch if no user in store
-        if (!user) {
-            fetch("/api/auth/me")
-                .then(async (res) => {
-                    if (!res.ok) {
-                        router.replace("/");
-                        return null;
-                    }
-                    const data = await res.json();
-                    setUser(data.user);
-                })
-                .catch(() => {
-                    router.replace("/");
-                })
-                .finally(() => {
-                    setIsChecking(false);
-                });
-        } else {
-            setIsChecking(false);
-        }
-    }, [user, setUser, router]);
+        // 4a) Rehydrate from localStorage
+        initializeAuth();
 
-    // 4) While checking (fetching /api/auth/me), show a loader
-    if (isChecking) {
+        // 4b) Delay a tick so that Zustand is populated
+        setTimeout(async () => {
+            const storedAccess = useAuthStore.getState().accessToken;
+            const storedRefresh = useAuthStore.getState().refreshToken;
+
+            // If either token is missing, we cannot proceed
+            if (!storedAccess || !storedRefresh) {
+                clearAuth();
+                router.replace("/");
+                return;
+            }
+
+            // Check access token expiry
+            const exp = getTokenExpiry(storedAccess);
+            const nowSec = Math.floor(Date.now() / 1000);
+
+            if (exp && exp > nowSec) {
+                // Access token still valid
+                setCheckingAuth(false);
+            } else {
+                // Access token expired → attempt refresh
+                const ok = await refreshAccessToken();
+                if (!ok) {
+                    clearAuth();
+                    router.replace("/");
+                    return;
+                }
+                setCheckingAuth(false);
+            }
+        }, 0);
+    }, [initializeAuth, refreshAccessToken, clearAuth, router]);
+
+    if (checkingAuth) {
         return (
             <div className="h-screen flex items-center justify-center">
                 Loading…
@@ -62,12 +89,10 @@ export default function AdminLayout({ children }) {
         );
     }
 
-    // 5) If still no user after check, we’ve already redirected; render nothing
     if (!user) {
         return null;
     }
 
-    // 6) Now that we have a valid user, render the dashboard + React Query
     return (
         <QueryClientProvider client={queryClient}>
             <LayoutDashboard>{children}</LayoutDashboard>

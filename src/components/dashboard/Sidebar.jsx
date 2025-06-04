@@ -1,64 +1,109 @@
+// File: app/components/Sidebar.jsx
 "use client";
 
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogTrigger,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from "@/components/ui/dialog";
 import { IMAGES } from "@/lib/constants/assets";
 import { ADMIN_SIDEBAR_LINKS } from "@/lib/constants/sidebarLinks";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function Sidebar({ isOpen, setIsSidebarOpen }) {
-
-    const allowedLinks = [...ADMIN_SIDEBAR_LINKS]
-
     const pathname = usePathname();
+    const router = useRouter();
+    const { user, clearAuth } = useAuthStore();
+
+    console.log(user)
 
     function onLinkClick() {
         setIsSidebarOpen(false);
     }
 
+    async function handleLogout() {
+        try {
+            const res = await fetch(
+                "http://mobiking-e-commerce-backend.vercel.app/api/v1/users/logout",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(''),
+                });
+
+            const data = await res.json();
+            if (res.ok && data.success) {
+                clearAuth();
+                router.replace("/");
+            } else {
+                console.error("Logout failed:", data);
+            }
+        } catch (err) {
+            console.error("Logout error:", err);
+        }
+    }
+
     return (
-        <div className={`max-[640px]:max-w-58 max-[640px]:absolute ${!isOpen ? "-left-full" : 'left-0'} max-[640px]:top-0 lg:w-[16rem] h-screen bg-gray-900 overflow-auto text-gray-100 border-r border-gray-700 shadow-xl flex flex-col items-center gap-2 px-3 py-2 transition-all duration-500 ease-in-out`}>
+        <div
+            className={`
+        max-[640px]:max-w-58 max-[640px]:absolute
+        ${!isOpen ? "-left-full" : "left-0"}
+        max-[640px]:top-0 lg:w-[16rem] h-screen bg-gray-900
+        overflow-auto text-gray-100 border-r border-gray-700
+        shadow-xl flex flex-col items-center gap-2 px-3 py-2
+        transition-all duration-500 ease-in-out
+      `}
+        >
             {/* Logo Section */}
             <div className="w-full pt-4 pb-4 px-4 hover:scale-[1.02] transition-transform duration-300">
                 <Image
-                    src={'/logoWhite.png'}
+                    src={"/logoWhite.png"}
                     alt="logo"
                     height={160}
                     width={160}
-                    className="object-contain "
+                    className="object-contain"
                 />
-
             </div>
 
             {/* Navigation Links */}
             <div className="w-full flex flex-col gap-3 transition-all duration-300 ease-in-out">
-                {allowedLinks?.map(({ href, label, icon }) => {
-                    const abc = href.split('/')[1];
-                    const isActive = href === `/${abc}` ? pathname === `/${abc}` : pathname.startsWith(href);
+                {ADMIN_SIDEBAR_LINKS.map(({ href, label, icon }) => {
+                    const rootPath = `/${href.split("/")[1]}`;
+                    const isActive =
+                        href === rootPath ? pathname === rootPath : pathname.startsWith(href);
+
                     return (
                         <Link
                             key={href}
                             href={href}
                             onClick={onLinkClick}
-                            className={`group flex items-center gap-4 px-4 py-2 rounded-lg transition-all duration-300
-                                ${isActive
+                            className={`
+                group flex items-center gap-4 px-4 py-2 rounded-lg
+                transition-all duration-300
+                ${isActive
                                     ? "bg-gray-700 shadow-md text-white"
-                                    : "hover:bg-gray-800 hover:translate-x-1 text-gray-300 hover:text-white"}
-                            `}
+                                    : "hover:bg-gray-800 hover:translate-x-1 text-gray-300 hover:text-white"
+                                }
+              `}
                         >
-                            <span className={`p-2 rounded-lg ${isActive ? "bg-white/10" : "bg-gray-800 group-hover:bg-gray-700"
-                                }`}>
-                                <span
-                                    className="text-sm text-gray-100"
-                                // style={{ fontSize: "max(1.1vw, 15px)" }}
-                                >
-                                    {icon}
-                                </span>
+                            <span
+                                className={`
+                  p-2 rounded-lg ${isActive ? "bg-white/10" : "bg-gray-800 group-hover:bg-gray-700"
+                                    }
+                `}
+                            >
+                                <span className="text-sm text-gray-100">{icon}</span>
                             </span>
-
                             <span className="text-sm font-medium opacity-90 group-hover:opacity-100 transition-opacity">
                                 {label}
                             </span>
@@ -77,18 +122,41 @@ export default function Sidebar({ isOpen, setIsSidebarOpen }) {
                         height={40}
                         className="rounded-full ring-2 ring-gray-400"
                     />
-                    <div>
-                        <p className="text-sm font-medium sm:hidden lg:block text-gray-100">Admin</p>
-                        <p className="text-xs text-gray-400 sm:hidden lg:block">admin@admin.com</p>
+                    <div className="">
+                        <p className="text-sm font-medium capitalize text-gray-100">
+                            {user.role || "User"}
+                        </p>
+                        <p className="text-xs text-gray-400 ">
+                            {user.email || "email@admin.com"}
+                        </p>
                     </div>
                 </div>
 
-                <Button
-                    className="w-full mt-2 bg-gray-800 hover:bg-gray-700 text-gray-100 transition-colors"
-                >
-                    <LogOut className="mr-2 h-4 w-4 text-red-400" />
-                    <span className="sm:hidden lg:block">Logout</span>
-                </Button>
+                {/* Logout Button & Confirmation Dialog */}
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button className="w-full mt-2 bg-gray-800 hover:bg-gray-700 text-gray-100 transition-colors flex items-center justify-center">
+                            <LogOut className="mr-2 h-4 w-4 text-red-400" />
+                            <span className="">Logout</span>
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Confirm Logout</DialogTitle>
+                            <DialogDescription>
+                                Are you sure you want to log out?
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => {/* closes automatically */ }}>
+                                Cancel
+                            </Button>
+                            <Button variant="destructive" onClick={handleLogout}>
+                                Yes, log out
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
         </div>
     );
