@@ -2,7 +2,6 @@
 'use client';
 import React, { useState } from 'react';
 import InnerDashboardLayout from '@/components/dashboard/InnerDashboardLayout';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import { CirclePlus } from 'lucide-react';
 import UploaderDialog from './components/UploaderDialog';
@@ -20,17 +19,6 @@ export default function MediaPage() {
                 <h1 className="text-primary font-bold sm:text-2xl lg:text-4xl mb-3">
                     Manage Media
                 </h1>
-                <Breadcrumb className="mb-3">
-                    <BreadcrumbList>
-                        <BreadcrumbItem>
-                            <BreadcrumbLink href="/admin">Dashboard</BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                            <BreadcrumbPage>Media</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
             </div>
 
             <div>
