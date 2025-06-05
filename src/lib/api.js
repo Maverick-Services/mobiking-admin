@@ -22,26 +22,17 @@ api.interceptors.request.use(
 );
 
 // Response interceptor
-api.interceptors.response.use(
-    (response) => response.data,
-    async (error) => {
-        const message = error.response?.data?.error || error.message;
+// api.interceptors.response.use(
+//     (response) => response.data,
+//     async (error) => {
+//         const message = error.response?.data?.error || error.message;
 
-        if (error.response?.status === 401) {
-            // Clear state & redirect
-            useAuthStore.getState().clearAuth(); // <- Clear auth store
-            if (typeof window !== "undefined") {
-                window.location.href = "/";
-            }
-            return Promise.reject(new Error("Session expired. Please login again."));
-        }
+//         if (error.response?.status === 403) {
+//             return Promise.reject(new Error("You don’t have permission to perform this action."));
+//         }
 
-        if (error.response?.status === 403) {
-            return Promise.reject(new Error("You don’t have permission to perform this action."));
-        }
-
-        return Promise.reject(new Error(message));
-    }
-);
+//         return Promise.reject(new Error(message));
+//     }
+// );
 
 export default api;

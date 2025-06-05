@@ -70,6 +70,12 @@ export const ADMIN_SIDEBAR_LINKS = [
         icon: <FaCaretSquareDown />,
     },
     {
+        key: 'media',
+        label: 'Media',
+        href: '/admin/media',
+        icon: <FaPaintBrush />,
+    },
+    {
         key: 'users',
         label: 'Users',
         href: '/admin/users',
@@ -126,12 +132,7 @@ export const ADMIN_SIDEBAR_LINKS = [
 //     href: '/admin/reports',
 //     icon: <FaChartLine />,
 // },
-// {
-//     key: 'banners',
-//     label: 'Banners',
-//     href: '/admin/banners',
-//     icon: <FaPaintBrush />,
-// },
+
 // {
 //     key: 'coupons',
 //     label: 'Coupons',

@@ -9,6 +9,7 @@ export const Resources = {
     CATEGORIES: 'categories',
     PRODUCTS: 'products',
     PRODUCT_GROUPS: 'product-groups',
+    MEDIA: 'media',
     USERS: 'users',
     SETTINGS: 'settings',
     POLICIES: 'policies',

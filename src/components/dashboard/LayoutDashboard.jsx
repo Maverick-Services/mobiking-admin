@@ -31,7 +31,7 @@ function LayoutDashboard({ children }) {
                 <Sidebar isOpen={sidebarOpen} setIsSidebarOpen={setSidebarOpen} />
             </div>
 
-            <div className='bg-gray-100 grow h-screen overflow-auto p-2 sm:p-4 lg:p-5' onClick={() => setSidebarOpen(false)}>
+            <div className='bg-gray-100 grow h-screen overflow-auto' onClick={() => setSidebarOpen(false)}>
                 {children}
             </div>
         </main>
