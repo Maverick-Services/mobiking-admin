@@ -52,7 +52,7 @@ export default function CategoriesListView({ isLoading, error, categories, onEdi
                                     {index + 1}
                                 </td>
 
-                                <td className="px-6 py-3 border-b align-middle">
+                                <td className="px-6 py-0 border-b align-middle">
                                     <div className="flex items-center justify-center min-h-20 py-1">
                                         <Image
                                             height={80}
@@ -60,7 +60,7 @@ export default function CategoriesListView({ isLoading, error, categories, onEdi
                                             quality={100}
                                             src={item.lowerBanner}
                                             alt={item.name}
-                                            className="object-contain"
+                                            className="object-contain rounded-sm"
                                         />
                                     </div>
                                 </td>

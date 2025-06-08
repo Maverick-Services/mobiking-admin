@@ -7,9 +7,10 @@ import React, { useState } from 'react'
 import UsersListView from './components/UsersListView';
 import UserDialog from './components/UserDialog';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import UsersTable from './UsersTable';
 
 function page() {
-    // const [roleFilter, setRoleFilter] = useState('user')
+    const [roleFilter, setRoleFilter] = useState('user')
     // const [page, setPage] = useState(1)
     // const [pageSize, setPageSize] = useState(10)
 
@@ -77,45 +78,14 @@ function page() {
     return (
         <div>
             <InnerDashboardLayout>
-                <div className='w-full flex items-center text-primary'>
-                    <h1 className='font-bold sm:text-2xl lg:text-4xl w-full'>Users</h1>
-                </div>
-                {/* filters */}
-                <div className="flex justify-between items-center mb-4 mt-4">
-                    {/* <div>
-                    <Select value={roleFilter} onValueChange={setRoleFilter}>
-                        <SelectTrigger className="w-[150px]">
-                            <SelectValue placeholder="Select role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {onlyAdmin &&
-                                <>
-                                    <SelectItem value="admin">Admin</SelectItem>
-                                    <SelectItem value="sub-admin">Sub-Admin</SelectItem>
-                                </>
-                            }
-                            <SelectItem value="user">User</SelectItem>
-                        </SelectContent>
-                    </Select>
-
-                    <Select value={pageSize.toString()} onValueChange={v => { setPageSize(+v); setPage(1) }}>
-                        <SelectTrigger className="w-[100px]">
-                            <SelectValue placeholder="Rows" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {[1, 2, 5, 10, 25, 50, 100].map(n => (
-                                <SelectItem key={n} value={n.toString()}>{n} / page</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    </div> */}
+                <div className='w-full flex items-center text-primary mb-4'>
+                    <h1 className='font-bold sm:text-2xl lg:text-4xl w-full'>Employees</h1>
 
                     {canAdd &&
                         <Button onClick={handleAddClick}>
                             <CirclePlus className="mr-2 h-4 w-4" /> Add New
                         </Button>
                     }
-
                 </div>
 
                 {/* {canView &&
@@ -134,6 +104,8 @@ function page() {
                         deleteError={deleteUser.error}
                     />
                 } */}
+
+                <UsersTable />
 
                 <UserDialog
                     open={isDialogOpen}

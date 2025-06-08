@@ -6,6 +6,7 @@ import CategoriesListView from './components/CategoriesListView';
 import { useSubCategories } from '@/hooks/useSubCategories';
 import { useCategories } from '@/hooks/useCategories';
 import { useRouter } from 'next/navigation';
+import { Separator } from '@/components/ui/separator';
 
 export default function Page() {
     const router = useRouter()
@@ -29,7 +30,7 @@ export default function Page() {
     return (
         <InnerDashboardLayout>
             <div className="w-full items-center justify-between">
-                <h1 className="text-primary font-bold sm:text-2xl lg:text-4xl mb-3">Sub Categories</h1>
+                <h1 className="text-primary font-bold sm:text-2xl lg:text-3xl mb-3">Sub Categories</h1>
             </div>
 
             <div>

@@ -41,18 +41,6 @@ export const ADMIN_SIDEBAR_LINKS = [
         icon: <FaShoppingCart />,
     },
     {
-        key: 'customers',
-        label: 'Customers',
-        href: '/admin/customers',
-        icon: <FaUserFriends />,
-    },
-    {
-        key: 'notifications',
-        label: 'Notifications',
-        href: '/admin/notifications',
-        icon: <FaBell />,
-    },
-    {
         key: 'categories',
         label: 'Categories',
         href: '/admin/categories',
@@ -83,10 +71,22 @@ export const ADMIN_SIDEBAR_LINKS = [
         icon: <FaPaintBrush />,
     },
     {
+        key: 'customers',
+        label: 'Customers',
+        href: '/admin/customers',
+        icon: <FaUserFriends />,
+    },
+    {
         key: 'users',
         label: 'Users',
         href: '/admin/users',
         icon: <FaUsersCog />,
+    },
+    {
+        key: 'notifications',
+        label: 'Notifications',
+        href: '/admin/notifications',
+        icon: <FaBell />,
     },
     {
         key: 'settings',
