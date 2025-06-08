@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <InnerDashboardLayout>
       <div className="w-full flex flex-col gap-4 mb-4">
-        <h1 className="text-primary font-medium sm:text-lg lg:text-2xl">
+        <h1 className="text-primary font-bold sm:text-lg lg:text-3xl">
           Hello, Mobiking!
         </h1>
       </div>
