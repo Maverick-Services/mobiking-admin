@@ -7,6 +7,7 @@ export const Resources = {
     CUSTOMERS: 'customers',
     NOTIFICATIONS: 'notifications',
     CATEGORIES: 'categories',
+    SUB_CATEGORIES: 'subCategories',
     PRODUCTS: 'products',
     PRODUCT_GROUPS: 'product-groups',
     MEDIA: 'media',
@@ -16,7 +17,6 @@ export const Resources = {
     ABOUT_US: 'about-us',
     CONTACT_US: 'contact-us',
 };
-
 
 // possible actions
 export const Actions = {

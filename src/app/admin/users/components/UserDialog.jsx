@@ -18,6 +18,7 @@ const permissionSections = [
     { id: 'customers', name: 'Customers' },
     { id: 'notifications', name: 'Notifications' },
     { id: 'categories', name: 'Categories' },
+    { id: 'subCategories', name: 'Sub Categories' },
     { id: 'products', name: 'Products' },
     { id: 'product-groups', name: 'Product Groups' },
     { id: 'users', name: 'Users' },

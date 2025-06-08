@@ -62,30 +62,3 @@ function ImageSelector({ open, onOpenChange, setImage }) {
 export default ImageSelector;
 
 
-
-{/* <Button
-                                                        type="submit"
-                                                        disabled={isUploading}
-                                                    >
-                                                        {isUploading ? (
-                                                            <>
-                                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                                Uploading...
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <FolderUp className="mr-2 h-4 w-4" />
-                                                                Upload
-                                                            </>
-                                                        )}
-                                                    </Button> */}
-
-
-
-// if (imagesQuery.isLoading) {
-//     return (
-//         <div className='h-30 bg-blue-50 rounded-xl flex items-center justify-center p-4'>
-//             <Loader2 className='animate-spin' size={20} />
-//         </div>
-//     );
-// }

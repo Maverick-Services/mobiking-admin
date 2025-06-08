@@ -24,6 +24,7 @@ import {
     FaPhoneAlt,
     FaLifeRing,
     FaCaretSquareDown,
+    FaSitemap,
 } from 'react-icons/fa';
 
 export const ADMIN_SIDEBAR_LINKS = [
@@ -56,6 +57,12 @@ export const ADMIN_SIDEBAR_LINKS = [
         label: 'Categories',
         href: '/admin/categories',
         icon: <FaThLarge />,
+    },
+    {
+        key: 'subCategories',
+        label: 'Sub Categories',
+        href: '/admin/subCategories',
+        icon: <FaSitemap />,
     },
     {
         key: 'products',

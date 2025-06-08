@@ -1,0 +1,96 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '@/lib/api';
+import { toast } from 'react-hot-toast';
+import { Actions, checkPermission, Resources } from '@/lib/permissions';
+import { useAuthStore } from '@/store/useAuthStore';
+
+export const useProducts = () => {
+    const { user } = useAuthStore()
+    const queryClient = useQueryClient();
+
+    // Check permissions
+    const canView = checkPermission(user, Resources.PRODUCTS, Actions.VIEW)
+    const canAdd = checkPermission(user, Resources.PRODUCTS, Actions.ADD)
+    const canEdit = checkPermission(user, Resources.PRODUCTS, Actions.EDIT)
+    const canDelete = checkPermission(user, Resources.PRODUCTS, Actions.DELETE)
+
+    // Get all SubCategories
+    const productsQuery = useQuery({
+        queryKey: ['products'],
+        enabled: canView,
+        queryFn: () => api.get('/products').then(res => res.data),
+        staleTime: 1000 * 60 * 5, // 5 minutes cache
+        onError: (err) => {
+            toast.error(err.message || 'Failed to fetch products');
+        }
+    });
+
+    const getProductQuery = (slug) => useQuery({
+        queryKey: ['product', slug],
+        queryFn: async () => {
+            const res = await api.get(`/categories/products/details/${slug}`);
+            const data = res.data;
+
+            if (!data || data.message === 'Sub Service not found') {
+                throw new Error('Service not found');
+            }
+
+            return data;
+        },
+        staleTime: 1000 * 60 * 5,
+        onError: (err) => {
+            toast.error(err.message || 'Failed to fetch service');
+        }
+    });
+
+
+    // Create Product mutation
+    const createProduct = useMutation({
+        mutationFn: (data) => api.post('/categories/createProduct', data),
+        enabled: canAdd,
+        onSuccess: () => {
+            queryClient.invalidateQueries(['products']);
+            toast.success('Product created successfully');
+        },
+        onError: (err) => {
+            toast.error(err.message || 'Failed to create category');
+        }
+    });
+
+    // Update Product mutation
+    const updateProduct = useMutation({
+        mutationFn: ({ id, data }) => api.put(`/categories/products/${id}`, data),
+        enabled: canEdit,
+        onSuccess: () => {
+            queryClient.invalidateQueries(['products']);
+            toast.success('Product updated successfully');
+        },
+        onError: (err) => {
+            console.log(err)
+            toast.error(err.message || 'Failed to update Product');
+        }
+    });
+
+    // Delete Product mutation
+    const deleteProduct = useMutation({
+        mutationFn: (id) => api.delete(`/categories/products/${id}`),
+        enabled: canDelete,
+        onSuccess: () => {
+            queryClient.invalidateQueries(['products']);
+            toast.success('Product deleted successfully');
+        },
+        onError: (err) => {
+            toast.error(err.message || 'Failed to delete Product');
+        }
+    });
+
+    return {
+        productsQuery, deleteProduct, updateProduct, createProduct, getProductQuery,
+        permissions: {
+            canView,
+            canAdd,
+            canEdit,
+            canDelete
+        }
+    };
+};

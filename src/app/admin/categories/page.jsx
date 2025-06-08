@@ -57,7 +57,7 @@ export default function Page() {
         resetUpdate();
         resetDelete();
         setSelectedCategory(category);
-        setImage(category?.imageURL)
+        setImage(category?.image)
         setIsDialogOpen(true);
     };
 
