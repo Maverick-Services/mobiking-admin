@@ -6,24 +6,22 @@ import { useProducts } from "@/hooks/useProducts"
 import { useSubCategories } from "@/hooks/useSubCategories"
 import Loader from "@/components/Loader"
 import { Button } from "@/components/ui/button"
-import {
-    Select,
-    SelectTrigger,
-    SelectValue,
-    SelectContent,
-    SelectItem,
-} from "@/components/ui/select"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { CirclePlus } from "lucide-react"
 import ProductsListView from "./components/ProductsTable"
+import ProductDialog from "./components/ProductDialog"
 
 export default function page() {
     const [categoryFilter, setCategoryFilter] = useState("all")
     const [searchTerm, setSearchTerm] = useState("")
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState();
 
     const {
         productsQuery,
-        deleteProduct: { mutateAsync: deleteAsync, isPending: isDeleting, error: deleteError },
+        createProduct: { mutateAsync: createProductAsync, isPending: creating, error: createError, reset: resetCreate },
+        updateProduct: { mutateAsync: updateProductAsync, isPending: updating, error: updateError, reset: resetUpdate },
         permissions: { canView, canAdd, canDelete, canEdit },
     } = useProducts()
 
@@ -46,6 +44,23 @@ export default function page() {
     const finalFiltered = afterCategoryFilter.filter((prod) =>
         prod.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
     )
+
+    // open dialog to add new 
+    const handleAddClick = () => {
+        resetCreate();
+        resetUpdate();
+        // resetDelete();
+        setSelectedProduct(undefined);
+        setIsDialogOpen(true);
+    };
+
+    const handleEditClick = (p) => {
+        resetCreate();
+        resetUpdate();
+        // resetDelete();
+        setSelectedProduct(p);
+        setIsDialogOpen(true);
+    };
 
     return (
         <InnerDashboardLayout>
@@ -83,7 +98,6 @@ export default function page() {
                             </SelectContent>
                         </Select>
 
-
                         {/* Search Bar */}
                         <Input
                             placeholder="Search products..."
@@ -95,11 +109,7 @@ export default function page() {
 
 
                     {/* Add New */}
-                    <Button
-                        onClick={() => {
-                            /* your navigation to “Add Product” */
-                        }}
-                    >
+                    <Button onClick={handleAddClick}>
                         <CirclePlus className="mr-2 h-4 w-4" />
                         Add New
                     </Button>
@@ -109,11 +119,23 @@ export default function page() {
                 <ProductsListView
                     error={productsQuery.error}
                     products={finalFiltered}
-                    onDelete={deleteAsync}
-                    isDeleting={isDeleting}
-                    deleteError={deleteError}
+                    // onDelete={deleteAsync}
+                    // isDeleting={isDeleting}
+                    // deleteError={deleteError}
                     canDelete={canDelete}
                     canEdit={canEdit}
+                    onEdit={handleEditClick}
+                />
+
+                <ProductDialog
+                    open={isDialogOpen}
+                    onOpenChange={setIsDialogOpen}
+                    selectedProduct={selectedProduct}
+                    categories={subCategories}
+                    isSubmitting={creating || updating}
+                    error={createError || updateError}
+                    onCreate={createProductAsync}
+                    onUpdate={updateProductAsync}
                 />
             </div>
         </InnerDashboardLayout>

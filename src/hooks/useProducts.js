@@ -28,7 +28,7 @@ export const useProducts = () => {
     const getProductQuery = (slug) => useQuery({
         queryKey: ['product', slug],
         queryFn: async () => {
-            const res = await api.get(`/categories/products/details/${slug}`);
+            const res = await api.get(`/products/details/${slug}`);
             const data = res.data;
 
             if (!data || data.message === 'Sub Service not found') {
@@ -46,20 +46,20 @@ export const useProducts = () => {
 
     // Create Product mutation
     const createProduct = useMutation({
-        mutationFn: (data) => api.post('/categories/createProduct', data),
+        mutationFn: (data) => api.post('/products/createProduct', data),
         enabled: canAdd,
         onSuccess: () => {
             queryClient.invalidateQueries(['products']);
             toast.success('Product created successfully');
         },
         onError: (err) => {
-            toast.error(err.message || 'Failed to create category');
+            toast.error(err.message || 'Failed to create Product');
         }
     });
 
     // Update Product mutation
     const updateProduct = useMutation({
-        mutationFn: ({ id, data }) => api.put(`/categories/products/${id}`, data),
+        mutationFn: ({ id, data }) => api.put(`/products/${id}`, data),
         enabled: canEdit,
         onSuccess: () => {
             queryClient.invalidateQueries(['products']);
@@ -72,20 +72,21 @@ export const useProducts = () => {
     });
 
     // Delete Product mutation
-    const deleteProduct = useMutation({
-        mutationFn: (id) => api.delete(`/categories/products/${id}`),
-        enabled: canDelete,
-        onSuccess: () => {
-            queryClient.invalidateQueries(['products']);
-            toast.success('Product deleted successfully');
-        },
-        onError: (err) => {
-            toast.error(err.message || 'Failed to delete Product');
-        }
-    });
+    // const deleteProduct = useMutation({
+    //     mutationFn: (id) => api.delete(`/products/${id}`),
+    //     enabled: canDelete,
+    //     onSuccess: () => {
+    //         queryClient.invalidateQueries(['products']);
+    //         toast.success('Product deleted successfully');
+    //     },
+    //     onError: (err) => {
+    //         toast.error(err.message || 'Failed to delete Product');
+    //     }
+    // });
 
     return {
-        productsQuery, deleteProduct, updateProduct, createProduct, getProductQuery,
+        productsQuery, createProduct, getProductQuery, updateProduct,
+        // productsQuery, deleteProduct, updateProduct, createProduct, getProductQuery,
         permissions: {
             canView,
             canAdd,
