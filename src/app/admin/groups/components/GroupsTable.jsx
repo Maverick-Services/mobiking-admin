@@ -16,9 +16,9 @@ import { Button } from '@/components/ui/button';
 import Loader from '@/components/Loader';
 import DeleteConfirmationDialog from './DeleteConfirmationDialog ';
 
-export default function ProductsListView({
+export default function GroupsTable({
     error,
-    products,
+    groups,
     onDelete,
     isDeleting,
     deleteError,
@@ -27,14 +27,12 @@ export default function ProductsListView({
     onEdit
 }) {
 
-    console.log(products.data)
+    console.log(groups.data)
+
+    const groupsData = groups?.data || []
+
     const router = useRouter();
     const [deletingId, setDeletingId] = useState(null);
-
-    const handleView = (product) => {
-        // setSelectedService(product);
-        router.push(`/admin/products/${product._id}/view`);
-    };
 
     const handleDeleteClick = (id) => {
         setDeletingId(id);
@@ -61,22 +59,19 @@ export default function ProductsListView({
                     <TableHeader>
                         <TableRow className="bg-gray-50">
                             <TableHead className="w-[50px]">#</TableHead>
-                            <TableHead className="">Image</TableHead>
+                            <TableHead className="">Banner</TableHead>
                             <TableHead className="">Name</TableHead>
-                            <TableHead className="">Full Name</TableHead>
-                            <TableHead className="">Category</TableHead>
-                            <TableHead className="">Price</TableHead>
-                            <TableHead className="">Qty</TableHead>
-                            <TableHead className="">In Stock</TableHead>
+                            <TableHead className="">Products</TableHead>
+                            <TableHead className="">Sequence</TableHead>
                             <TableHead className="text-center">Status</TableHead>
                             <TableHead className="text-center">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
 
                     <TableBody>
-                        {products?.map((product, index) => (
+                        {groupsData.map((group, index) => (
                             <TableRow
-                                key={product._id || index}
+                                key={group._id || index}
                                 className="even:bg-gray-50 hover:bg-gray-100 transition"
                             >
                                 {/* 1. Index */}
@@ -88,8 +83,8 @@ export default function ProductsListView({
                                 <TableCell className="">
                                     <div className="py-2">
                                         <img
-                                            src={product.images[0]}
-                                            alt={product.name}
+                                            src={group?.banner}
+                                            alt={group?.name || 'img'}
                                             width={60}
                                             height={60}
                                             className="object-contain rounded"
@@ -100,53 +95,32 @@ export default function ProductsListView({
                                 {/* 3. Name */}
                                 <TableCell className="">
                                     <div className=''>
-                                        {product.name}
+                                        {group?.name}
                                     </div>
                                 </TableCell>
 
-                                {/* 3. full Name */}
-                                <TableCell className="">
-                                    <div className='max-w-52 text-wrap'>
-                                        {product.fullName}
-                                    </div>
-                                </TableCell>
-
-                                {/* 3. category */}
+                                {/* 3. products */}
                                 <TableCell className="">
                                     <div className=''>
-                                        {product.category.name}
+                                        {group?.products.length}
                                     </div>
                                 </TableCell>
 
-                                {/* price */}
+                                {/* 3. sequence */}
                                 <TableCell className="">
                                     <div className=''>
-                                        ₹{product.sellingPrice[0].price}
+                                        {group?.sequenceNo}
                                     </div>
                                 </TableCell>
 
-                                {/* quantity */}
-                                <TableCell className="">
-                                    <div className=''>
-                                        {product.totalStock}
-                                    </div>
-                                </TableCell>
-
-                                {/* 4. Categories - FIXED ALIGNMENT */}
-                                <TableCell className="align-middle">
-                                    {product.totalStock <= 0 ?
-                                        <Badge className={'bg-emerald-600 text-white'}>Yes</Badge>
-                                        : <Badge variant="destructive">No</Badge>
-                                    }
-                                </TableCell>
 
                                 {/* 5. Status Switch - FIXED ALIGNMENT */}
                                 <TableCell className="align-middle">
                                     <div className="flex justify-center">
                                         <Switch
-                                            checked={product.active}
+                                            checked={group.active}
                                             onCheckedChange={(checked) => {
-                                                // TODO: call your API/mutation to toggle `product.status`
+                                                // TODO: call your API/mutation to toggle `group.status`
                                             }}
                                         />
                                     </div>
@@ -155,34 +129,24 @@ export default function ProductsListView({
                                 {/* 6. Actions Dropdown */}
                                 <TableCell className="">
                                     <div className="flex items-center justify-center gap-2">
-                                        {/* <ServiceDetailsDialog product={product} /> */}
-                                        {/* 
+
+                                        {/* {canEdit && */}
                                         <Button
                                             size="icon"
                                             variant="outline"
-                                            className="hover:bg-gray-100"
-                                            onClick={() => handleView(product)}
+                                            onClick={() => onEdit(group)}
                                         >
-                                            <Eye size={18} className="text-gray-600" />
-                                        </Button> */}
-
-                                        {canEdit &&
-                                            <Button
-                                                size="icon"
-                                                variant="outline"
-                                                onClick={() => onEdit(product)}
-                                            >
-                                                <Pencil size={16} />
-                                            </Button>
-                                        }
-                                        {canDelete &&
-                                            <Button
-                                                variant="destructive"
-                                                onClick={() => handleDeleteClick(product._id)}
-                                            >
-                                                <Trash size={16} />
-                                            </Button>
-                                        }
+                                            <Pencil size={16} />
+                                        </Button>
+                                        {/* } */}
+                                        {/* {canDelete && */}
+                                        <Button
+                                            variant="destructive"
+                                        // onClick={() => handleDeleteClick(group._id)}
+                                        >
+                                            <Trash size={16} />
+                                        </Button>
+                                        {/* } */}
                                     </div>
                                 </TableCell>
                             </TableRow>

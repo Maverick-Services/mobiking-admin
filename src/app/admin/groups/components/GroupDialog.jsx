@@ -2,30 +2,16 @@ import React from 'react'
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import PCard from '@/components/custom/PCard';
 import { Loader2, X } from 'lucide-react';
 import Image from 'next/image';
 import ImageSelector from '@/components/ImageSelector';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Command, CommandInput, CommandList, CommandEmpty, CommandItem, } from '@/components/ui/command';
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -35,11 +21,12 @@ const formSchema = z.object({
     products: z.array(z.string()).optional(),
 });
 
-function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, isSubmitting, error, categories }) {
-    console.log(selectedGroup)
+function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, isSubmitting, error, products }) {
+    // console.log(selectedGroup)
+    // console.log(products?.data)
     const form = useForm({
         resolver: zodResolver(formSchema),
-        mode: 'onBlur',
+        mode: 'onSubmit',
         defaultValues: selectedGroup || {
             name: "",
             sequenceNo: "",
@@ -50,44 +37,54 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
     });
     const { watch, setValue, control, reset } = form;
 
-    // useEffect(() => {
-    //     if (selectedGroup) {
-    //         reset({
-    //             name: selectedGroup.name,
-    //             fullName: selectedGroup.fullName,
-    //             price: selectedGroup?.sellingPrice[selectedGroup.sellingPrice?.length - 1].price,
-    //             slug: selectedGroup.slug,
-    //             active: selectedGroup.active,
-    //             description: selectedGroup.description,
-    //             categoryId: selectedGroup.category?._id || "",
-    //             images: selectedGroup.images || [],
-    //         });
-    //     } else {
-    //         // or back to your blank defaults
-    //         reset({
-    //             name: "",
-    //             fullName: "",
-    //             sellingPrice: 0,
-    //             slug: "",
-    //             active: true,
-    //             description: "",
-    //             categoryId: "",
-    //             images: [],
-    //         });
-    //     }
-    // }, [selectedGroup, reset]);
+    useEffect(() => {
+        if (selectedGroup) {
+            reset({
+                name: selectedGroup.name,
+                sequenceNo: selectedGroup.sequenceNo,
+                active: selectedGroup.active,
+                banner: selectedGroup.banner,
+                products: selectedGroup.products,
+            });
+        } else {
+            reset({
+                name: "",
+                sequenceNo: 0,
+                active: true,
+                banner: "",
+                products: [],
+            });
+        }
+    }, [selectedGroup, reset]);
 
     const watchName = form.watch("name");
-    useEffect(() => {
-        const slug = watchName
-            ?.toLowerCase()
-            .replace(/\s+/g, "-")
-            .replace(/[^a-z0-9-]/g, "");
-        form.setValue("slug", slug);
-    }, [watchName]);
+    // useEffect(() => {
+    //     const slug = watchName
+    //         ?.toLowerCase()
+    //         .replace(/\s+/g, "-")
+    //         .replace(/[^a-z0-9-]/g, "");
+    //     form.setValue("slug", slug);
+    // }, [watchName]);
 
     const banner = watch('banner')
     const [bannerDialog, setBannerDialog] = useState(false)
+
+    const allProducts = products?.data || []
+    const selectedProducts = watch('products') || [];
+
+
+    const toggleSelect = (field, id) => {
+        const curr = watch(field) || [];
+        if (curr.includes(id)) {
+            setValue(
+                field,
+                curr.filter((x) => x !== id),
+                { shouldValidate: true }
+            );
+        } else {
+            setValue(field, [...curr, id], { shouldValidate: true });
+        }
+    };
 
     async function onSubmit(values) {
         console.log(values)
@@ -100,7 +97,7 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[1000px] max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>
                         {selectedGroup ? "Edit Product" : "Add Product"}
@@ -158,6 +155,7 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                                                 onChange={field.onChange}
                                             />
                                         </FormControl>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
@@ -203,11 +201,77 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                                 )}
                             />
 
+                            <FormField
+                                control={form.control}
+                                name="products"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <div>
+                                            <FormLabel>Products</FormLabel>
+                                        </div>
+                                        <FormControl>
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <div className='border border-gray-100 rounded-sm grid grid-cols-3 gap-1 p-1'>
+                                                        {selectedProducts.length === 0 && (
+                                                            <span className="text-gray-400">Select products...</span>
+                                                        )}
+                                                        {selectedProducts.map((id, idx) => {
+                                                            const tag = allProducts.find((t) => t._id === id);
+                                                            return (
+                                                                <span
+                                                                    key={idx}
+                                                                    className="flex items-center bg-green-100 text-green-800 px-2 py-0.5 rounded-sm text-sm"
+                                                                >
+                                                                    {tag?.name}
+                                                                    <X
+                                                                        className="ml-1 cursor-pointer"
+                                                                        size={12}
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            toggleSelect('products', id);
+                                                                        }}
+                                                                    />
+                                                                </span>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-[300px] p-0">
+                                                    <Command>
+                                                        <CommandInput placeholder="Search Products..." />
+                                                        <CommandList>
+                                                            <CommandEmpty>No Products found.</CommandEmpty>
+                                                            {allProducts.map((cat) => (
+                                                                <CommandItem
+                                                                    key={cat._id}
+                                                                    onSelect={() => toggleSelect('products', cat._id)}
+                                                                >
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        checked={selectedProducts.includes(cat._id)}
+                                                                        readOnly
+                                                                        className="mr-2"
+                                                                    />
+                                                                    {cat.name}
+                                                                </CommandItem>
+                                                            ))}
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
                             <DialogFooter>
-                                {/* <Button type="submit" disabled={isSubmitting}>
+                                <Button type="submit" disabled={isSubmitting}>
                                     {isSubmitting && <Loader2 className="animate-spin mr-1" />}
                                     {selectedGroup ? "Update" : "Create"}
-                                </Button> */}
+                                </Button>
+                                {/* <Button>Submit</Button> */}
                             </DialogFooter>
                         </form>
                     </Form>
