@@ -82,11 +82,11 @@ function page() {
         <div>
             <InnerDashboardLayout>
                 <div className='w-full flex items-center justify-between text-primary mb-5'>
-                    <h1 className='font-bold sm:text-2xl lg:text-4xl w-full'>Employees</h1>
+                    <h1 className='font-bold sm:text-2xl lg:text-4xl w-full'>Customers</h1>
 
                     {canAdd &&
                         <Button onClick={handleAddClick}>
-                            <CirclePlus className="mr-2 h-4 w-4" /> Add New Employee
+                            <CirclePlus className="mr-2 h-4 w-4" /> Add New
                         </Button>
                     }
                 </div>

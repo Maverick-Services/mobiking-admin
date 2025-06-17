@@ -24,10 +24,12 @@ export default function ProductsListView({
     deleteError,
     canDelete,
     canEdit,
-    onEdit
+    onEdit,
+    setStockEditing,
+    setSelectedProduct
 }) {
 
-    console.log(products.data)
+    // console.log(products)
     const router = useRouter();
     const [deletingId, setDeletingId] = useState(null);
 
@@ -59,7 +61,7 @@ export default function ProductsListView({
             <div className="overflow-x-auto rounded-md border border-gray-200">
                 <Table className="w-full">
                     <TableHeader>
-                        <TableRow className="bg-gray-50">
+                        <TableRow className="bg-gray-50 ">
                             <TableHead className="w-[50px]">#</TableHead>
                             <TableHead className="">Image</TableHead>
                             <TableHead className="">Name</TableHead>
@@ -80,7 +82,7 @@ export default function ProductsListView({
                                 className="even:bg-gray-50 hover:bg-gray-100 transition"
                             >
                                 {/* 1. Index */}
-                                <TableCell className="">
+                                <TableCell className=" text-sm">
                                     {index + 1}
                                 </TableCell>
 
@@ -98,46 +100,61 @@ export default function ProductsListView({
                                 </TableCell>
 
                                 {/* 3. Name */}
-                                <TableCell className="">
-                                    <div className=''>
+                                <TableCell className=" text-sm">
+                                    <div className=' text-xs'>
                                         {product.name}
                                     </div>
                                 </TableCell>
 
                                 {/* 3. full Name */}
                                 <TableCell className="">
-                                    <div className='max-w-52 text-wrap'>
+                                    <div className='max-w-52 text-wrap text-xs'>
                                         {product.fullName}
                                     </div>
                                 </TableCell>
 
                                 {/* 3. category */}
                                 <TableCell className="">
-                                    <div className=''>
+                                    <div className=' text-xs'>
                                         {product.category.name}
                                     </div>
                                 </TableCell>
 
                                 {/* price */}
                                 <TableCell className="">
-                                    <div className=''>
-                                        ₹{product.sellingPrice[0].price}
+                                    <div className=' text-xs'>
+                                        ₹{product.sellingPrice[product.sellingPrice.length - 1].price}
                                     </div>
                                 </TableCell>
 
                                 {/* quantity */}
                                 <TableCell className="">
-                                    <div className=''>
+                                    <div className=' text-xs'>
                                         {product.totalStock}
                                     </div>
                                 </TableCell>
 
-                                {/* 4. Categories - FIXED ALIGNMENT */}
+                                {/* _____________________________________________________________________________________________________________________________________________________________ */}
+
+                                {/* 4. stock */}
                                 <TableCell className="align-middle">
-                                    {product.totalStock <= 0 ?
-                                        <Badge className={'bg-emerald-600 text-white'}>Yes</Badge>
-                                        : <Badge variant="destructive">No</Badge>
-                                    }
+                                    <div className='flex flex-col gap-2 items-center text-xs'>
+                                        {product.totalStock > 0 ?
+                                            <Badge className={'bg-emerald-600 text-white'} >Yes</Badge>
+                                            : <Badge variant="destructive">No</Badge>
+                                        }
+                                        <div
+                                            className='text-xs'
+                                            onClick={() => {
+                                                setStockEditing(true)
+                                                setSelectedProduct(product)
+                                            }}
+                                        >
+                                            <Badge variant={"outline"}>
+                                                <Pencil size={10} />
+                                            </Badge>
+                                        </div>
+                                    </div>
                                 </TableCell>
 
                                 {/* 5. Status Switch - FIXED ALIGNMENT */}

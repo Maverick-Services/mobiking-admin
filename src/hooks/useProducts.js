@@ -71,6 +71,18 @@ export const useProducts = () => {
         }
     });
 
+    const addProductStock = useMutation({
+        mutationFn: (data) => api.post('/products/addProductStock', data),
+        enabled: canAdd,
+        onSuccess: () => {
+            queryClient.invalidateQueries(['products']);
+            toast.success('Stock Added successfully');
+        },
+        onError: (err) => {
+            toast.error(err.message || 'Failed to add stock.');
+        }
+    });
+
     // Delete Product mutation
     // const deleteProduct = useMutation({
     //     mutationFn: (id) => api.delete(`/products/${id}`),
@@ -85,13 +97,13 @@ export const useProducts = () => {
     // });
 
     return {
-        productsQuery, createProduct, getProductQuery, updateProduct,
+        productsQuery, createProduct, getProductQuery, updateProduct, addProductStock,
         // productsQuery, deleteProduct, updateProduct, createProduct, getProductQuery,
         permissions: {
             canView,
             canAdd,
             canEdit,
-            canDelete
+            canDelete,
         }
     };
 };

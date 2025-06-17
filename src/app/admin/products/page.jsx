@@ -11,12 +11,17 @@ import { Input } from "@/components/ui/input"
 import { CirclePlus } from "lucide-react"
 import ProductsListView from "./components/ProductsTable"
 import ProductDialog from "./components/ProductDialog"
+import StockUpdate from "./components/StockUpdate"
 
 export default function page() {
     const [categoryFilter, setCategoryFilter] = useState("all")
     const [searchTerm, setSearchTerm] = useState("")
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState();
+    const [stockEditing, setStockEditing] = useState(false)
+    const [selectedStockProduct, setSelectedStockProduct] = useState()
+
+    console.log(selectedStockProduct)
 
     const {
         productsQuery,
@@ -125,6 +130,8 @@ export default function page() {
                     canDelete={canDelete}
                     canEdit={canEdit}
                     onEdit={handleEditClick}
+                    setStockEditing={setStockEditing}
+                    setSelectedProduct={setSelectedStockProduct}
                 />
 
                 <ProductDialog
@@ -136,6 +143,12 @@ export default function page() {
                     error={createError || updateError}
                     onCreate={createProductAsync}
                     onUpdate={updateProductAsync}
+                />
+
+                <StockUpdate
+                    open={stockEditing}
+                    onOpenChange={setStockEditing}
+                    product={selectedStockProduct}
                 />
             </div>
         </InnerDashboardLayout>

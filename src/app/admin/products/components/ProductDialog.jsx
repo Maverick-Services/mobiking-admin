@@ -39,7 +39,7 @@ const formSchema = z.object({
 });
 
 function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate, isSubmitting, error, categories }) {
-    console.log(selectedProduct)
+    // console.log(selectedProduct)
     const form = useForm({
         resolver: zodResolver(formSchema),
         mode: 'onBlur',
