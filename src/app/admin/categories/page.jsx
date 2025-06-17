@@ -68,7 +68,6 @@ export default function Page() {
                 <h1 className="text-primary font-bold sm:text-2xl lg:text-4xl mb-3">Categories</h1>
             </div>
 
-
             <div>
                 <div className="flex justify-between items-center mb-4 mt-4">
                     <Button variant="outline">

@@ -37,16 +37,10 @@ const permissionTypes = [
 
 export default function UserDialog({ open, onOpenChange, selectedUser, onCreate, onUpdate, isSubmitting, error, changePassword, canEdit, onlyAdmin }) {
     const { register, handleSubmit, reset, formState: { errors }, watch, setValue, } = useForm();
-    const watchRole = watch("role", "user");
+    const watchRole = watch("role", "employee");
     const watchPermissions = watch("permissions", {});
 
     const [showPassword, setShowPassword] = useState(false);
-
-    const [pwdDialogOpen, setPwdDialogOpen] = useState(false);
-
-    const openPwdDialog = id => {
-        setPwdDialogOpen(true);
-    };
 
     useEffect(() => {
         if (open) {
@@ -56,7 +50,7 @@ export default function UserDialog({ open, onOpenChange, selectedUser, onCreate,
                     email: selectedUser.email || "",
                     phoneNo: selectedUser.phoneNo || "",
                     password: selectedUser.password || "",
-                    role: selectedUser.role || "user",
+                    role: selectedUser.role || "employee",
                     permissions: selectedUser.permissions
                 });
             } else {
@@ -64,7 +58,7 @@ export default function UserDialog({ open, onOpenChange, selectedUser, onCreate,
                     name: "",
                     email: "",
                     password: "",
-                    role: "user",
+                    role: "employee",
                     permissions: {}
                 });
             }
@@ -80,7 +74,6 @@ export default function UserDialog({ open, onOpenChange, selectedUser, onCreate,
 
     const onSubmit = async (data) => {
         try {
-            // const permissions = data.permissions;
             const fd = { ...data, departments: ["Human Resource"], }
 
             const { password, ...rest } = fd;
@@ -229,10 +222,8 @@ export default function UserDialog({ open, onOpenChange, selectedUser, onCreate,
                                         "border-red-500": errors.role,
                                     })}
                                 >
-                                    <option value="user">User</option>
-                                    {onlyAdmin &&
-                                        <option value="employee">Employee</option>
-                                    }
+                                    {/* <option value="user">User</option> */}
+                                    <option value="employee">Employee</option>
                                 </select>
                                 {errors.role && (
                                     <p className="text-sm text-red-500 mt-1">
@@ -342,7 +333,7 @@ export default function UserDialog({ open, onOpenChange, selectedUser, onCreate,
 
                         }
 
-                        {selectedUser && onlyAdmin ?
+                        {selectedUser ?
                             <Button type="submit" disabled={isSubmitting}>
                                 {isSubmitting && <Loader2 className="animate-spin mr-1" />}
                                 Update
@@ -355,14 +346,6 @@ export default function UserDialog({ open, onOpenChange, selectedUser, onCreate,
 
                     </DialogFooter>
                 </form>
-
-                <PasswordDialog
-                    open={pwdDialogOpen}
-                    onOpenChange={setPwdDialogOpen}
-                    userId={selectedUser?._id}
-                    changePassword={changePassword}
-                />
-
             </DialogContent>
         </Dialog>
     );

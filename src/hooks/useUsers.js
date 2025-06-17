@@ -18,19 +18,19 @@ export const useUsers = () => {
     const onlyAdmin = onlyAdminPermission(user)
 
     // // Get all users
-    // const usersQuery = useQuery({
-    //     queryKey: ['users', role, page, pageSize],
-    //     queryFn: () => api.get(`/users?role=${role}&page=${page}&limit=${pageSize}`),
-    //     keepPreviousData: true,
-    //     enabled: canView,
-    //     staleTime: 1000 * 60 * 5, // 5 minutes cache
-    //     onError: (err) => {
-    //         toast.error(err.message || 'Failed to fetch users');
-    //     },
-    //     onSettled: () => {
-    //         queryClient.invalidateQueries(['users']);
-    //     }
-    // });
+    const usersQuery = (role) => useQuery({
+        queryKey: ['users', role],
+        queryFn: () => api.get(`/users/role/${role}`).then(res => res.data),
+        keepPreviousData: true,
+        enabled: canView,
+        staleTime: 1000 * 60 * 5, // 5 minutes cache
+        onError: (err) => {
+            toast.error(err.message || 'Failed to fetch users');
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries(['users']);
+        }
+    });
 
     // Create User mutation
     const createUser = useMutation({
@@ -46,30 +46,30 @@ export const useUsers = () => {
     });
 
     // // Update User mutation
-    // const updateUser = useMutation({
-    //     mutationFn: ({ id, data }) => api.patch(`/users/${id}`, data),
-    //     enabled: canEdit,
-    //     onSuccess: () => {
-    //         queryClient.invalidateQueries(['users']);
-    //         toast.success('User updated successfully');
-    //     },
-    //     onError: (err) => {
-    //         toast.error(err.message || 'Failed to update User');
-    //     }
-    // });
+    const updateUser = useMutation({
+        mutationFn: ({ id, data }) => api.put(`/users/employees/${id}`, data),
+        enabled: canEdit,
+        onSuccess: () => {
+            queryClient.invalidateQueries(['users']);
+            toast.success('User updated successfully');
+        },
+        onError: (err) => {
+            toast.error(err.message || 'Failed to update User');
+        }
+    });
 
     // // Delete User mutation
-    // const deleteUser = useMutation({
-    //     mutationFn: (id) => api.delete(`/users/${id}`),
-    //     enabled: canDelete,
-    //     onSuccess: () => {
-    //         queryClient.invalidateQueries(['users']);
-    //         toast.success('User deleted successfully');
-    //     },
-    //     onError: (err) => {
-    //         toast.error(err.message || 'Failed to delete User');
-    //     }
-    // });
+    const deleteUser = useMutation({
+        mutationFn: (id) => api.delete(`/users/employees/${id}`),
+        enabled: canDelete,
+        onSuccess: () => {
+            queryClient.invalidateQueries(['users']);
+            toast.success('User deleted successfully');
+        },
+        onError: (err) => {
+            toast.error(err.message || 'Failed to delete User');
+        }
+    });
 
     // // change password
     // const changePassword = useMutation({
@@ -85,10 +85,10 @@ export const useUsers = () => {
     // });
 
     return {
-        // usersQuery,
+        usersQuery,
         createUser,
-        // updateUser,
-        // deleteUser,
+        updateUser,
+        deleteUser,
         // changePassword,
         permissions: {
             canView,

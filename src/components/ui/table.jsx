@@ -9,7 +9,7 @@ function Table({
   ...props
 }) {
   return (
-    (<div data-slot="table-container" className="relative w-full overflow-x-auto">
+    (<div data-slot="table-container" className="relative w-full overflow-x-auto bg-white">
       <table
         data-slot="table"
         className={cn("w-full caption-bottom text-sm", className)}
@@ -25,7 +25,7 @@ function TableHeader({
   return (
     (<thead
       data-slot="table-header"
-      className={cn("[&_tr]:border-b", className)}
+      className={cn("[&_tr]:border-b bg-gray-50", className)}
       {...props} />)
   );
 }

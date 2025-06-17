@@ -89,6 +89,12 @@ export const ADMIN_SIDEBAR_LINKS = [
         icon: <FaBell />,
     },
     {
+        key: 'reports',
+        label: 'Reports',
+        href: '/admin/reports',
+        icon: <FaChartLine />,
+    },
+    {
         key: 'settings',
         label: 'Settings',
         href: '/admin/settings',
@@ -133,12 +139,7 @@ export const ADMIN_SIDEBAR_LINKS = [
 //     href: '/admin/transactions',
 //     icon: <FaExchangeAlt />,
 // },
-// {
-//     key: 'reports',
-//     label: 'Reports',
-//     href: '/admin/reports',
-//     icon: <FaChartLine />,
-// },
+
 
 // {
 //     key: 'coupons',

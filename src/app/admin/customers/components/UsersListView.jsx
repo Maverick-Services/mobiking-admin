@@ -65,12 +65,12 @@ export default function UsersListView({
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>S. No.</TableHead>
+                            <TableHead>#</TableHead>
                             <TableHead>Name</TableHead>
                             <TableHead>Phone No</TableHead>
                             <TableHead>Email</TableHead>
                             <TableHead>Joined Date</TableHead>
-                            <TableHead>Actions</TableHead>
+                            <TableHead className={'text-center'}>Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -83,7 +83,7 @@ export default function UsersListView({
                                 <TableCell>
                                     {format(new Date(user.createdAt), 'dd MMM yyyy, hh:mm a')}
                                 </TableCell>
-                                <TableCell className="flex justify-center gap-2">
+                                <TableCell className="flex justify-center items-center gap-2">
                                     {canEdit &&
                                         <Button
                                             size="icon"

@@ -25,7 +25,7 @@ export default function Sidebar({ isOpen, setIsSidebarOpen }) {
     const router = useRouter();
     const { user, clearAuth } = useAuthStore();
 
-    console.log(user)
+    // console.log(user)
 
     function onLinkClick() {
         setIsSidebarOpen(false);
