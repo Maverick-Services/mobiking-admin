@@ -71,6 +71,18 @@ export const useGroups = () => {
         }
     });
 
+    const updateProductsInGroup = useMutation({
+        mutationFn: (data) => api.post(`/groups/updateProducts`, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries(['groups']);
+            toast.success('Products added successfully');
+        },
+        onError: (err) => {
+            console.log(err)
+            toast.error(err.message || 'Failed to update Group');
+        }
+    })
+
     // Delete Group mutation
     // const deleteGroup = useMutation({
     //     mutationFn: (id) => api.delete(`/groups/${id}`),
@@ -85,7 +97,7 @@ export const useGroups = () => {
     // });
 
     return {
-        groupsQuery, createGroup, updateGroup,
+        groupsQuery, createGroup, updateGroup, updateProductsInGroup,
         // groupsQuery, deleteGroup, updateGroup, createGroup, getGroupQuery,
         permissions: {
             canView,

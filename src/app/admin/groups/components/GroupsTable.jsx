@@ -24,7 +24,9 @@ export default function GroupsTable({
     deleteError,
     canDelete,
     canEdit,
-    onEdit
+    onEdit,
+    setGroupForProducts,
+    setPrdouctsSheet
 }) {
 
     console.log(groups.data)
@@ -101,8 +103,18 @@ export default function GroupsTable({
 
                                 {/* 3. products */}
                                 <TableCell className="">
-                                    <div className=''>
-                                        {group?.products.length}
+                                    <div className='flex items-center justify-start gap-2'>
+                                        <Button variant={'outline'}>
+                                            {group?.products.length}
+                                        </Button>
+                                        <div
+                                            onClick={() => {
+                                                setPrdouctsSheet(true)
+                                                setGroupForProducts(group)
+                                            }}
+                                        >
+                                            <Pencil size={15} className='hover:text-black text-gray-500 cursor-pointer' />
+                                        </div>
                                     </div>
                                 </TableCell>
 

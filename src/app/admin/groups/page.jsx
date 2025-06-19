@@ -7,11 +7,15 @@ import GroupDialog from './components/GroupDialog';
 import { useProducts } from '@/hooks/useProducts';
 import { useGroups } from '@/hooks/useGroups';
 import GroupsTable from './components/GroupsTable';
+import GroupProductsSheet from './components/GroupProductsSheet';
 
 function page() {
     const { productsQuery } = useProducts()
-    const { groupsQuery, createGroup, updateGroup } = useGroups()
+    const { groupsQuery, createGroup, updateGroup, updateProductsInGroup } = useGroups()
     const [selectedGroup, setSelectedGroup] = useState(null)
+
+    const [prdouctsSheet, setPrdouctsSheet] = useState(false)
+    const [groupForProducts, setGroupForProducts] = useState()
 
     const groupsData = groupsQuery?.data || []
 
@@ -29,7 +33,13 @@ function page() {
         reset: resetUpdate,
     } = updateGroup;
 
-    console.log(groupsQuery.data)
+    const {
+        mutateAsync: updateProductsInGroupAsync,
+        isPending: updatingProducts,
+        error: updateProductsError,
+    } = updateProductsInGroup;
+
+    // console.log(groupsQuery.data)
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     // open dialog to add new 
@@ -66,6 +76,8 @@ function page() {
             <GroupsTable
                 groups={groupsData}
                 onEdit={handleEditClick}
+                setGroupForProducts={setGroupForProducts}
+                setPrdouctsSheet={setPrdouctsSheet}
             />
 
             <GroupDialog
@@ -82,6 +94,15 @@ function page() {
                 error={createError || updateError}
                 // onCreate={createProductAsync}
                 onUpdate={updateGroupAsync}
+            />
+
+            <GroupProductsSheet
+                open={prdouctsSheet}
+                onOpenChange={setPrdouctsSheet}
+                group={groupForProducts}
+                onProductsAdd={updateProductsInGroupAsync}
+                updatingProducts={updatingProducts}
+                updateProductsError={updateProductsError}
             />
         </InnerDashboardLayout >
     )

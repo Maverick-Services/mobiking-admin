@@ -31,6 +31,7 @@ const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
     fullName: z.string().min(1, "Full name is required"),
     price: z.number().min(0, "Price must be a positive number"),
+    gst: z.number().min(0, "GST must be a positive number"),
     slug: z.string().min(1, "Slug is required"),
     active: z.boolean(),
     description: z.string().min(1, "Description is required"),
@@ -39,14 +40,16 @@ const formSchema = z.object({
 });
 
 function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate, isSubmitting, error, categories }) {
+    console.log(selectedProduct)
     // console.log(selectedProduct)
     const form = useForm({
         resolver: zodResolver(formSchema),
-        mode: 'onBlur',
+        mode: 'onSubmit',
         defaultValues: selectedProduct || {
             name: "",
             fullName: "",
             price: 0,
+            gst: 0,
             slug: "",
             active: true,
             description: "",
@@ -62,6 +65,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                 name: selectedProduct.name,
                 fullName: selectedProduct.fullName,
                 price: selectedProduct?.sellingPrice[selectedProduct.sellingPrice?.length - 1].price,
+                gst: selectedProduct.gst,
                 slug: selectedProduct.slug,
                 active: selectedProduct.active,
                 description: selectedProduct.description,
@@ -73,7 +77,8 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
             reset({
                 name: "",
                 fullName: "",
-                sellingPrice: 0,
+                price: 0,
+                gst: 0,
                 slug: "",
                 active: true,
                 description: "",
@@ -132,19 +137,21 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                 )}
                             />
                             {/* Slug */}
-                            <FormField
-                                control={form.control}
-                                name="slug"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Slug<span className="text-red-500"> *</span></FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="jbl-smartwatch" {...field} disabled />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                            <div className='hidden'>
+                                <FormField
+                                    control={form.control}
+                                    name="slug"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Slug<span className="text-red-500"> *</span></FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="jbl-smartwatch" {...field} disabled />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
 
                             {/* full name */}
                             <FormField
@@ -186,25 +193,25 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                 control={form.control}
                                 name="categoryId"
                                 render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className={''}>
                                         <FormLabel>Category<span className="text-red-500"> *</span></FormLabel>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                        >
-                                            <FormControl>
+                                        <FormControl>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={field.value}
+                                            >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select a category" />
                                                 </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {categories?.map((category) => (
-                                                    <SelectItem key={category._id} value={category._id}>
-                                                        {category.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                                <SelectContent className={'w-full'}>
+                                                    {categories?.map((category) => (
+                                                        <SelectItem key={category._id} value={category._id}>
+                                                            {category.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -229,6 +236,27 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                     </FormItem>
                                 )}
                             />
+
+                            {/* GST */}
+                            <FormField
+                                control={form.control}
+                                name="gst"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>GST (%)<span className="text-red-500"> *</span></FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                placeholder="18"
+                                                {...field}
+                                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
 
                             {/* Active */}
                             <FormField

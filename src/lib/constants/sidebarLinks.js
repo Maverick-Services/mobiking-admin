@@ -25,6 +25,7 @@ import {
     FaLifeRing,
     FaCaretSquareDown,
     FaSitemap,
+    FaCamera,
 } from 'react-icons/fa';
 
 export const ADMIN_SIDEBAR_LINKS = [
@@ -63,6 +64,12 @@ export const ADMIN_SIDEBAR_LINKS = [
         label: 'Product Groups',
         href: '/admin/groups',
         icon: <FaCaretSquareDown />,
+    },
+    {
+        key: 'design-studio',
+        label: 'Design Studio',
+        href: '/admin/design-studio',
+        icon: <FaCamera />,
     },
     {
         key: 'media',
