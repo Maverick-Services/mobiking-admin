@@ -41,6 +41,7 @@ const STATUS_VARIANTS = {
 export function OrderViewDialog({ order, children }) {
     const safe = (value) => (value !== null && value !== undefined && value !== '' ? value : '-')
     const [acceptDialog, setAcceptDialog] = useState(false)
+    const [rejectDialog, setRejectDialog] = useState(false)
 
     console.log(order)
 
@@ -145,12 +146,17 @@ export function OrderViewDialog({ order, children }) {
                                 {order.requests.map((r, i) => (
                                     <li key={i} className="border rounded p-2">
                                         <p><strong>Type:</strong> {safe(r.type)}</p>
-                                        <p><strong>Raised:</strong> {r.isRaised ? 'Yes' : 'No'}{r.raisedAt ? ` at ${r.raisedAt}` : ''}</p>
+                                        <p><strong>Raised: </strong>
+                                            {r.isRaised ? `Yes at ${format(new Date(r.raisedAt), 'dd MMM yyyy hh:mm a')}` : 'No'}
+                                        </p>
                                         <p><strong>Status:</strong> {safe(r.status)}</p>
                                         <p><strong>Reason:</strong> {safe(r.reason)}</p>
-                                        <p><strong>Resolved:</strong> {r.resolvedAt || '-'}</p>
+                                        <p><strong>Resolved: </strong>
+                                            {r.resolvedAt ? format(new Date(r.resolvedAt), 'dd MMM yyyy hh:mm a') : '-'}
+                                        </p>
                                     </li>
                                 ))}
+
                             </ul>
                         </section>
                     )}
@@ -172,7 +178,7 @@ export function OrderViewDialog({ order, children }) {
                             && <div className=" flex flex-col gap-1">
                                 <p className='text-sm text-gray-500'>Cancel Request</p>
                                 <div className=" flex gap-1">
-                                    <Button variant="outline" onClick={() => { setAcceptDialog(true) }}>Accept</Button>
+                                    <Button variant="outline" onClick={() => { setRejectDialog(true) }}>Accept</Button>
                                     <Button variant="outline">Reject</Button>
                                 </div>
                             </div>
@@ -189,8 +195,8 @@ export function OrderViewDialog({ order, children }) {
             />
 
             <CancelDialog
-                open={acceptDialog}
-                onOpenChange={setAcceptDialog}
+                open={rejectDialog}
+                onOpenChange={setRejectDialog}
                 order={order}
             />
         </>

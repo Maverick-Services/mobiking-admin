@@ -11,20 +11,15 @@ import { Input } from '@/components/ui/input' // assuming you're using shadcn/ui
 
 export default function CancelDialog({ open, onOpenChange, order }) {
     const { cancelOrder } = useOrders()
-    const [reason, setReason] = useState("")
 
     const handleCancel = async () => {
-        if (!order?._id || !reason.trim()) {
+        if (!order?._id) {
             toast.error("Please provide a reason for cancellation.")
             return
         }
         try {
-            await cancelOrder.mutateAsync({
-                orderId: order._id,
-                reason,
-            })
+            await cancelOrder.mutateAsync({ orderId: order._id, })
             onOpenChange(false)
-            setReason("")
         } catch (error) {
             toast.error("Failed to cancel order.")
         }
@@ -44,16 +39,6 @@ export default function CancelDialog({ open, onOpenChange, order }) {
                     <p><strong>Order ID:</strong> {order?.orderId || '-'}</p>
                     <p><strong>Customer:</strong> {order?.name || '-'} ({order?.phoneNo || '-'})</p>
                     <p><strong>Total:</strong> ₹{order?.orderAmount?.toFixed(2) ?? '-'}</p>
-                </div>
-
-                <div className="mt-4">
-                    <label className="text-sm font-medium text-gray-700">Reason for cancellation</label>
-                    <Input
-                        placeholder="e.g., Ordered wrong item"
-                        value={reason}
-                        onChange={(e) => setReason(e.target.value)}
-                        className="mt-1"
-                    />
                 </div>
 
                 <DialogFooter className="flex justify-end space-x-2 mt-4">
