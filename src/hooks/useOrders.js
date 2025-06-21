@@ -38,9 +38,23 @@ export const useOrders = () => {
         }
     })
 
+    // cancel the order
+    const cancelOrder = useMutation({
+        mutationFn: (data) => api.post('/orders/cancel', data),
+        onSuccess: () => {
+            toast.success('Order cancelled!')
+            // refetch the list
+            queryClient.invalidateQueries({ queryKey: ['orders'] })
+        },
+        onError: err => {
+            toast.error(err.message || 'Failed to cancel order')
+        }
+    })
+
     return {
         ordersQuery,
         acceptOrder,
+        cancelOrder,
         permissions: {
             canView,
             canAdd,

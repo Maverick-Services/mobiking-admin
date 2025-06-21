@@ -23,6 +23,7 @@ import {
 import { format } from 'date-fns'
 import { useOrders } from '@/hooks/useOrders'
 import AcceptDialog from './AcceptDialog'
+import CancelDialog from './CancelDialog'
 
 // Map each order status to a Badge variant
 const STATUS_VARIANTS = {
@@ -43,6 +44,11 @@ export function OrderViewDialog({ order, children }) {
 
     console.log(order)
 
+    const lastRequestOf = (order) =>
+        Array.isArray(order.requests) && order.requests.length > 0
+            ? order.requests[order.requests.length - 1]
+            : null
+
     return (
         <>
             <Dialog>
@@ -50,7 +56,7 @@ export function OrderViewDialog({ order, children }) {
                     {children}
                 </DialogTrigger>
 
-                <DialogContent className="max-w-3xl overflow-auto">
+                <DialogContent className="max-w-3xl overflow-auto max-h-[90vh]">
                     <DialogHeader>
                         <div className="flex justify-between items-center">
                             <DialogTitle>Order #{safe(order.orderId)}</DialogTitle>
@@ -149,21 +155,40 @@ export function OrderViewDialog({ order, children }) {
                         </section>
                     )}
 
+                    {/* Action buttons */}
                     <DialogFooter className="mt-6 flex gap-1">
-                        <div>
-                            <Button variant="outline">Close</Button>
-                        </div>
+
+                        {/* accept order */}
                         {order.status === 'New' &&
                             <div className=" flex gap-1">
                                 <Button variant="outline" onClick={() => { setAcceptDialog(true) }}>Accept</Button>
                                 <Button variant="outline">Reject</Button>
                             </div>
                         }
+
+                        {/* cancel order */}
+                        {order.requests && order.requests.length > 0
+                            && lastRequestOf(order).type === 'Cancel' && lastRequestOf(order).isRaised && lastRequestOf(order).status === 'Pending'
+                            && <div className=" flex flex-col gap-1">
+                                <p className='text-sm text-gray-500'>Cancel Request</p>
+                                <div className=" flex gap-1">
+                                    <Button variant="outline" onClick={() => { setAcceptDialog(true) }}>Accept</Button>
+                                    <Button variant="outline">Reject</Button>
+                                </div>
+                            </div>
+                        }
+
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
 
             <AcceptDialog
+                open={acceptDialog}
+                onOpenChange={setAcceptDialog}
+                order={order}
+            />
+
+            <CancelDialog
                 open={acceptDialog}
                 onOpenChange={setAcceptDialog}
                 order={order}

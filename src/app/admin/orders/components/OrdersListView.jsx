@@ -107,6 +107,8 @@ export default function OrdersListView({ error, orders = [] }) {
                                         {format(new Date(o.createdAt), 'hh:mm a')}
                                     </div>
                                 </TableCell>
+
+                                {/* action buttons */}
                                 <TableCell className="text-center space-x-2">
                                     <OrderViewDialog order={o}>
                                         <Button size="icon" variant="outline">

@@ -6,6 +6,7 @@ import { DateRangePicker } from '@/components/custom/date-range-picker'
 import { Button } from '@/components/ui/button'
 import { Plus, RefreshCcw } from 'lucide-react'
 import OrdersListView from './components/OrdersListView'
+import POS from '@/components/POS'
 
 const TABS = [
     { key: 'all', label: 'ALL ORDERS' },
@@ -47,7 +48,6 @@ export default function Page() {
     const [statusFilter, setStatusFilter] = useState(null)
 
     const [activeTab, setActiveTab] = useState('all')
-
     // helper to get last request in the requests-array
     const lastRequestOf = (order) =>
         Array.isArray(order.requests) && order.requests.length > 0
@@ -73,7 +73,7 @@ export default function Page() {
                 case 'pos': return o.type === 'Pos'
                 case 'abandoned': return o.abondonedOrder
                 case 'returns': return lastReq?.type === 'Return' && lastReq.isRaised
-                case 'cancelled': return lastReq?.type === 'Cancel' && lastReq.isRaised
+                case 'cancelled': return lastReq?.type === 'Cancel' && lastReq.isRaised && lastReq.status === 'Pending'
                 case 'warranty': return lastReq?.type === 'Warranty' && lastReq.isRaised
                 default: return true   // 'all'
             }
@@ -90,7 +90,7 @@ export default function Page() {
                     case 'pos': return o.type === 'Pos'
                     case 'abandoned': return o.abondonedOrder
                     case 'returns': return lastReq?.type === 'Return' && lastReq.isRaised
-                    case 'cancelled': return lastReq?.type === 'Cancel' && lastReq.isRaised
+                    case 'cancelled': return lastReq?.type === 'Cancel' && lastReq.isRaised && lastReq.status === 'Pending'
                     case 'warranty': return lastReq?.type === 'Warranty' && lastReq.isRaised
                     default: return true
                 }
@@ -116,7 +116,9 @@ export default function Page() {
                 <div className="space-x-1 flex">
                     <DateRangePicker />
                     <Button><Plus /></Button>
-                    <Button>POS</Button>
+                    <POS>
+                        <Button>POS</Button>
+                    </POS>
                     <Button><RefreshCcw /></Button>
                 </div>
             </div>
