@@ -84,12 +84,26 @@ export const useUsers = () => {
     //     }
     // });
 
+    // Create User mutation
+    const createCustomer = useMutation({
+        mutationFn: (data) => api.post('/users/createCustomer', data),
+        enabled: canAdd,
+        onSuccess: () => {
+            queryClient.invalidateQueries(['users']);
+            toast.success('Customer created successfully');
+        },
+        onError: (err) => {
+            toast.error(err.message || 'Failed to create customer');
+        }
+    });
+
     return {
         usersQuery,
         createUser,
         updateUser,
         deleteUser,
         // changePassword,
+        createCustomer,
         permissions: {
             canView,
             canAdd,

@@ -27,6 +27,7 @@ import {
     FaSitemap,
     FaCamera,
 } from 'react-icons/fa';
+import { FiMessageSquare } from 'react-icons/fi';
 
 export const ADMIN_SIDEBAR_LINKS = [
     {
@@ -40,6 +41,12 @@ export const ADMIN_SIDEBAR_LINKS = [
         label: 'Orders',
         href: '/admin/orders',
         icon: <FaShoppingCart />,
+    },
+    {
+        key: 'queries',
+        label: 'Queries',
+        href: '/admin/queries',
+        icon: <FiMessageSquare />,
     },
     {
         key: 'categories',

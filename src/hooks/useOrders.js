@@ -43,7 +43,6 @@ export const useOrders = () => {
         mutationFn: (data) => api.post('/orders/cancel', data),
         onSuccess: () => {
             toast.success('Order cancelled!')
-            // refetch the list
             queryClient.invalidateQueries({ queryKey: ['orders'] })
         },
         onError: err => {
@@ -51,10 +50,22 @@ export const useOrders = () => {
         }
     })
 
+    const createPosOrder = useMutation({
+        mutationFn: (data) => api.post('/orders/cod/new', data),
+        onSuccess: () => {
+            toast.success('Order Created!')
+            queryClient.invalidateQueries({ queryKey: ['orders'] })
+        },
+        onError: err => {
+            toast.error(err.message || 'Failed to create order')
+        }
+    })
+
     return {
         ordersQuery,
         acceptOrder,
         cancelOrder,
+        createPosOrder,
         permissions: {
             canView,
             canAdd,

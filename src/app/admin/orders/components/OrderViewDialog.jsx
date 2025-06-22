@@ -43,7 +43,7 @@ export function OrderViewDialog({ order, children }) {
     const [acceptDialog, setAcceptDialog] = useState(false)
     const [rejectDialog, setRejectDialog] = useState(false)
 
-    console.log(order)
+    // console.log(order)
 
     const lastRequestOf = (order) =>
         Array.isArray(order.requests) && order.requests.length > 0

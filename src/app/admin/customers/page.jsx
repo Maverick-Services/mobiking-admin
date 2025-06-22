@@ -16,7 +16,6 @@ function page() {
     // fetch users query
     const {
         usersQuery,
-        createUser,
         updateUser,
         deleteUser,
         // changePassword,
@@ -32,14 +31,6 @@ function page() {
     const users = usersQuery(roleFilter)
     console.log(users.data)
     // console.log(usersQuery?.data)
-    // destructure createUser mutation
-
-    const {
-        mutateAsync: createUserAsync,
-        isPending: isCreating,
-        error: createError,
-        reset: resetCreate,
-    } = createUser;
 
     // destructure updateUser mutation
     const {
@@ -62,7 +53,6 @@ function page() {
 
     // open dialog to add new tag
     const handleAddClick = () => {
-        resetCreate();
         resetUpdate();
         resetDelete();
         setSelectedUser(undefined);
@@ -114,12 +104,11 @@ function page() {
                     open={isDialogOpen}
                     onOpenChange={setIsDialogOpen}
                     selectedUser={selectedUser}
-                    onCreate={createUserAsync}
                     onUpdate={updateUserAsync}
                     // isSubmitting={isCreating}
-                    isSubmitting={isCreating || isUpdating}
+                    isSubmitting={isUpdating}
                     // error={createError?.message}
-                    error={createError?.message || updateError?.message}
+                    error={updateError?.message}
                     // changePassword={changePassword}
                     // onlyAdmin={onlyAdmin}
                     canEdit={canEdit}
