@@ -129,7 +129,7 @@ export default function POS({ children }) {
         defaultValues: {
             userId: "",
             name: "",
-            phone: "",
+            phoneNo: "",
             gst: "",
             method: "COD",
             orderAmount: 0,
@@ -145,9 +145,10 @@ export default function POS({ children }) {
     useEffect(() => {
         const sum = items.reduce((a, i) => a + (i.price || 0), 0)
         if (form.getValues("orderAmount") !== sum) form.setValue("orderAmount", sum)
+        if (form.getValues("subtotal") !== sum) form.setValue("subtotal", sum)
     }, [items, form])
 
-    // phone lookup
+    // phoneNo lookup
     const [phoneQuery, setPhoneQuery] = useState("")
     const [suggestions, setSuggestions] = useState([])
     useEffect(() => {
@@ -161,20 +162,26 @@ export default function POS({ children }) {
     const onPhoneSelect = (u) => {
         form.setValue("userId", u._id)
         form.setValue("name", u.name)
-        form.setValue("phone", u.phoneNo)
+        form.setValue("phoneNo", u.phoneNo)
         setSuggestions([])
     }
 
     const onSubmit = form.handleSubmit(async (data) => {
-        console.log("POS Order Data:", data)
+
+        const finalData = {
+            subtotal: data.orderAmount,
+            gst: 'GSIN1233',
+            ...data,
+        }
+
+        console.log("POS Order Data:", finalData)
 
 
+        try {
+            await createPosOrder.mutateAsync(finalData)
+        } catch (error) {
 
-        // try {
-        //     await createPosOrder.mutateAsync(data)
-        // } catch (error) {
-
-        // }
+        }
         // API call
     })
 
@@ -186,7 +193,7 @@ export default function POS({ children }) {
                 <Form {...form}>
                     <form onSubmit={onSubmit} className="space-y-6">
 
-                        <FormField control={form.control} name="phone" render={({ field }) => (
+                        <FormField control={form.control} name="phoneNo" render={({ field }) => (
                             <FormItem className="relative">
                                 <FormLabel>Phone Number</FormLabel>
                                 <FormControl>
@@ -228,7 +235,13 @@ export default function POS({ children }) {
                         </div>
 
                         <DialogFooter className="pt-6">
-                            <LoaderButton loading={createPosOrder.isPending} type="submit">Create Order</LoaderButton>
+                            <LoaderButton
+                                loading={createPosOrder.isPending}
+                                disabled={createPosOrder.isPending}
+                                type="submit"
+                            >
+                                Create Order
+                            </LoaderButton>
                         </DialogFooter>
                     </form>
                 </Form>

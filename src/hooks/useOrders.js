@@ -51,13 +51,14 @@ export const useOrders = () => {
     })
 
     const createPosOrder = useMutation({
-        mutationFn: (data) => api.post('/orders/cod/new', data),
+        mutationFn: (data) => api.post('/orders/pos/new', data),
         onSuccess: () => {
             toast.success('Order Created!')
             queryClient.invalidateQueries({ queryKey: ['orders'] })
         },
-        onError: err => {
+        onError: (err) => {
             toast.error(err.message || 'Failed to create order')
+            console.log(err)
         }
     })
 
