@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import InnerDashboardLayout from '@/components/dashboard/InnerDashboardLayout'
 import { useOrders } from '@/hooks/useOrders'
 import { DateRangePicker } from '@/components/custom/date-range-picker'
@@ -43,8 +43,30 @@ const STATUS_BORDER = {
 }
 
 export default function Page() {
-    const { ordersQuery } = useOrders()
-    const allOrders = ordersQuery.data?.data || []
+    // 1. Default to last 7 days
+    const today = new Date()
+    const defaultFrom = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6)
+    const defaultTo = today
+
+    // 2. Track the picker range
+    const [range, setRange] = useState({ from: defaultFrom, to: defaultTo })
+    // 3. Store custom results
+    const [customOrders, setCustomOrders] = useState(null)
+
+    // 4. Hook with both all-orders and getOrdersByDate
+    const { ordersQuery, getOrdersByDate } = useOrders();
+
+    // Format Date to YYYY-MM-DD
+    const fmt = date => date.toISOString().split('T')[0]
+    const startDate = fmt(range.from)
+    const endDate = fmt(range.to)
+
+    // ✅ Now it's safe to call the hook
+    const { data: customOrdersData, isFetching, error } = getOrdersByDate({ startDate, endDate })
+
+    // This will be used for display
+    const displayOrders = customOrdersData ?? ordersQuery.data?.data ?? [];
+
     const [statusFilter, setStatusFilter] = useState(null)
 
     const [activeTab, setActiveTab] = useState('all')
@@ -59,7 +81,7 @@ export default function Page() {
         TABS.forEach(({ key }) => counts[key] = 0)
 
         // 1) First, filter by activeTab & statusFilter
-        const filteredOrders = allOrders.filter((o) => {
+        const filteredOrders = displayOrders.filter((o) => {
             // if a status card has been clicked, short‑circuit
             if (statusFilter) {
                 return o.status === statusFilter
@@ -81,7 +103,7 @@ export default function Page() {
 
         // 2) Compute tab counts (ignoring statusFilter here)
         TABS.forEach(({ key }) => {
-            counts[key] = allOrders.filter((o) => {
+            counts[key] = displayOrders.filter((o) => {
                 const lastReq = lastRequestOf(o)
                 switch (key) {
                     case 'website': return !o.isAppOrder && o.type === 'Regular'
@@ -100,11 +122,11 @@ export default function Page() {
         // 3) Compute your status‑card counts
         const statusCounts = {}
         STATUS_CARDS.forEach((status) => {
-            statusCounts[status] = allOrders.filter(o => o.status === status).length
+            statusCounts[status] = displayOrders.filter(o => o.status === status).length
         })
 
         return { filteredOrders, counts, statusCounts }
-    }, [allOrders, activeTab, statusFilter])
+    }, [displayOrders, activeTab, statusFilter])
 
 
     return (
@@ -114,12 +136,14 @@ export default function Page() {
                     Orders
                 </h1>
                 <div className="space-x-1 flex">
-                    <DateRangePicker />
-                    <Button><Plus /></Button>
+                    <DateRangePicker
+                        initialDateFrom={range.from}
+                        initialDateTo={range.to}
+                        onUpdate={({ range: newRange }) => setRange(newRange)}
+                    />
                     <POS>
                         <Button>POS</Button>
                     </POS>
-                    <Button><RefreshCcw /></Button>
                 </div>
             </div>
 

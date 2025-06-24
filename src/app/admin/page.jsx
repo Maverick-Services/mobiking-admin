@@ -1,23 +1,51 @@
+"use client"
+import RefreshButton from "@/components/custom/RefreshButton";
 import InnerDashboardLayout from "@/components/dashboard/InnerDashboardLayout";
-import { ChartLineDefault } from "@/components/home/Chart1";
-import { ChartAreaInteractive } from "@/components/home/Chart2";
+import POS from "@/components/POS";
+import { Button } from "@/components/ui/button";
+import { useTotalOrders } from "@/hooks/useDashboard";
+import TotalOrders from "./(dashboard)/TotalOrders";
+import TotalCustomers from "./(dashboard)/TotalCustomers";
+import TotalSales from "./(dashboard)/TotalSales";
 
 export default function Home() {
+  const { refetch, isFetching } = useTotalOrders();
+
   return (
     <InnerDashboardLayout>
-      <div className="w-full flex flex-col gap-4 mb-4">
+      <div className="w-full flex justify-between items-center gap-4 mb-4">
         <h1 className="text-primary font-bold sm:text-lg lg:text-3xl">
-          Hello, Mobiking!
+          Mobiking Admin
         </h1>
+        <div className="flex gap-2 items-center justify-center">
+          <POS>
+            <Button>POS</Button>
+          </POS>
+          <RefreshButton
+            onRefresh={refetch}
+            isRefreshing={isFetching}
+            label="Refresh"
+          />
+        </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <TotalOrders />
+        <TotalCustomers />
+        <TotalSales />
+      </div>
+    </InnerDashboardLayout>
+  );
+}
+
+
+
+
+{/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <ChartLineDefault />
         <ChartLineDefault />
         <ChartLineDefault />
       </div>
       <div className="mt-3">
         <ChartAreaInteractive />
-      </div>
-    </InnerDashboardLayout>
-  );
-}
+      </div> */}
