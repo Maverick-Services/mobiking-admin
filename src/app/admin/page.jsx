@@ -7,6 +7,8 @@ import { useTotalOrders } from "@/hooks/useDashboard";
 import TotalOrders from "./(dashboard)/TotalOrders";
 import TotalCustomers from "./(dashboard)/TotalCustomers";
 import TotalSales from "./(dashboard)/TotalSales";
+import { ChartLineDefault } from "@/components/home/Chart1";
+import { ChartAreaInteractive } from "@/components/home/Chart2";
 
 export default function Home() {
   const { refetch, isFetching } = useTotalOrders();
@@ -34,10 +36,13 @@ export default function Home() {
         <TotalCustomers />
         <TotalSales />
       </div>
+
+      <div className="mt-3">
+        <ChartAreaInteractive />
+      </div>
     </InnerDashboardLayout>
   );
 }
-
 
 
 
@@ -45,7 +50,4 @@ export default function Home() {
         <ChartLineDefault />
         <ChartLineDefault />
         <ChartLineDefault />
-      </div>
-      <div className="mt-3">
-        <ChartAreaInteractive />
       </div> */}
