@@ -65,6 +65,8 @@ export default function Page() {
     // This will be used for display
     const displayOrders = customOrdersData ?? [];
 
+    console.log(displayOrders)
+
     const [statusFilter, setStatusFilter] = useState(null)
 
     const [activeTab, setActiveTab] = useState('all')
@@ -90,7 +92,7 @@ export default function Page() {
                 case 'website': return !o.isAppOrder && o.type === 'Regular' && !o.abondonedOrder
                 case 'app': return o.isAppOrder && o.type === 'Regular' && !o.abondonedOrder
                 case 'regular': return o.type === 'Regular' && !o.abondonedOrder
-                case 'pos': return o.type === 'Pos' && !o.abondonedOrder
+                case 'pos': return o.type === 'Pos'
                 case 'abandoned': return o.abondonedOrder
                 case 'returns': return lastReq?.type === 'Return' && lastReq.isRaised
                 case 'cancelled': return lastReq?.type === 'Cancel' && lastReq.isRaised && lastReq.status === 'Pending'
@@ -107,7 +109,7 @@ export default function Page() {
                     case 'website': return !o.isAppOrder && o.type === 'Regular' && !o.abondonedOrder
                     case 'app': return o.isAppOrder && o.type === 'Regular' && !o.abondonedOrder
                     case 'regular': return o.type === 'Regular' && !o.abondonedOrder
-                    case 'pos': return o.type === 'Pos' && !o.abondonedOrder
+                    case 'pos': return o.type === 'Pos'
                     case 'abandoned': return o.abondonedOrder
                     case 'returns': return lastReq?.type === 'Return' && lastReq.isRaised
                     case 'cancelled': return lastReq?.type === 'Cancel' && lastReq.isRaised && lastReq.status === 'Pending'

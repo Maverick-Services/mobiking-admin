@@ -52,6 +52,16 @@ export const useOrders = () => {
         onError: err => toast.error(err.message || 'Failed to accept order'),
     })
 
+    const rejectOrder = useMutation({
+        mutationFn: ({ orderId, reason }) =>
+            api.post('/orders/reject', { orderId, reason }).then(res => res.data),
+        onSuccess: () => {
+            toast.success('Order rejected!')
+            queryClient.invalidateQueries({ queryKey: ['orders'] })
+        },
+        onError: err => toast.error(err.message || 'Failed to reject order'),
+    })
+
     const cancelOrder = useMutation({
         mutationFn: data => api.post('/orders/cancel', data),
         onSuccess: () => {
@@ -79,6 +89,7 @@ export const useOrders = () => {
         acceptOrder,
         cancelOrder,
         createPosOrder,
+        rejectOrder,
         permissions: { canView, canAdd, canEdit, canDelete },
     }
 }

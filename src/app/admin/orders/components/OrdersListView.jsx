@@ -86,13 +86,15 @@ export default function OrdersListView({ error, orders = [] }) {
                                         {customerOrderNumber}
                                     </span>
                                 </TableCell>
-                                <TableCell className="flex items-center space-x-2">
-                                    <span>{o.phoneNo}</span>
-                                    <FaWhatsapp
-                                        className="cursor-pointer text-green-500 hover:text-green-600"
-                                        size={18}
-                                        onClick={() => openWhatsApp(o.phoneNo)}
-                                    />
+                                <TableCell >
+                                    <div className="flex items-center space-x-2">
+                                        <span>{o.phoneNo}</span>
+                                        <FaWhatsapp
+                                            className="cursor-pointer text-green-500 hover:text-green-600"
+                                            size={18}
+                                            onClick={() => openWhatsApp(o.phoneNo)}
+                                        />
+                                    </div>
                                 </TableCell>
                                 <TableCell>₹{o.orderAmount.toFixed(2)}</TableCell>
                                 <TableCell>{o.method}</TableCell>

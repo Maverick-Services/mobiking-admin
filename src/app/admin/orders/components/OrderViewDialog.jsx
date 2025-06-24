@@ -24,6 +24,7 @@ import { format } from 'date-fns'
 import { useOrders } from '@/hooks/useOrders'
 import AcceptDialog from './AcceptDialog'
 import CancelDialog from './CancelDialog'
+import RejectDialog from './RejectOrderDialog'
 
 // Map each order status to a Badge variant
 const STATUS_VARIANTS = {
@@ -42,6 +43,7 @@ export function OrderViewDialog({ order, children }) {
     const safe = (value) => (value !== null && value !== undefined && value !== '' ? value : '-')
     const [acceptDialog, setAcceptDialog] = useState(false)
     const [rejectDialog, setRejectDialog] = useState(false)
+    const [rejectOrderDialog, setRejectOrderDialog] = useState(false)
 
     // console.log(order)
 
@@ -165,10 +167,10 @@ export function OrderViewDialog({ order, children }) {
                     <DialogFooter className="mt-6 flex gap-1">
 
                         {/* accept order */}
-                        {order.status === 'New' &&
+                        {order.status === 'New' && order.requests.length <= 0 &&
                             <div className=" flex gap-1">
                                 <Button variant="outline" onClick={() => { setAcceptDialog(true) }}>Accept</Button>
-                                <Button variant="outline">Reject</Button>
+                                <Button variant="outline" onClick={() => { setRejectOrderDialog(true) }}>Reject</Button>
                             </div>
                         }
 
@@ -191,6 +193,12 @@ export function OrderViewDialog({ order, children }) {
             <AcceptDialog
                 open={acceptDialog}
                 onOpenChange={setAcceptDialog}
+                order={order}
+            />
+
+            <RejectDialog
+                open={rejectOrderDialog}
+                onOpenChange={setRejectOrderDialog}
                 order={order}
             />
 
