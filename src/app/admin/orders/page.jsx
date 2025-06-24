@@ -87,15 +87,15 @@ export default function Page() {
 
             const lastReq = lastRequestOf(o)
             switch (activeTab) {
-                case 'website': return !o.isAppOrder && o.type === 'Regular'
-                case 'app': return o.isAppOrder && o.type === 'Regular'
-                case 'regular': return o.type === 'Regular'
-                case 'pos': return o.type === 'Pos'
+                case 'website': return !o.isAppOrder && o.type === 'Regular' && !o.abondonedOrder
+                case 'app': return o.isAppOrder && o.type === 'Regular' && !o.abondonedOrder
+                case 'regular': return o.type === 'Regular' && !o.abondonedOrder
+                case 'pos': return o.type === 'Pos' && !o.abondonedOrder
                 case 'abandoned': return o.abondonedOrder
                 case 'returns': return lastReq?.type === 'Return' && lastReq.isRaised
                 case 'cancelled': return lastReq?.type === 'Cancel' && lastReq.isRaised && lastReq.status === 'Pending'
                 case 'warranty': return lastReq?.type === 'Warranty' && lastReq.isRaised
-                default: return true   // 'all'
+                default: return !o.abondonedOrder
             }
         })
 
@@ -104,15 +104,15 @@ export default function Page() {
             counts[key] = displayOrders.filter((o) => {
                 const lastReq = lastRequestOf(o)
                 switch (key) {
-                    case 'website': return !o.isAppOrder && o.type === 'Regular'
-                    case 'app': return o.isAppOrder && o.type === 'Regular'
-                    case 'regular': return o.type === 'Regular'
-                    case 'pos': return o.type === 'Pos'
+                    case 'website': return !o.isAppOrder && o.type === 'Regular' && !o.abondonedOrder
+                    case 'app': return o.isAppOrder && o.type === 'Regular' && !o.abondonedOrder
+                    case 'regular': return o.type === 'Regular' && !o.abondonedOrder
+                    case 'pos': return o.type === 'Pos' && !o.abondonedOrder
                     case 'abandoned': return o.abondonedOrder
                     case 'returns': return lastReq?.type === 'Return' && lastReq.isRaised
                     case 'cancelled': return lastReq?.type === 'Cancel' && lastReq.isRaised && lastReq.status === 'Pending'
                     case 'warranty': return lastReq?.type === 'Warranty' && lastReq.isRaised
-                    default: return true
+                    default: return !o.abondonedOrder
                 }
             }).length
         })

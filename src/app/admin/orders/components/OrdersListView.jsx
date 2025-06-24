@@ -94,7 +94,7 @@ export default function OrdersListView({ error, orders = [] }) {
                                         onClick={() => openWhatsApp(o.phoneNo)}
                                     />
                                 </TableCell>
-                                <TableCell>₹{o.orderAmount}</TableCell>
+                                <TableCell>₹{o.orderAmount.toFixed(2)}</TableCell>
                                 <TableCell>{o.method}</TableCell>
                                 <TableCell>
                                     <Badge variant={variant}>
