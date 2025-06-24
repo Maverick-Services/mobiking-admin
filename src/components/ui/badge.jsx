@@ -14,6 +14,8 @@ const badgeVariants = cva(
         outline: "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         yellow: "bg-yellow-100 text-yellow-700 border-transparent",
         green: "bg-green-100 text-green-700 border-transparent",
+        success: "bg-green-100 text-green-700 border-transparent",     // ✅ alias for green
+        warning: "bg-yellow-100 text-yellow-700 border-transparent",   // ✅ alias for yellow
       },
     },
     defaultVariants: {
@@ -21,6 +23,7 @@ const badgeVariants = cva(
     },
   }
 )
+
 
 function Badge({ className, variant, asChild = false, ...props }) {
   const Comp = asChild ? Slot : "span"

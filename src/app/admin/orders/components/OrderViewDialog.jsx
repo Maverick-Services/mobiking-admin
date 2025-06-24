@@ -25,6 +25,7 @@ import { useOrders } from '@/hooks/useOrders'
 import AcceptDialog from './AcceptDialog'
 import CancelDialog from './CancelDialog'
 import RejectDialog from './RejectOrderDialog'
+import HoldDialog from './HoldOrder'
 
 // Map each order status to a Badge variant
 const STATUS_VARIANTS = {
@@ -44,6 +45,7 @@ export function OrderViewDialog({ order, children }) {
     const [acceptDialog, setAcceptDialog] = useState(false)
     const [rejectDialog, setRejectDialog] = useState(false)
     const [rejectOrderDialog, setRejectOrderDialog] = useState(false)
+    const [holdDialog, setHoldDialog] = useState(false)
 
     // console.log(order)
 
@@ -167,7 +169,7 @@ export function OrderViewDialog({ order, children }) {
                     <DialogFooter className="mt-6 flex gap-1">
 
                         {/* accept order */}
-                        {order.status === 'New' && order.requests.length <= 0 &&
+                        {order.status === 'New' && order.requests.length <= 0 && !order.abondonedOrder &&
                             <div className=" flex gap-1">
                                 <Button variant="outline" onClick={() => { setAcceptDialog(true) }}>Accept</Button>
                                 <Button variant="outline" onClick={() => { setRejectOrderDialog(true) }}>Reject</Button>
@@ -186,6 +188,12 @@ export function OrderViewDialog({ order, children }) {
                             </div>
                         }
 
+                        {order.abondonedOrder &&
+                            <Button variant="outline" onClick={() => { setHoldDialog(true) }}>Hold</Button>
+
+                        }
+
+
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -199,6 +207,12 @@ export function OrderViewDialog({ order, children }) {
             <RejectDialog
                 open={rejectOrderDialog}
                 onOpenChange={setRejectOrderDialog}
+                order={order}
+            />
+
+            <HoldDialog
+                open={holdDialog}
+                onOpenChange={setHoldDialog}
                 order={order}
             />
 
