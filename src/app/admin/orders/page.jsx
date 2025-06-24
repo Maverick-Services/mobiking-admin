@@ -1,12 +1,12 @@
 'use client'
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo } from 'react'
 import InnerDashboardLayout from '@/components/dashboard/InnerDashboardLayout'
 import { useOrders } from '@/hooks/useOrders'
 import { DateRangePicker } from '@/components/custom/date-range-picker'
 import { Button } from '@/components/ui/button'
-import { Plus, RefreshCcw } from 'lucide-react'
 import OrdersListView from './components/OrdersListView'
 import POS from '@/components/POS'
+import TableSkeleton from '@/components/custom/TableSkeleton'
 
 const TABS = [
     { key: 'all', label: 'ALL ORDERS' },
@@ -50,11 +50,9 @@ export default function Page() {
 
     // 2. Track the picker range
     const [range, setRange] = useState({ from: defaultFrom, to: defaultTo })
-    // 3. Store custom results
-    const [customOrders, setCustomOrders] = useState(null)
 
     // 4. Hook with both all-orders and getOrdersByDate
-    const { ordersQuery, getOrdersByDate } = useOrders();
+    const { getOrdersByDate } = useOrders();
 
     // Format Date to YYYY-MM-DD
     const fmt = date => date.toISOString().split('T')[0]
@@ -65,7 +63,7 @@ export default function Page() {
     const { data: customOrdersData, isFetching, error } = getOrdersByDate({ startDate, endDate })
 
     // This will be used for display
-    const displayOrders = customOrdersData ?? ordersQuery.data?.data ?? [];
+    const displayOrders = customOrdersData ?? [];
 
     const [statusFilter, setStatusFilter] = useState(null)
 
@@ -196,10 +194,14 @@ export default function Page() {
             </div>
 
             {/* Table */}
-            <OrdersListView
-                error={ordersQuery.error}
-                orders={filteredOrders}
-            />
+
+            {isFetching ?
+                <TableSkeleton />
+                : <OrdersListView
+                    // error={ordersQuery.error}
+                    orders={filteredOrders}
+                />
+            }
         </InnerDashboardLayout>
     )
 }
