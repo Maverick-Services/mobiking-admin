@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 
 export default function TotalSales() {
     const { data, isLoading, isError } = useTotalSales();
+    console.log(data)
 
     const formattedSales = new Intl.NumberFormat("en-IN", {
         style: "currency",

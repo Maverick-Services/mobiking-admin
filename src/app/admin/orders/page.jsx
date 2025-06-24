@@ -174,26 +174,30 @@ export default function Page() {
                 ))}
             </div>
 
-
             {/* Tab bar */}
-            <div className="flex space-x-4 border-b mb-4 justify-between w-full overflow-x-auto">
-                {TABS.map(({ key, label }) => (
-                    <button
-                        key={key}
-                        className={`pb-2 uppercase text-sm ${activeTab === key
-                            ? 'border-b-2 border-black text-black'
-                            : 'border-b-2 border-transparent text-gray-500 hover:text-black'
-                            }`}
-                        onClick={() => {
-                            setActiveTab(key)
-                            setStatusFilter(null)
-                        }}
-
-                    >
-                        {label} ({counts[key]})
-                    </button>
-                ))}
+            <div className="flex flex-wrap gap-2 mb-6">
+                {TABS.map(({ key, label }) => {
+                    const isActive = activeTab === key
+                    return (
+                        <button
+                            key={key}
+                            className={`
+          px-4 py-2 rounded text-sm font-medium transition
+          ${isActive
+                                    ? 'bg-white shadow text-primary'
+                                    : 'bg-gray-200 text-gray-600 hover:bg-white hover:text-black'}
+        `}
+                            onClick={() => {
+                                setActiveTab(key)
+                                setStatusFilter(null)
+                            }}
+                        >
+                            {label} ({counts[key]})
+                        </button>
+                    )
+                })}
             </div>
+
 
             {/* Table */}
 

@@ -34,7 +34,8 @@ export const useTotalSales = () => {
     return useQuery({
         queryKey: ["dashboard", "sales", "count"],
         queryFn: async () => {
-            const res = await api.get("/reports/sales/total").then(res => res.data);
+            const res = await api.get("/reports/sales/total");
+            return res.data;
         },
         staleTime: 5 * 60 * 1000, // 5 mins (optional)
         onError: (err) => {
