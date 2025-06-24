@@ -36,7 +36,7 @@ export default function Page() {
             <div>
                 <div className="flex justify-between items-center mb-4 mt-4">
                     <Button variant="outline">
-                        Categories: {subCategoriesQuery.data?.data?.length || 0}
+                        Total: {subCategoriesQuery.data?.data?.length || 0}
                     </Button>
                     <Button onClick={handleAddClick}>
                         <CirclePlus className="mr-2 h-4 w-4" /> Add New

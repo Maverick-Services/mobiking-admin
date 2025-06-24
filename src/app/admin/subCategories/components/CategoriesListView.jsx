@@ -1,16 +1,34 @@
 "use client";
-import { Button } from '@/components/ui/button';
+
+import { Button } from "@/components/ui/button";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell,
+} from "@/components/ui/table";
+import { Switch } from "@/components/ui/switch";
 import { Loader2, Pencil, Trash } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Loader from "@/components/Loader";
+import Image from "next/image";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog ";
-import Loader from '@/components/Loader';
-import Image from 'next/image';
-import { Switch } from '@/components/ui/switch';
-import { useRouter } from 'next/navigation';
 
-export default function CategoriesListView({ isLoading, error, categories, onEdit, onDelete, isDeleting, deleteError }) {
+export default function CategoriesListView({
+    isLoading,
+    error,
+    categories,
+    onDelete,
+    isDeleting,
+    deleteError,
+}) {
+
+    console.log(categories)
     const [deletingCategoryId, setDeletingCategoryId] = useState(null);
-    const router = useRouter()
+    const router = useRouter();
 
     const handleDeleteClick = (categoryId) => {
         setDeletingCategoryId(categoryId);
@@ -21,86 +39,105 @@ export default function CategoriesListView({ isLoading, error, categories, onEdi
         setDeletingCategoryId(null);
     };
 
-    if (isLoading) return <div className="text-center p-4">
-        <Loader />
-    </div>;
+    if (isLoading) {
+        return (
+            <div className="text-center p-4">
+                <Loader />
+            </div>
+        );
+    }
 
-    if (error) return <div className="text-red-600 p-4">Error: {error.message}</div>;
-    if (!categories?.length) return <div className="text-center text-gray-500 p-4">No categories Found!</div>;
+    if (error) {
+        return (
+            <div className="text-red-600 p-4">Error: {error.message}</div>
+        );
+    }
+
+    if (!categories?.length) {
+        return (
+            <div className="text-center text-gray-500 p-4">
+                No categories found!
+            </div>
+        );
+    }
 
     return (
         <section className="w-full">
-            <div className="overflow-x-auto rounded-md border border-gray-200">
-                <table className="w-full border-collapse">
-                    <thead>
-                        <tr className="bg-gray-50 text-xl border-b text-primary">
-                            <th className="px-6 py-3 text-center font-semibold align-middle">#</th>
-                            <th className="px-6 py-3 text-center font-semibold align-middle">Image</th>
-                            <th className="px-6 py-3 text-center font-semibold align-middle">Name</th>
-                            <th className="px-6 py-3 text-center font-semibold align-middle">Active</th>
-                            <th className="px-6 py-3 text-center font-semibold align-middle">Products</th>
-                            <th className="px-6 py-3 text-center font-semibold align-middle">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {categories?.map((item, index) => (
-                            <tr
-                                key={item._id || index}
-                                className="even:bg-gray-50 hover:bg-gray-100 transition"
-                            >
-                                <td className="px-6 py-3 border-b text-center align-middle">
-                                    {index + 1}
-                                </td>
+            <Table>
+                <TableHeader>
+                    <TableRow className="text-primary">
+                        <TableHead className="text-center">#</TableHead>
+                        <TableHead className="text-center">Image</TableHead>
+                        <TableHead className="text-center">Name</TableHead>
+                        <TableHead className="text-center">Parent Category</TableHead>
+                        <TableHead className="text-center">Active</TableHead>
+                        <TableHead className="text-center">Products</TableHead>
+                        <TableHead className="text-center">Action</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {categories.map((item, idx) => (
+                        <TableRow
+                            key={item._id}
+                            className="hover:bg-gray-50 transition border"
+                        >
+                            <TableCell className="text-center">{idx + 1}</TableCell>
 
-                                <td className="px-6 py-0 border-b align-middle">
-                                    <div className="flex items-center justify-center min-h-20 py-1">
-                                        <Image
-                                            height={80}
-                                            width={80}
-                                            quality={100}
-                                            src={item.lowerBanner}
-                                            alt={item.name}
-                                            className="object-contain rounded-sm"
-                                        />
-                                    </div>
-                                </td>
+                            <TableCell className="py-1">
+                                <div className="flex items-center justify-center min-h-20">
+                                    <Image
+                                        src={item.lowerBanner}
+                                        alt={item.name}
+                                        width={80}
+                                        height={80}
+                                        quality={100}
+                                        className="object-contain rounded-sm"
+                                    />
+                                </div>
+                            </TableCell>
 
-                                <td className="px-6 py-3 border-b text-center align-middle">
-                                    {item.name}
-                                </td>
+                            <TableCell className="text-center">{item.name}</TableCell>
+                            <TableCell className="text-center">{item.parentCategory?.name}</TableCell>
 
-                                <td className="px-6 py-3 border-b text-center align-middle">
-                                    <Switch checked={item.active} />
-                                </td>
-                                <td className="px-6 py-3 border-b text-center align-middle">
-                                    {item?.products?.length}
-                                </td>
-                                <td className="px-6 py-3 border-b align-middle">
-                                    <div className="flex items-center justify-center gap-2">
-                                        <Button
-                                            size="icon"
-                                            variant="outline"
-                                            onClick={() => router.push(`/admin/subCategories/${item.slug}/edit`)}
-                                        >
-                                            <Pencil size={16} />
-                                        </Button>
-                                        <Button
-                                            variant="destructive"
-                                            onClick={() => handleDeleteClick(item._id)}
-                                        >
-                                            <Trash size={16} />
-                                        </Button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                            <TableCell className="text-center">
+                                <Switch checked={item.active} />
+                            </TableCell>
+
+                            <TableCell className="text-center">
+                                {item?.products?.length ?? 0}
+                            </TableCell>
+
+                            <TableCell >
+                                <div className="flex gap-2 items-center justify-center">
+                                    <Button
+                                        size="icon"
+                                        variant="outline"
+                                        onClick={() =>
+                                            router.push(
+                                                `/admin/subCategories/${item.slug}/edit`
+                                            )
+                                        }
+                                    >
+                                        <Pencil size={16} />
+                                    </Button>
+                                    <Button
+                                        variant="destructive"
+                                        onClick={() => handleDeleteClick(item._id)}
+                                    >
+                                        <Trash size={16} />
+                                    </Button>
+                                </div>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
 
             <DeleteConfirmationDialog
                 isOpen={!!deletingCategoryId}
-                onOpenChange={(open) => !open && setDeletingCategoryId(null)}
+                onOpenChange={(open) =>
+                    !open && setDeletingCategoryId(null)
+                }
                 onConfirm={handleDeleteConfirm}
                 isLoading={isDeleting}
                 error={deleteError}
