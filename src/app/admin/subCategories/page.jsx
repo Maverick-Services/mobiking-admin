@@ -13,7 +13,7 @@ export default function Page() {
     // fetch categories query
     const { subCategoriesQuery, deleteSubCategory } = useSubCategories();
     const { categoriesQuery } = useCategories()
-    console.log(categoriesQuery.data)
+    console.log(subCategoriesQuery.data)
     // destructure deleteSubCategory mutation
     const {
         mutateAsync: deleteSubCategoryAsync,

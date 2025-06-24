@@ -50,10 +50,10 @@ export const useSubCategories = () => {
         enabled: canAdd,
         onSuccess: () => {
             queryClient.invalidateQueries(['subCategories']);
-            toast.success('Category created successfully');
+            toast.success('Sub Category created successfully');
         },
         onError: (err) => {
-            toast.error(err.message || 'Failed to create category');
+            toast.error(err.message || 'Failed to create sub category');
         }
     });
 

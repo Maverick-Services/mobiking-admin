@@ -13,7 +13,7 @@ function page() {
     const handleSubmit = async (data) => {
         await createSubCategory.mutateAsync(data)
         console.log('Update subCategory:', data);
-        router.push('/admin/subCategories')
+        // router.push('/admin/subCategories')
     };
 
     return (
