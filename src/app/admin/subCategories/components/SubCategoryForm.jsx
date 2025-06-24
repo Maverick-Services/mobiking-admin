@@ -80,10 +80,7 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
         if (defaultValues) {
             reset({
                 ...defaultValues,
-                // Safely set categoryId using parentCategory._id if it's an object
-                categoryId: typeof defaultValues.parentCategory === "object"
-                    ? defaultValues.parentCategory._id
-                    : defaultValues.parentCategory || "",
+                categoryId: defaultValues?.parentCategory?._id || ''
             })
         }
     }, [defaultValues, reset])
@@ -103,7 +100,7 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
         console.log(error)
     }
 
-    console.log(categoriesQuery.data.data)
+    // console.log(categoriesQuery.data.data)
 
     return (
 
@@ -401,7 +398,7 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                             />
                         </PCard>
                     </div>
-                    <div className='flex items-end justify-end'>
+                    <div className='flex items-end justify-end mt-3'>
                         <LoaderButton
                             loading={loading}
                             type="submit"
