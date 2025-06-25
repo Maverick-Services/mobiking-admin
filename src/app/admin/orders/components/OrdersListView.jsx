@@ -117,9 +117,11 @@ export default function OrdersListView({ error, orders = [] }) {
                                             <Eye size={16} />
                                         </Button>
                                     </OrderViewDialog>
+
                                     <Button
                                         className={'h-7 w-7'}
                                         variant="outline"
+                                        onClick={() => router.push(`/admin/orders/${o._id}`)}
                                     >
                                         <Download />
                                     </Button>

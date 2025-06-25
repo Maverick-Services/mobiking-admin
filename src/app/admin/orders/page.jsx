@@ -54,11 +54,13 @@ export default function Page() {
     // 4. Hook with both all-orders and getOrdersByDate
     const { getOrdersByDate } = useOrders();
 
+
     // Format Date to YYYY-MM-DD
     const fmt = date => date.toISOString().split('T')[0]
     const startDate = fmt(range.from)
     const endDate = fmt(range.to)
 
+    console.log(getOrdersByDate({ startDate, endDate }))
     // ✅ Now it's safe to call the hook
     const { data: customOrdersData, isFetching, error } = getOrdersByDate({ startDate, endDate })
 

@@ -39,6 +39,7 @@ export const useOrders = () => {
         staleTime: 1000 * 60 * 5,
         onError: (err) => {
             toast.error(err.message || 'Failed to fetch orders');
+            console.log(err)
         }
     });
 
@@ -93,6 +94,25 @@ export const useOrders = () => {
         },
     })
 
+    //  Get single order by Id
+    const getSingleOrderQuery = (id) => useQuery({
+        queryKey: ['orders', id],
+        queryFn: async () => {
+            const res = await api.get(`/orders/details/${id}`);
+            const data = res.data;
+
+            if (!data || data.message === 'Order not found') {
+                throw new Error('Order not found');
+            }
+
+            return data;
+        },
+        staleTime: 1000 * 60 * 5,
+        onError: (err) => {
+            toast.error(err.message || 'Failed to fetch Order');
+        }
+    });
+
     return {
         ordersQuery,
         getOrdersByDate,
@@ -101,6 +121,7 @@ export const useOrders = () => {
         holdOrder,
         createPosOrder,
         rejectOrder,
+        getSingleOrderQuery,
         permissions: { canView, canAdd, canEdit, canDelete },
     }
 }
