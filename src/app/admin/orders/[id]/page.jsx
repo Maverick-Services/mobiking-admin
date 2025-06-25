@@ -1,4 +1,6 @@
 "use client"
+import { Car, Printer, Download } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import PCard from '@/components/custom/PCard';
 import InnerDashboardLayout from '@/components/dashboard/InnerDashboardLayout';
 import { useOrders } from '@/hooks/useOrders';
@@ -30,9 +32,21 @@ function page() {
                 <h1 className="text-primary font-bold sm:text-xl lg:text-2xl">
                     View Order
                 </h1>
-                <div>
-                    {/* Buttons */}
+                <div className="flex gap-2">
+                    <Button variant="outline" className="gap-2">
+                        <Car className="h-4 w-4" />
+                        Delivery
+                    </Button>
+                    <Button variant="outline" className="gap-2">
+                        <Printer className="h-4 w-4" />
+                        Print
+                    </Button>
+                    <Button variant="outline" className="gap-2">
+                        <Download className="h-4 w-4" />
+                        Download
+                    </Button>
                 </div>
+
             </div>
             <div className='space-y-3'>
                 {/* Upper Details */}

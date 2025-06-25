@@ -96,7 +96,7 @@ export const useOrders = () => {
 
     //  Get single order by Id
     const getSingleOrderQuery = (id) => useQuery({
-        queryKey: ['orders', id],
+        queryKey: ['orders', 'order', id],
         queryFn: async () => {
             const res = await api.get(`/orders/details/${id}`);
             const data = res.data;
@@ -113,6 +113,18 @@ export const useOrders = () => {
         }
     });
 
+    const updateOrder = useMutation({
+        mutationFn: ({ data, id }) => api.put(`/orders/${id}`, data),
+        onSuccess: () => {
+            toast.success('Order updated successfully.')
+            queryClient.invalidateQueries({ queryKey: ['order'] })
+        },
+        onError: err => {
+            toast.error(err.message || 'Failed to update order')
+            console.error(err)
+        },
+    })
+
     return {
         ordersQuery,
         getOrdersByDate,
@@ -122,6 +134,7 @@ export const useOrders = () => {
         createPosOrder,
         rejectOrder,
         getSingleOrderQuery,
+        updateOrder,
         permissions: { canView, canAdd, canEdit, canDelete },
     }
 }
