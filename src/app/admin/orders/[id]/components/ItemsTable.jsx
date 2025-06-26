@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import PCard from "@/components/custom/PCard"
 import {
     Table,
@@ -8,15 +8,15 @@ import {
     TableHeader,
     TableRow
 } from "@/components/ui/table"
-import { Minus, MinusSquareIcon, Plus, PlusSquare } from "lucide-react"
+import { Minus, Plus } from "lucide-react"
 import MiniLoaderButton from "@/components/custom/MiniLoaderButton"
 import { useOrders } from "@/hooks/useOrders"
 
 function ItemsTable({ order }) {
     const items = order?.items || []
-    console.log(items)
-
     const { addItemInOrder, removeItemFromOrder } = useOrders()
+
+    const [loadingItemId, setLoadingItemId] = useState(null)
 
     async function handleIncrement(item) {
         const data = {
@@ -24,12 +24,13 @@ function ItemsTable({ order }) {
             productId: item.productId._id,
             variantName: item.variantName,
         }
-        // console.log({...data})
+        setLoadingItemId(`${data.productId}-${data.variantName}-inc`)
         try {
             await addItemInOrder.mutateAsync({ ...data })
-
         } catch (error) {
             console.log(error)
+        } finally {
+            setLoadingItemId(null)
         }
     }
 
@@ -39,12 +40,13 @@ function ItemsTable({ order }) {
             productId: item.productId._id,
             variantName: item.variantName,
         }
-        // console.log({...data})
+        setLoadingItemId(`${data.productId}-${data.variantName}-dec`)
         try {
             await removeItemFromOrder.mutateAsync({ ...data })
-
         } catch (error) {
             console.log(error)
+        } finally {
+            setLoadingItemId(null)
         }
     }
 
@@ -72,8 +74,11 @@ function ItemsTable({ order }) {
                             const name = product?.fullName || product?.name
                             const variant = item.variantName
                             const quantity = item.quantity
-                            const sellingPrice = product?.sellingPrice?.[0]?.price || item.price // fallback
+                            const sellingPrice = product?.sellingPrice?.[0]?.price || item.price
                             const totalPrice = sellingPrice * quantity
+
+                            const incKey = `${product._id}-${variant}-inc`
+                            const decKey = `${product._id}-${variant}-dec`
 
                             return (
                                 <TableRow key={idx}>
@@ -95,16 +100,16 @@ function ItemsTable({ order }) {
                                         <div className="flex gap-2">
                                             <MiniLoaderButton
                                                 variant={'outline'}
-                                                onClick={() => { handleIncrement(item) }}
-                                                loading={addItemInOrder.isPending}
+                                                onClick={() => handleIncrement(item)}
+                                                loading={loadingItemId === incKey}
                                             >
                                                 <Plus className="cursor-pointer hover:text-green-600 transition-all duration-200 ease-in-out" />
                                             </MiniLoaderButton>
 
-                                            <MiniLoaderButton 
-                                            variant={'outline'}
-                                            onClick={() => { handleDecrement(item) }}
-                                                loading={removeItemFromOrder.isPending}
+                                            <MiniLoaderButton
+                                                variant={'outline'}
+                                                onClick={() => handleDecrement(item)}
+                                                loading={loadingItemId === decKey}
                                             >
                                                 <Minus className="cursor-pointer hover:text-red-600 transition-all duration-200 ease-in-out" />
                                             </MiniLoaderButton>

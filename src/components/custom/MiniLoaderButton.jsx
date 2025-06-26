@@ -12,7 +12,7 @@ export default function MiniLoaderButton({
 }) {
   return (
     <Button
-      className={`flex items-center justify-center p-1 ${className}`}
+      className={`flex items-center justify-center ${className}`}
       variant={variant}
       size={size}
       disabled={loading}
@@ -20,7 +20,7 @@ export default function MiniLoaderButton({
       {...props}
     >
       {loading
-        ? <Loader2 className="w-3 h-3 animate-spin" />
+        ? <Loader2 size={2} className="animate-spin" />
         : children
       }
     </Button>
