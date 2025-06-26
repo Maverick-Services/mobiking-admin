@@ -14,6 +14,7 @@ import ItemsTable from './components/ItemsTable';
 import LoaderButton from "@/components/custom/LoaderButton";
 import CourierDialog from "./components/CourierDialog";
 import ShippingDetails from "./components/ShippingDetails";
+import { toast } from 'react-hot-toast'
 
 function page() {
     const params = useParams();
@@ -34,7 +35,16 @@ function page() {
     }
 
     async function handleGetCourierId() {
-        setCourierOpen(true)
+       const { address, city, country, pincode } = order
+
+  // if any of these is falsy, show an error
+  if (!address || !city || !country || !pincode) {
+    toast.error('Please complete the customer\'s address details before continue.')
+    return
+  }
+
+  // all good → open the courier dialog
+  setCourierOpen(true)
     }
 
 
@@ -67,10 +77,13 @@ function page() {
                 <UpperDetailss order={order} />
                 <PaymentDetails order={order} />
                 <PersonalDetails order={order} />
-                <ItemsTable order={order} />
+                <ItemsTable 
+                order={order}
+                isNewOrder={isNewOrder}
+                 />
                 {order?.shipmentId &&
                 <ShippingDetails order={order}/>
-                }
+            }
             </div>
             <CourierDialog
                 open={courierOpen}

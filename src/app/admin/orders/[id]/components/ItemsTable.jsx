@@ -11,11 +11,14 @@ import {
 import { Minus, Plus } from "lucide-react"
 import MiniLoaderButton from "@/components/custom/MiniLoaderButton"
 import { useOrders } from "@/hooks/useOrders"
+import { Button } from "@/components/ui/button"
+import AddItemDialog from './AddItemDialog';
 
-function ItemsTable({ order }) {
+function ItemsTable({ order, isNewOrder }) {
     const items = order?.items || []
     const { addItemInOrder, removeItemFromOrder } = useOrders()
 
+    const [addingItem, setAddingItem] = useState(false)
     const [loadingItemId, setLoadingItemId] = useState(null)
 
     async function handleIncrement(item) {
@@ -52,7 +55,12 @@ function ItemsTable({ order }) {
 
     return (
         <PCard className="p-4">
-            <h2 className="mb-4 text-lg font-semibold text-gray-700">Items</h2>
+            <div className="flex items-center justify-between w-full">
+                <h2 className="mb-4 text-lg font-semibold text-gray-700">Items</h2>
+                {isNewOrder() &&
+                <Button onClick={() => setAddingItem(true)} variant={'outline'}>Add Items</Button>
+                }
+            </div>
 
             <div className="overflow-x-auto">
                 <Table>
@@ -64,7 +72,9 @@ function ItemsTable({ order }) {
                             <TableHead>Qty</TableHead>
                             <TableHead>Selling Price</TableHead>
                             <TableHead>Total Price</TableHead>
+                {isNewOrder() &&
                             <TableHead>Actions</TableHead>
+                }
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -74,7 +84,7 @@ function ItemsTable({ order }) {
                             const name = product?.fullName || product?.name
                             const variant = item.variantName
                             const quantity = item.quantity
-                            const sellingPrice = product?.sellingPrice?.[0]?.price || item.price
+                            const sellingPrice =  item.price
                             const totalPrice = sellingPrice * quantity
 
                             const incKey = `${product._id}-${variant}-inc`
@@ -96,6 +106,7 @@ function ItemsTable({ order }) {
                                     <TableCell>{quantity}</TableCell>
                                     <TableCell>₹{sellingPrice}</TableCell>
                                     <TableCell>₹{totalPrice}</TableCell>
+                {isNewOrder() &&
                                     <TableCell>
                                         <div className="flex gap-2">
                                             <MiniLoaderButton
@@ -115,6 +126,7 @@ function ItemsTable({ order }) {
                                             </MiniLoaderButton>
                                         </div>
                                     </TableCell>
+                        }
                                 </TableRow>
                             )
                         })}
@@ -137,6 +149,11 @@ function ItemsTable({ order }) {
                     </div>
                 </div>
             </div>
+            <AddItemDialog
+                open={addingItem}
+                onOpenChange={setAddingItem}
+                orderId={order?._id}
+            />
         </PCard>
     )
 }
