@@ -5,7 +5,7 @@ import {
     Star, Weight, CreditCard, Info
 } from "lucide-react";
 
-const CourierCard = ({ courier }) => {
+const CourierCard = ({ courier, selectedCourier, setSelectedCourier }) => {
     const {
         courier_name,
         min_weight,
@@ -22,7 +22,9 @@ const CourierCard = ({ courier }) => {
         pickup_performance,
         delivery_performance,
         rating,
+        courier_company_id,
     } = courier;
+
 
     // Compute expected pickup & delivery
     const pickupETA = addSeconds(new Date(), seconds_left_for_pickup);
@@ -44,16 +46,20 @@ const CourierCard = ({ courier }) => {
 
     return (
         <div className="mb-4">
-            <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col md:flex-row">
+            <div className={`bg-white rounded-lg border-2 shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col md:flex-row ${selectedCourier === courier_company_id ? "border-blue-700 ": "border-gray-200 "}`}>
 
                 {/* Left: Courier Info & Metrics */}
                 <div className="flex-1 p-4 space-y-4">
                     {/* Top row: Name & Tags */}
                     <div className="flex items-center justify-between">
+                        <div>
                         <h3 className="font-semibold text-gray-800">{courier_name}</h3>
+<p className="text-gray-500 text-xs">Company Id: {courier_company_id}</p>
+                        </div>
+
                         <div className="bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs flex items-center">
                             <Weight className="h-3 w-3 mr-1" />
-                            {min_weight} kg
+                            Min Weight: {min_weight} kg
                         </div>
                     </div>
 
@@ -146,7 +152,9 @@ const CourierCard = ({ courier }) => {
                     {/* Bottom: Delivery Boy Contact + Button */}
                     <div className="mt-4 text-xs text-gray-500 flex justify-between items-center">
                         <span>Contact: {delivery_boy_contact || 'Not provided'}</span>
-                        <button className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1 px-3 rounded">
+                        <button
+                        onClick={()=> setSelectedCourier(courier_company_id)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1 px-3 rounded">
                             Select
                         </button>
                     </div>
