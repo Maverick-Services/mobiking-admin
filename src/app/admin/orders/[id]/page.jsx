@@ -13,6 +13,7 @@ import PaymentDetails from './components/PaymentDetails';
 import ItemsTable from './components/ItemsTable';
 import LoaderButton from "@/components/custom/LoaderButton";
 import CourierDialog from "./components/CourierDialog";
+import ShippingDetails from "./components/ShippingDetails";
 
 function page() {
     const params = useParams();
@@ -28,6 +29,9 @@ function page() {
     if (isLoading) return <p>Loading…</p>
     if (error) return <p>Error: {error.message}</p>
 
+      function isNewOrder() {
+        return order?.status === 'New'
+    }
 
     async function handleGetCourierId() {
         setCourierOpen(true)
@@ -41,6 +45,7 @@ function page() {
                     View Order
                 </h1>
                 <div className="flex gap-2">
+                    {isNewOrder() &&
                     <LoaderButton
                         onClick={handleGetCourierId}
                         variant="outline"
@@ -49,10 +54,7 @@ function page() {
                         <Car className="h-4 w-4" />
                         Delivery
                     </LoaderButton>
-                    <Button variant="outline" className="gap-2">
-                        <Printer className="h-4 w-4" />
-                        Print
-                    </Button>
+                    }
                     <Button variant="outline" className="gap-2">
                         <Download className="h-4 w-4" />
                         Download
@@ -63,10 +65,12 @@ function page() {
             <div className='space-y-3'>
                 {/* Upper Details */}
                 <UpperDetailss order={order} />
-
-                <PersonalDetails order={order} />
                 <PaymentDetails order={order} />
+                <PersonalDetails order={order} />
                 <ItemsTable order={order} />
+                {order?.shipmentId &&
+                <ShippingDetails order={order}/>
+                }
             </div>
             <CourierDialog
                 open={courierOpen}

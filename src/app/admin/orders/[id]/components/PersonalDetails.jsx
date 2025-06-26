@@ -38,14 +38,20 @@ function PersonalDetails({ order }) {
         ["Address", fullAddress || "—"]
     ]
 
+    function isEditable() {
+        return order.status === 'New'
+    }
+
     return (
         <PCard>
             <div className="flex w-full justify-between items-center">
-                <h2 className="mb-4 text-lg font-semibold text-gray-700">Personal Details</h2>
-                <Button variant="outline" className="gap-2" onClick={() => setOpen(true)}>
-                    <Pencil className="h-4 w-4" />
-                    Edit
-                </Button>
+                <h2 className=" text-lg font-semibold text-gray-700">Personal Details</h2>
+                {isEditable() &&
+                    <Button variant="outline" className="gap-2" onClick={() => setOpen(true)}>
+                        <Pencil className="h-4 w-4" />
+                        Edit
+                    </Button>
+                }
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
