@@ -8,9 +8,45 @@ import {
     TableHeader,
     TableRow
 } from "@/components/ui/table"
+import { Minus, MinusSquareIcon, Plus, PlusSquare } from "lucide-react"
+import MiniLoaderButton from "@/components/custom/MiniLoaderButton"
+import { useOrders } from "@/hooks/useOrders"
 
 function ItemsTable({ order }) {
     const items = order?.items || []
+    console.log(items)
+
+    const { addItemInOrder, removeItemFromOrder } = useOrders()
+
+    async function handleIncrement(item) {
+        const data = {
+            orderId: order._id,
+            productId: item.productId._id,
+            variantName: item.variantName,
+        }
+        // console.log({...data})
+        try {
+            await addItemInOrder.mutateAsync({ ...data })
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async function handleDecrement(item) {
+        const data = {
+            orderId: order._id,
+            productId: item.productId._id,
+            variantName: item.variantName,
+        }
+        // console.log({...data})
+        try {
+            await removeItemFromOrder.mutateAsync({ ...data })
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     return (
         <PCard className="p-4">
@@ -26,6 +62,7 @@ function ItemsTable({ order }) {
                             <TableHead>Qty</TableHead>
                             <TableHead>Selling Price</TableHead>
                             <TableHead>Total Price</TableHead>
+                            <TableHead>Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -54,6 +91,25 @@ function ItemsTable({ order }) {
                                     <TableCell>{quantity}</TableCell>
                                     <TableCell>₹{sellingPrice}</TableCell>
                                     <TableCell>₹{totalPrice}</TableCell>
+                                    <TableCell>
+                                        <div className="flex gap-2">
+                                            <MiniLoaderButton
+                                                variant={'outline'}
+                                                onClick={() => { handleIncrement(item) }}
+                                                loading={addItemInOrder.isPending}
+                                            >
+                                                <Plus className="cursor-pointer hover:text-green-600 transition-all duration-200 ease-in-out" />
+                                            </MiniLoaderButton>
+
+                                            <MiniLoaderButton 
+                                            variant={'outline'}
+                                            onClick={() => { handleDecrement(item) }}
+                                                loading={removeItemFromOrder.isPending}
+                                            >
+                                                <Minus className="cursor-pointer hover:text-red-600 transition-all duration-200 ease-in-out" />
+                                            </MiniLoaderButton>
+                                        </div>
+                                    </TableCell>
                                 </TableRow>
                             )
                         })}

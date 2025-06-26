@@ -4,6 +4,7 @@ import api from '@/lib/api'
 import { toast } from 'react-hot-toast'
 import { Actions, checkPermission, Resources } from '@/lib/permissions'
 import { useAuthStore } from '@/store/useAuthStore'
+import axios from 'axios'
 
 export const useOrders = () => {
     const { user } = useAuthStore()
@@ -44,7 +45,7 @@ export const useOrders = () => {
     });
 
     const acceptOrder = useMutation({
-        mutationFn: ({orderId, courierId}) =>
+        mutationFn: ({ orderId, courierId }) =>
             api.post('/orders/accept', { orderId, courierId }).then(res => res.data),
         onSuccess: () => {
             toast.success('Order accepted!')
@@ -96,7 +97,7 @@ export const useOrders = () => {
 
     //  Get single order by Id
     const getSingleOrderQuery = (id) => useQuery({
-        queryKey: ['orders', 'order', id],
+        queryKey: ['order', id],
         queryFn: async () => {
             const res = await api.get(`/orders/details/${id}`);
             const data = res.data;
@@ -125,6 +126,38 @@ export const useOrders = () => {
         },
     })
 
+    const addItemInOrder = useMutation({
+        mutationFn: data => api.post('/orders/items/add', data),
+        onSuccess: () => {
+            toast.success('Item Added')
+            queryClient.invalidateQueries({ queryKey: ['order'] })
+        },
+        onError: (error) => {
+            let msg = 'Failed to add item in order'
+            if (axios.isAxiosError(error)) {
+                msg = error.response?.data?.message ?? error.message
+            }
+            toast.error(msg)
+        },
+    })
+
+    const removeItemFromOrder = useMutation({
+        mutationFn: data => api.post('/orders/items/remove', data),
+        onSuccess: () => {
+            toast.success('Item Removed')
+            queryClient.invalidateQueries({ queryKey: ['order'] })
+        },
+        onError: (error) => {
+            let msg = 'Failed to remove item from order'
+            if (axios.isAxiosError(error)) {
+                msg = error.response?.data?.message ?? error.message
+            }
+            toast.error(msg)
+        },
+    })
+
+
+
     return {
         ordersQuery,
         getOrdersByDate,
@@ -135,6 +168,8 @@ export const useOrders = () => {
         rejectOrder,
         getSingleOrderQuery,
         updateOrder,
+        addItemInOrder,
+        removeItemFromOrder,
         permissions: { canView, canAdd, canEdit, canDelete },
     }
 }
