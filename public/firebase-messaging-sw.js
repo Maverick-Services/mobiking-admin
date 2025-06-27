@@ -1,7 +1,7 @@
 "use client"
 importScripts("https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js");
-
+ 
 firebase.initializeApp({
   apiKey: "AIzaSyBEYUKlsycfCcvxJ7ZbHFV_J31x10IjaoU",
   authDomain: "aaaa-769c6.firebaseapp.com",
