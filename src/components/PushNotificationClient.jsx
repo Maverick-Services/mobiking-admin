@@ -1,28 +1,35 @@
+// components/PushNotificationClient.jsx
 "use client"
 import { useEffect } from 'react'
-import { requestPermissionAndSaveToken, onMessageListener } from '@/lib/firebase'
 
 export default function PushNotificationClient() {
   useEffect(() => {
-    // Register service worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/firebase-messaging-sw.js')
-        .then((registration) => {
-          console.log('SW registered:', registration);
-        }).catch((err) => {
-          console.error('SW registration failed:', err);
-        });
-    }
+    if (typeof window === 'undefined') return;
 
-    // Request permission and save token
-    requestPermissionAndSaveToken()
+    const initializeFirebase = async () => {
+      try {
+        const { requestPermissionAndSaveToken, onMessageListener } = await import('@/lib/firebase');
+        
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+          await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        }
 
-    // Listen for foreground messages
-    onMessageListener().then((payload) => {
-      console.log("Foreground Push Received:", payload)
-      // Optional: Show a toast or UI alert
-    })
-  }, [])
+        // Request permission and save token
+        await requestPermissionAndSaveToken();
 
-  return null
+        // Listen for foreground messages
+        const payload = await onMessageListener();
+        if (payload) {
+          console.log("Foreground Push Received:", payload);
+        }
+      } catch (error) {
+        console.error('Firebase initialization error:', error);
+      }
+    };
+
+    initializeFirebase();
+  }, []);
+
+  return null;
 }
