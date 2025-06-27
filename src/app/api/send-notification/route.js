@@ -1,5 +1,5 @@
-import { messaging } from '@/lib/firebase-admin'
 import admin from 'firebase-admin'
+import { messaging } from '@/lib/firebase-admin'
 
 const db = admin.firestore()
 

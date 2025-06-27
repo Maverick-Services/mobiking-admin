@@ -8,7 +8,7 @@ firebase.initializeApp({
   projectId: "aaaa-769c6",
   storageBucket: "aaaa-769c6.firebasestorage.app",
   messagingSenderId: "959874165382",
-  appId: "1:959874165382:web:f1d4d7a46b1c7249aaff07",
+  appId: "1:959874165382:web:f1d4d7a46b1c7249aaff07", 
   validApiKey: "AIzaSyBEYUKlsycfCcvxJ7ZbHFV_J31x10IjaoU"
 });
 
