@@ -20,13 +20,14 @@ function QuerySheet({ open, onOpenChange, query }) {
     const [message, setMessage] = useState("")
     const [closeDialogOpen, setCloseDialogOpen] = useState(false)
 
-    console.log(query)
-
     const handleSendMessage = async () => {
         if (message.trim() === "") return
 
         try {
-            await sendReply.mutateAsync({ queryId: query._id, message: message })
+            await sendReply.mutateAsync({
+                queryId: query._id,
+                message: message,
+            })
             setMessage("")
             onOpenChange(false)
         } catch (error) {
@@ -45,29 +46,11 @@ function QuerySheet({ open, onOpenChange, query }) {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                         <div className="text-muted-foreground text-xs">Raised By</div>
-                        <div className="font-medium">{query?.raisedBy?.name || "-"}</div>
+                        <div className="font-medium">{query.raisedBy?.name || query.raisedBy?.email || query.raisedBy?.phoneNo || "User"}</div>
                     </div>
                     <div>
                         <div className="text-muted-foreground text-xs">Raised At</div>
                         <div>{query?.raisedAt ? format(new Date(query.raisedAt), "dd MMM yyyy, hh:mm a") : "-"}</div>
-                    </div>
-                    <div>
-                        <div className="text-muted-foreground text-xs">Assigned To</div>
-                        <div>
-                            {query?.assignedTo?.name || (
-                                <Badge variant="secondary" className="mt-1">
-                                    Not Assigned
-                                </Badge>
-                            )}
-                        </div>
-                    </div>
-                    <div>
-                        <div className="text-muted-foreground text-xs">Assigned At</div>
-                        <div>
-                            {query?.assignedAt
-                                ? format(new Date(query.assignedAt), "dd MMM yyyy, hh:mm a")
-                                : "-"}
-                        </div>
                     </div>
                     <div>
                         <div className="text-muted-foreground text-xs">Status</div>
@@ -86,14 +69,14 @@ function QuerySheet({ open, onOpenChange, query }) {
                 </div>
 
                 {/* Title & Description */}
-                <div className="mt-2 space-y-2 bg-emerald-50 p-3 rounded-xl">
+                <div className="mt-2 space-y-3 bg-blue-50 p-3 rounded-md">
                     <div>
-                        <div className="text-muted-foreground text-xs">Title</div>
-                        <div className="text-md">{query?.title}</div>
+                        <div className="text-gray-400 text-xs font-bold uppercase">Title</div>
+                        <div className="text-sm">{query?.title}</div>
                     </div>
                     <div>
-                        <div className="text-muted-foreground text-xs">Description</div>
-                        <div className="whitespace-pre-line text-md">{query?.description}</div>
+                        <div className="text-gray-400 text-xs font-bold uppercase">Description</div>
+                        <div className="whitespace-pre-line text-sm">{query?.description}</div>
                     </div>
                 </div>
 
@@ -153,14 +136,14 @@ function QuerySheet({ open, onOpenChange, query }) {
                         })}
 
                         {(!query?.replies || query.replies.length === 0) && (
-                            <div className="h-full flex items-center justify-center text-muted-foreground">
+                            <div className="h-full min-h-[250px] flex items-center justify-center text-muted-foreground">
                                 No replies yet
                             </div>
                         )}
                     </div>
 
                     {/* Message Input */}
-                    {!query?.assignedTo || !query?.isResolved && (
+                    {!query?.isResolved && (
                         <div className="mt-2 flex gap-2 sticky bottom-0 bg-white pb-4 pt-2">
                             <Input
                                 value={message}

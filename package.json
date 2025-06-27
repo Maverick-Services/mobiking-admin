@@ -31,6 +31,8 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "firebase": "^11.9.1",
+    "firebase-admin": "^13.4.0",
     "framer-motion": "^12.16.0",
     "icons": "^1.0.0",
     "jose": "^6.0.11",
