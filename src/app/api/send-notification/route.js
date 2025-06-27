@@ -33,7 +33,7 @@ export async function POST(req) {
     }
 
     // 3. Send notification
-    const response = await messaging.sendMulticast(payload)
+    const response = await messaging.sendEachForMulticast(payload)
 
     return Response.json({ success: true, sent: response.successCount, failed: response.failureCount })
   } catch (err) {

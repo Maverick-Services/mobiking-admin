@@ -1,15 +1,17 @@
 // lib/firebase-client.js
+
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: "AIzaSyBEYUKlsycfCcvxJ7ZbHFV_J31x10IjaoU",
+  authDomain: "aaaa-769c6.firebaseapp.com",
+  projectId: "aaaa-769c6",
+  storageBucket: "aaaa-769c6.firebasestorage.app",
+  messagingSenderId: "959874165382",
+  appId: "1:959874165382:web:f1d4d7a46b1c7249aaff07",
+  validKey: "AIzaSyBEYUKlsycfCcvxJ7ZbHFV_J31x10IjaoU"
 };
 
 const app = initializeApp(firebaseConfig);

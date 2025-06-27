@@ -1,6 +1,7 @@
 // app/layout.jsx
 import { Inter, Roboto_Mono } from "next/font/google"
 import "./globals.css"
+import PushNotificationClient from "@/components/PushNotificationClient"
 
 const inter = Inter({
   variable: "--font-sans",
@@ -29,6 +30,7 @@ export default function RootLayout({ children }) {
         `}
       >
         {children}
+        <PushNotificationClient/>
       </body>
     </html>
   )
