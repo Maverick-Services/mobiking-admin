@@ -1,3 +1,4 @@
+// app/api/send-notification/route.js
 import admin from 'firebase-admin'
 import { messaging } from '@/lib/firebase-admin'
 

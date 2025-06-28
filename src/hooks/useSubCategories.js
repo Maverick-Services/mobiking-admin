@@ -63,7 +63,7 @@ export const useSubCategories = () => {
         enabled: canEdit,
         onSuccess: () => {
             queryClient.invalidateQueries(['subCategories']);
-            toast.success('Category updated successfully');
+            toast.success('Sub Category updated successfully');
         },
         onError: (err) => {
             console.log(err)
@@ -77,7 +77,7 @@ export const useSubCategories = () => {
         enabled: canDelete,
         onSuccess: () => {
             queryClient.invalidateQueries(['subCategories']);
-            toast.success('Category deleted successfully');
+            toast.success('Sub Category deleted successfully');
         },
         onError: (err) => {
             toast.error(err.message || 'Failed to delete Category');

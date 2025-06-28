@@ -1,13 +1,8 @@
 // api/images/route.js
 import cloudinary from "@/lib/cloudinary";
-import { Actions, Resources } from "@/lib/permissions";
-// import { requirePermissionApi } from "@/lib/serverPermissions";
 import { NextResponse } from "next/server";
 
 export async function POST(req) {
-    // const errorResponse = await requirePermissionApi(req, Resources.MEDIA, Actions.ADD);
-    // if (errorResponse) return errorResponse;
-
     try {
         const { image } = await req.json();
 

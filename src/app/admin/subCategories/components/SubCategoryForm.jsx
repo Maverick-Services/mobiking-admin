@@ -7,7 +7,7 @@ const MultiImageSelector = dynamic(
     { ssr: false }
 );
 
-import React from 'react'
+import React, { useRef } from 'react'
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -23,13 +23,17 @@ import ImageSelector from "@/components/ImageSelector";
 import { useCategories } from '@/hooks/useCategories';
 import PCard from '@/components/custom/PCard';
 import LoaderButton from '@/components/custom/LoaderButton';
+import { Textarea } from '@/components/ui/textarea';
+import { toast, Toaster } from 'sonner';
+import { uploadImage } from '@/lib/services/uploadImage';
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
     slug: z.string().min(1, "Slug is required").refine(val => !/\s/.test(val), {
         message: "Slug cannot contain spaces",
     }),
-    sequenceNo: z.coerce.number({ required_error: "Sequence number is required" }),
+    sequenceNo: z.number().optional(),
+    icon: z.string().min(1, "Icon is required"),
     active: z.boolean(),
     featured: z.boolean(),
     categoryId: z.string().min(1, "Category is required"),
@@ -46,10 +50,11 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
 
     const form = useForm({
         resolver: zodResolver(formSchema),
-        mode: 'onTouched',
+        mode: 'onSubmit',
         defaultValues: defaultValues || {
             name: "",
             slug: "",
+            icon: "",
             active: true,
             featured: false,
             sequenceNo: 0,
@@ -90,11 +95,59 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
     const [photosDialogOpen, setPhotosDialogOpen] = useState(false);
     // console.log(photos)
 
-    const upperBanner = watch('upperBanner')
-    const [upperDialog, setUpperDialog] = useState(false)
+    // const upperBanner = watch('upperBanner')
+    // const [upperDialog, setUpperDialog] = useState(false)
 
-    const lowerBanner = watch('lowerBanner')
-    const [lowerDialog, setLowerDialog] = useState(false)
+    const upperInputRef = useRef(null)
+   const onUpperClick = ()=> upperInputRef.current?.click();
+
+    // const lowerBanner = watch('lowerBanner')
+    // const [lowerDialog, setLowerDialog] = useState(false)
+
+    const lowerInputRef = useRef(null)
+
+    // 1. trigger native picker
+    const onLowerClick = () => lowerInputRef.current?.click()
+
+    // 2. handle file selection + upload
+    const onLowerChange = async (e) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        const toastId = toast.loading('Uploading...')
+        // Optional: you can show a spinner here
+        const reader = new FileReader()
+        reader.onloadend = async () => {
+            try {
+                const url = await uploadImage(reader.result)
+                setValue('lowerBanner', url, { shouldValidate: true })
+                toast.success('Image Uploaded', { id: toastId })
+            } catch (err) {
+                console.error(err)
+                toast.success('Error', { id: toastId })
+            }
+        }
+        reader.readAsDataURL(file)
+    }
+
+     const onUpperChange = async (e) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        const toastId = toast.loading('Uploading...')
+        const reader = new FileReader()
+        reader.onloadend = async () => {
+            try {
+                const url = await uploadImage(reader.result)
+                setValue('upperBanner', url, { shouldValidate: true })
+                toast.success('Image Uploaded', { id: toastId })
+            } catch (err) {
+                console.error(err)
+                toast.success('Error', { id: toastId })
+            }
+        }
+        reader.readAsDataURL(file)
+    }
 
     if (error) {
         console.log(error)
@@ -168,6 +221,21 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                         </PCard>
 
                         <PCard>
+                            {/* Icon */}
+                            <FormField
+                                control={form.control}
+                                name="icon"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Icon<span className="text-red-500"> *</span></FormLabel>
+                                        <FormControl>
+                                            <Textarea placeholder="Paste an svg icon here." {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
                             {/* Sequence Number */}
                             <FormField
                                 control={form.control}
@@ -308,51 +376,68 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                             </div>
                         </PCard>
 
-                        <PCard>
                             {/* upper Banner */}
+                        <PCard>
+                            <input
+                            type="file"
+                            accept="image/*,.gif"
+                            ref={upperInputRef}
+                            className="hidden"
+                            onChange={onUpperChange}
+                        />
                             <FormField
                                 control={control}
                                 name="upperBanner"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Upper Banner<span className="text-red-500"> *</span></FormLabel>
+                                        <FormLabel>Upper Banner<span className="text-red-500">*</span></FormLabel>
 
-                                        {/* Preview or placeholder */}
-                                        {!upperBanner ? (
+                                        {/* 3. on click, open file picker */}
+                                        {!field.value ? (
                                             <div
                                                 className="border-2 border-dashed border-gray-300 rounded-lg mt-3 h-36 flex items-center justify-center cursor-pointer"
-                                                onClick={() => setUpperDialog(true)}
+                                                onClick={onUpperClick}
                                             >
-                                                <span className="text-gray-500">Click to select upper banner</span>
+                                                <span className="text-gray-500">Click to select Upper banner</span>
                                             </div>
                                         ) : (
-                                            <div className="relative h-48 w-full border rounded-lg mb-2">
+                                            <div className="relative w-full aspect-[2/1] border rounded-lg mb-2">
                                                 <Image
-                                                    src={upperBanner}
+                                                    src={field.value}
                                                     alt="Selected Upper Banner"
                                                     fill
                                                     className="object-contain"
                                                 />
                                             </div>
+
                                         )}
 
-                                        {/* Change / Select button */}
-                                        {upperBanner &&
+                                        {/* change button also triggers picker */}
+                                        {field.value && (
                                             <Button
-                                                type='button'
+                                                type="button"
                                                 variant="outline"
-                                                onClick={() => setUpperDialog(true)}
+                                                onClick={onUpperClick}
                                                 className="mt-1"
                                             >
                                                 Change Upper Banner
                                             </Button>
-                                        }
+                                        )}
 
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
                         </PCard>
+
+
+                        <input
+                            type="file"
+                            accept="image/*,.gif"
+                            ref={lowerInputRef}
+                            className="hidden"
+                            onChange={onLowerChange}
+                        />
                         <PCard>
                             {/* Lower Banner */}
                             <FormField
@@ -360,42 +445,45 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                                 name="lowerBanner"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Lower Banner<span className="text-red-500"> *</span></FormLabel>
+                                        <FormLabel>Lower Banner<span className="text-red-500">*</span></FormLabel>
 
-                                        {/* Preview or placeholder */}
-                                        {!lowerBanner ? (
+                                        {/* 3. on click, open file picker */}
+                                        {!field.value ? (
                                             <div
                                                 className="border-2 border-dashed border-gray-300 rounded-lg mt-3 h-36 flex items-center justify-center cursor-pointer"
-                                                onClick={() => setLowerDialog(true)}
+                                                onClick={onLowerClick}
                                             >
                                                 <span className="text-gray-500">Click to select Lower banner</span>
                                             </div>
                                         ) : (
-                                            <div className="relative h-48 w-full border rounded-lg mb-2">
+                                            <div className="relative w-full aspect-[2/1] border rounded-lg mb-2">
                                                 <Image
-                                                    src={lowerBanner}
+                                                    src={field.value}
                                                     alt="Selected lower Banner"
                                                     fill
                                                     className="object-contain"
                                                 />
                                             </div>
+
                                         )}
 
-                                        {/* Change / Select button */}
-                                        {lowerBanner &&
+                                        {/* change button also triggers picker */}
+                                        {field.value && (
                                             <Button
-                                                type='button'
+                                                type="button"
                                                 variant="outline"
-                                                onClick={() => setLowerDialog(true)}
+                                                onClick={onLowerClick}
                                                 className="mt-1"
                                             >
-                                                Change lower banner
+                                                Change Lower Banner
                                             </Button>
-                                        }
+                                        )}
+
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
+
                         </PCard>
                     </div>
                     <div className='flex items-end justify-end mt-3'>
@@ -409,34 +497,34 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                 </form>
             </Form>
 
-            <ImageSelector
+            {/* <ImageSelector
                 open={upperDialog}
                 onOpenChange={setUpperDialog}
                 setImage={(url) => {
                     setValue("upperBanner", url, { shouldValidate: true });
                     setUpperDialog(false);
                 }}
-            />
+            /> */}
 
-            <ImageSelector
+            {/* <ImageSelector
                 open={lowerDialog}
                 onOpenChange={setLowerDialog}
                 setImage={(url) => {
                     setValue("lowerBanner", url, { shouldValidate: true });
                     setLowerDialog(false);
                 }}
-            />
+            /> */}
 
             <MultiImageSelector
                 open={photosDialogOpen}
                 onOpenChange={setPhotosDialogOpen}
                 onChange={(newUrls) => {
-                    // append whatever you just picked
                     setValue("photos", [...(photos || []), ...newUrls], {
                         shouldValidate: true,
                     });
                 }}
             />
+            <Toaster position='top-right' richColors />
         </div>
     )
 }
