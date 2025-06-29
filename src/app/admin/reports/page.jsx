@@ -1,10 +1,19 @@
 import React from 'react'
+import InnerDashboardLayout from '@/components/dashboard/InnerDashboardLayout'
+import { Button } from '@/components/ui/button'
 
 function page() {
     return (
-        <div className="space-y-4">
-            <h1 className="text-2xl font-bold">Orders</h1>
-        </div>
+        <InnerDashboardLayout>
+            <div className='flex items-center justify-between w-full mb-3'>
+                <h1 className="text-primary font-bold sm:text-2xl lg:text-3xl mb-3">Reports</h1>
+
+                <Button variant={'outline'}>
+                    Generate Report
+                </Button>
+            </div>
+
+        </InnerDashboardLayout>
     )
 }
 
