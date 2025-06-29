@@ -1,8 +1,8 @@
 'use client';
 
-import { TrendingUp, CalendarIcon, Loader2 } from "lucide-react";
+import {  Loader2 } from "lucide-react";
 import { CartesianGrid, AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
-import { useCustomerCount } from '@/hooks/useDashboard'
+import { useOrderCount } from '@/hooks/useDashboard'
 import React, { useEffect, useState } from 'react'
 import {
     Card,
@@ -30,7 +30,7 @@ function CustomTooltip({ active, payload, label }) {
   return null;
 }
 
-export function CustomersChart() {
+export function OrdersChart() {
     const today = new Date()
     const initialRange = { from: startOfMonth(today), to: today }
     const [range, setRange] = useState(initialRange)
@@ -43,20 +43,20 @@ export function CustomersChart() {
     const formattedStart = format(range.from, 'dd MMM yyyy')
     const formattedEnd = format(range.to, 'dd MMM yyyy')
 
-    const { isLoading, error, data: customersData } = useCustomerCount(format(range.from, 'yyyy-MM-dd'), format(range.to, 'yyyy-MM-dd'))
+    const { isLoading, error, data: ordersData } = useOrderCount(format(range.from, 'yyyy-MM-dd'), format(range.to, 'yyyy-MM-dd'))
 
-    const chartData = customersData?.dates?.map((date, index) => ({
+    const chartData = ordersData?.dates?.map((date, index) => ({
         month: date,
-        desktop: customersData.customerCounts[index] || 0,
+        desktop: ordersData.dailyCounts[index] || 0,
     })) || []
 
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                    <CardTitle>Customer</CardTitle>
+                    <CardTitle>Orders</CardTitle>
                     <CardDescription>
-                        Data shows the number of customers
+                        Data shows the number of orders
                     </CardDescription>
                 </div>
                 <DateRangeSelector onChange={setRange} defaultRange={initialRange} />
@@ -76,9 +76,9 @@ export function CustomersChart() {
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={chartData} margin={{ left: 12, right: 12 }}>
                                 <defs>
-                                    <linearGradient id="colorCustomer" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="var(--color-chart-2)" stopOpacity={0.6} />
-                                        <stop offset="95%" stopColor="var(--color-chart-2)" stopOpacity={0} />
+                                    <linearGradient id="colorOrder" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="var(--color-chart-4)" stopOpacity={0.6} />
+                                        <stop offset="95%" stopColor="var(--color-chart-4)" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid vertical={false} />
@@ -87,7 +87,6 @@ export function CustomersChart() {
                                     tickLine={false}
                                     axisLine={false}
                                     tickMargin={8}
-                                      tick={{ fontSize: 12 }}
                                     tickFormatter={(value) => format(new Date(value), 'dd MMM')}
                                 />
                                 <YAxis hide />
@@ -95,9 +94,9 @@ export function CustomersChart() {
                                 <Area
                                     type="monotone"
                                     dataKey="desktop"
-                                    stroke="var(--color-chart-2)"
+                                    stroke="var(--color-chart-4)"
                                     fillOpacity={1}
-                                    fill="url(#colorCustomer)"
+                                    fill="url(#colorOrder)"
                                     strokeWidth={1}
                                     dot={false}
                                 />

@@ -13,6 +13,10 @@ import SalesOfOneDay from "./(dashboard)/SalesOfOneDay";
 import SalesOfOneMonth from "./(dashboard)/SalesOfOneMonth";
 import Time from "./(dashboard)/Time";
 import { CustomersChart } from "./(dashboard)/CustomersChart";
+import { OrdersChart } from "./(dashboard)/OrdersChart";
+import { ChartAreaInteractive } from "@/components/home/Chart2";
+import FilteredOrdersChart from "./(dashboard)/FilteredOrdersChart";
+import { SalesChartByDate } from "./(dashboard)/SalesChartByDates";
 
 export default function Home() {
   const { refetch, isFetching } = useTotalOrders();
@@ -39,15 +43,21 @@ export default function Home() {
         <TotalOrders />
         <TotalCustomers />
         <TotalSales />
-        <SalesOfOneDay/>
-        <SalesOfOneMonth/>
-        <Time/>
+        <SalesOfOneDay />
+        <SalesOfOneMonth />
+        <Time />
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-3">
-        <CustomersChart/>
-        <CustomersChart/>
-        {/* <ChartAreaInteractive /> */}
+        <CustomersChart />
+        {/* <OrdersChart /> */}
+        <SalesChartByDate/>
+      </div>
+      <div>
+
+<div className="mt-3">
+        <FilteredOrdersChart />
+</div>
       </div>
     </InnerDashboardLayout>
   );
