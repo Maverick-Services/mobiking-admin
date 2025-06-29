@@ -22,7 +22,7 @@ const TableSkeleton = ({
             )}
 
             {/* Table Structure */}
-            <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm bg-white">
+            <div className="overflow-hidden rounded border border-gray-200 bg-white">
                 {/* Table Headers */}
                 <div className="bg-gray-50 p-4 grid grid-cols-12 gap-4">
                     {Array.from({ length: columns }).map((_, idx) => (

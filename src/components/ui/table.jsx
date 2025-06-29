@@ -9,7 +9,7 @@ function Table({
   ...props
 }) {
   return (
-    (<div data-slot="table-container" className="relative w-full overflow-x-auto bg-white border border-gray-200 rounded">
+    (<div data-slot="table-container" className="relative w-full overflow-x-auto bg-white border border-gray-200">
       <table
         data-slot="table"
         className={cn("w-full caption-bottom text-sm", className)}
