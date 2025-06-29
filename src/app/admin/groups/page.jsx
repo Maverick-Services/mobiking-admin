@@ -76,6 +76,7 @@ function page() {
             <GroupsTable
                 groups={groupsData}
                 onEdit={handleEditClick}
+                isLoading={groupsQuery.isLoading}
                 setGroupForProducts={setGroupForProducts}
                 setPrdouctsSheet={setPrdouctsSheet}
             />

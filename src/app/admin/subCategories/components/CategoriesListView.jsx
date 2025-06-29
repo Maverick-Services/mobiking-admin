@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import Loader from "@/components/Loader";
 import Image from "next/image";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog ";
+import TableSkeleton from "@/components/custom/TableSkeleton";
 
 export default function CategoriesListView({
     isLoading,
@@ -39,27 +40,9 @@ export default function CategoriesListView({
         setDeletingCategoryId(null);
     };
 
-    if (isLoading) {
-        return (
-            <div className="text-center p-4">
-                <Loader />
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="text-red-600 p-4">Error: {error.message}</div>
-        );
-    }
-
-    if (!categories?.length) {
-        return (
-            <div className="text-center text-gray-500 p-4">
-                No categories found!
-            </div>
-        );
-    }
+    if (isLoading) return <TableSkeleton showHeader={false} />;
+    if (error) return <div className="text-red-600 p-4">Error: {error.message}</div>
+    if (!categories?.length) return <div className="text-center text-gray-500 p-4">No categories found!</div>
 
     return (
         <section className="w-full">

@@ -29,8 +29,14 @@ function GroupProductsSheet({ open, onOpenChange, group, onProductsAdd, updating
     const { productsQuery } = useProducts()
     const allProducts = productsQuery?.data?.data || []
 
+    const [searchTerm, setSearchTerm] = useState('');
     const [selectedProducts, setSelectedProducts] = useState([])
     const [visibleProducts, setVisibleProducts] = useState([])
+
+    const filteredProducts = allProducts
+        .filter(p => p.fullName?.toLowerCase().includes(searchTerm.toLowerCase()))
+        .slice(0, 10); // only show top 10
+
 
     // Initialize local state whenever the sheet opens or the group changes
     useEffect(() => {
@@ -75,11 +81,6 @@ function GroupProductsSheet({ open, onOpenChange, group, onProductsAdd, updating
         if (updateProductsError) {
             console.log(updateProductsError)
         }
-        // console.log('Saving product IDs:', data)
-
-
-
-        // axios.put(`/api/groups/${group._id}/products`, { productIds: selectedProducts })
     }
 
     return (
@@ -109,10 +110,13 @@ function GroupProductsSheet({ open, onOpenChange, group, onProductsAdd, updating
                             </PopoverTrigger>
                             <PopoverContent className="w-[300px] p-0" align="start">
                                 <Command>
-                                    <CommandInput placeholder="Search products..." />
+                                    <CommandInput
+                                        placeholder="Search products..."
+                                        onValueChange={setSearchTerm}
+                                    />
                                     <CommandList>
                                         <CommandEmpty>No products found.</CommandEmpty>
-                                        {allProducts.map(product => (
+                                        {filteredProducts.map(product => (
                                             <CommandItem
                                                 key={product._id}
                                                 onSelect={() => handleToggle(product._id)}

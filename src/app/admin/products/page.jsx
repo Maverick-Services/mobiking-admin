@@ -12,6 +12,7 @@ import { CirclePlus } from "lucide-react"
 import ProductsListView from "./components/ProductsTable"
 import ProductDialog from "./components/ProductDialog"
 import StockUpdate from "./components/StockUpdate"
+import TableSkeleton from "@/components/custom/TableSkeleton"
 
 export default function page() {
     const [categoryFilter, setCategoryFilter] = useState("all")
@@ -33,9 +34,7 @@ export default function page() {
     const { subCategoriesQuery } = useSubCategories()
     const subCategories = subCategoriesQuery.data?.data || []
 
-    if (productsQuery.isLoading || subCategoriesQuery.isLoading) {
-        return <Loader />
-    }
+
 
     const allProducts = productsQuery.data?.data || []
 
@@ -121,18 +120,21 @@ export default function page() {
                 </div>
 
                 {/* Table */}
-                <ProductsListView
-                    error={productsQuery.error}
-                    products={finalFiltered}
-                    // onDelete={deleteAsync}
-                    // isDeleting={isDeleting}
-                    // deleteError={deleteError}
-                    canDelete={canDelete}
-                    canEdit={canEdit}
-                    onEdit={handleEditClick}
-                    setStockEditing={setStockEditing}
-                    setSelectedProduct={setSelectedStockProduct}
-                />
+                {(productsQuery.isLoading || subCategoriesQuery.isLoading)
+                    ? <TableSkeleton showHeader={false} />
+                    : <ProductsListView
+                        error={productsQuery.error}
+                        products={finalFiltered}
+                        // onDelete={deleteAsync}
+                        // isDeleting={isDeleting}
+                        // deleteError={deleteError}
+                        canDelete={canDelete}
+                        canEdit={canEdit}
+                        onEdit={handleEditClick}
+                        setStockEditing={setStockEditing}
+                        setSelectedProduct={setSelectedStockProduct}
+                    />
+                }
 
                 <ProductDialog
                     open={isDialogOpen}

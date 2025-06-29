@@ -15,6 +15,7 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import Loader from '@/components/Loader';
 import DeleteConfirmationDialog from './DeleteConfirmationDialog ';
+import TableSkeleton from '@/components/custom/TableSkeleton';
 
 export default function GroupsTable({
     error,
@@ -26,10 +27,11 @@ export default function GroupsTable({
     canEdit,
     onEdit,
     setGroupForProducts,
-    setPrdouctsSheet
+    setPrdouctsSheet,
+    isLoading
 }) {
 
-    console.log(groups.data)
+    // console.log(groups.data)
 
     const groupsData = groups?.data || []
 
@@ -44,6 +46,8 @@ export default function GroupsTable({
         await onDelete(deletingId);
         setDeletingId(null);
     };
+
+    if (isLoading) return <TableSkeleton showHeader={false} />;
 
     if (error) {
         return (
