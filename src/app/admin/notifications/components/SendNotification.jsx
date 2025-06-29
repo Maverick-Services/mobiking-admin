@@ -1,24 +1,23 @@
 "use client"
 
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle
+    Dialog, DialogContent, DialogHeader, DialogTitle
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { useForm } from "react-hook-form"
 import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form"
-import { useRef, useState } from "react"
+import { useState } from "react"
 import LoaderButton from "@/components/custom/LoaderButton"
 import ImageSelector from "@/components/ImageSelector"
 import axios from "axios"
+import { useNotifications } from "@/hooks/useNotifications"
 
 export default function SendNotification({ open, onOpenChange }) {
+    const { createNotification } = useNotifications()
+    const [sending, setSending] = useState(false)
+
     const form = useForm({
         defaultValues: {
             title: "",
@@ -28,18 +27,25 @@ export default function SendNotification({ open, onOpenChange }) {
         },
     })
 
-    const {watch, setValue} = form;
+    const { watch, setValue, reset } = form;
 
     const image = watch("image")
     const [imagePicker, setImagePicker] = useState(false)
 
-    const onSubmit = (values) => {
+    const onSubmit = async (values) => {
         console.log("Sending Notification:", values)
+        setSending(true)
         try {
+            const abc = {...values,}
             const res = axios.post('/api/send-notification', values)
+            await createNotification.mutateAsync(abc)
             console.log(res)
+            onOpenChange(false)
+            reset({})
         } catch (error) {
             console.log(error)
+        }finally{
+            setSending(false)
         }
     }
 
@@ -99,7 +105,7 @@ export default function SendNotification({ open, onOpenChange }) {
                                     />
                                     <button
                                         type="button"
-                                        onClick={()=> setValue("image", null)}
+                                        onClick={() => setValue("image", null)}
                                         className="absolute top-2 right-2 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
                                         title="Remove image"
                                     >
@@ -122,18 +128,22 @@ export default function SendNotification({ open, onOpenChange }) {
                             )}
                         />
 
-                        <LoaderButton type="submit" className="w-full">
+                        <LoaderButton
+                        loading={createNotification.isPending || sending}
+                         type="submit" 
+                         className="w-full"
+                         >
                             Send Notification
                         </LoaderButton>
                     </form>
                 </Form>
                 <ImageSelector
-                onOpenChange={setImagePicker}
-                open={imagePicker}
-                setImage={(url) => {
-                    setValue("image", url, { shouldValidate: true });
-                    setImagePicker(false);
-                }}
+                    onOpenChange={setImagePicker}
+                    open={imagePicker}
+                    setImage={(url) => {
+                        setValue("image", url, { shouldValidate: true });
+                        setImagePicker(false);
+                    }}
                 />
             </DialogContent>
         </Dialog>

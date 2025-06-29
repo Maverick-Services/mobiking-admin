@@ -91,9 +91,9 @@ export const ADMIN_SIDEBAR_LINKS = [
         icon: <FaUserFriends />,
     },
     {
-        key: 'users',
-        label: 'Users',
-        href: '/admin/users',
+        key: 'employees',
+        label: 'Employees',
+        href: '/admin/employees',
         icon: <FaUsersCog />,
     },
     {

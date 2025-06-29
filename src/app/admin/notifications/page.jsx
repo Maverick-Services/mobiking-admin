@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import InnerDashboardLayout from '@/components/dashboard/InnerDashboardLayout';
 import { Button } from '@/components/ui/button';
 import SendNotification from './components/SendNotification';
+import NotificationTable from './components/NotificationTable';
 
 function page() {
     const [notiDialog, setNotiDialog] = useState(false)
@@ -16,6 +17,9 @@ function page() {
                     Create New Notification
                 </Button>
             </div>
+
+            <NotificationTable />
+
             <SendNotification
                 open={notiDialog}
                 onOpenChange={setNotiDialog}
