@@ -1,9 +1,7 @@
 "use client"
-import RefreshButton from "@/components/custom/RefreshButton";
 import InnerDashboardLayout from "@/components/dashboard/InnerDashboardLayout";
-// import POS from "@/components/POS";
-// import { Button } from "@/components/ui/button";
-import { useTotalOrders } from "@/hooks/useDashboard";
+import POS from "@/components/POS";
+import { Button } from "@/components/ui/button";
 import TotalOrders from "./(dashboard)/TotalOrders";
 import TotalCustomers from "./(dashboard)/TotalCustomers";
 import TotalSales from "./(dashboard)/TotalSales";
@@ -13,14 +11,10 @@ import SalesOfOneDay from "./(dashboard)/SalesOfOneDay";
 import SalesOfOneMonth from "./(dashboard)/SalesOfOneMonth";
 import Time from "./(dashboard)/Time";
 import { CustomersChart } from "./(dashboard)/CustomersChart";
-import { OrdersChart } from "./(dashboard)/OrdersChart";
-import { ChartAreaInteractive } from "@/components/home/Chart2";
 import FilteredOrdersChart from "./(dashboard)/FilteredOrdersChart";
 import { SalesChartByDate } from "./(dashboard)/SalesChartByDates";
 
 export default function Home() {
-  const { refetch, isFetching } = useTotalOrders();
-
   return (
     <InnerDashboardLayout>
       <div className="w-full flex justify-between items-center gap-4 mb-4">
@@ -28,14 +22,9 @@ export default function Home() {
           Mobiking Admin
         </h1>
         <div className="flex gap-2 items-center justify-center">
-          {/* <POS>
+          <POS>
             <Button>POS</Button>
-          </POS> */}
-          <RefreshButton
-            onRefresh={refetch}
-            isRefreshing={isFetching}
-            label="Refresh"
-          />
+          </POS>
         </div>
       </div>
 

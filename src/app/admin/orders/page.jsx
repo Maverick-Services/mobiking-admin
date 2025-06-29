@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import InnerDashboardLayout from '@/components/dashboard/InnerDashboardLayout'
 import { useOrders } from '@/hooks/useOrders'
 import { DateRangePicker } from '@/components/custom/date-range-picker'
@@ -7,6 +7,12 @@ import { Button } from '@/components/ui/button'
 import OrdersListView from './components/OrdersListView'
 import POS from '@/components/POS'
 import TableSkeleton from '@/components/custom/TableSkeleton'
+import DateRangeSelector from '@/components/custom/DateRangeSelector'
+import { format, startOfMonth, startOfToday, subDays } from 'date-fns'
+import { Separator } from '@/components/ui/separator'
+import AmountCards from './components/AmountCards'
+import { ChevronDown } from 'lucide-react'
+import { LayoutGroup, motion } from 'framer-motion'
 
 const TABS = [
     { key: 'all', label: 'ALL ORDERS' },
@@ -14,10 +20,10 @@ const TABS = [
     { key: 'app', label: 'APP' },
     { key: 'regular', label: 'REGULAR' },
     { key: 'pos', label: 'POS' },
-    { key: 'abandoned', label: 'ABANDONED CHECKOUT ORDERS' },
     { key: 'returns', label: 'RETURNS' },
-    { key: 'cancelled', label: 'Cancel Requests' },
+    { key: 'cancelled', label: 'CANCEL REQUESTS' },
     { key: 'warranty', label: 'WARRANTY' },
+    { key: 'abandoned', label: 'ABANDONED CHECKOUT ORDERS' },
 ]
 
 const STATUS_CARDS = [
@@ -26,52 +32,63 @@ const STATUS_CARDS = [
     'Shipped',
     'Delivered',
     'Cancelled',
-    'Returned',
-    'Replaced',
     'Hold'
 ]
 
 const STATUS_BORDER = {
-    New: 'border-blue-500',
+    New: 'border-indigo-500',
     Accepted: 'border-green-500',
     Shipped: 'border-yellow-500',
     Delivered: 'border-teal-500',
     Cancelled: 'border-red-500',
     Returned: 'border-indigo-500',
     Replaced: 'border-purple-500',
-    Hold: 'border-orange-500',
+    Hold: 'border-purple-500',
+}
+
+const STATUS_BG = {
+    New: 'bg-indigo-500',
+    Accepted: 'bg-green-500',
+    Shipped: 'bg-yellow-500',
+    Delivered: 'bg-teal-500',
+    Cancelled: 'bg-red-500',
+    Returned: 'bg-indigo-500',
+    Replaced: 'bg-purple-500',
+    Hold: 'bg-purple-500',
 }
 
 export default function Page() {
-    // 1. Default to last 7 days
+    const [showAmountCards, setShowAmountCards] = useState(false)
+
+    // Date range
     const today = new Date()
-    const defaultFrom = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6)
-    const defaultTo = today
+    const pastDate = new Date()
+    const from = pastDate.setDate(today.getDate() - 6)
 
-    // 2. Track the picker range
-    const [range, setRange] = useState({ from: defaultFrom, to: defaultTo })
+    const initialRange = { from: from, to: today }
+    const [range, setRange] = useState(initialRange)
 
-    // 4. Hook with both all-orders and getOrdersByDate
+    useEffect(() => {
+        setRange(initialRange)
+    }, [])
+
     const { getOrdersByDate } = useOrders();
 
+    const formattedStart = format(range.from, 'dd MMM yyyy')
+    const formattedEnd = format(range.to, 'dd MMM yyyy')
 
-    // Format Date to YYYY-MM-DD
-    const fmt = date => date.toISOString().split('T')[0]
-    const startDate = fmt(range.from)
-    const endDate = fmt(range.to)
+    const startDate = format(range.from, 'yyyy-MM-dd')
+    const endDate = format(range.to, 'yyyy-MM-dd')
 
-    console.log(getOrdersByDate({ startDate, endDate }))
-    // ✅ Now it's safe to call the hook
+    // Data fetching
     const { data: customOrdersData, isFetching, error } = getOrdersByDate({ startDate, endDate })
-
-    // This will be used for display
     const displayOrders = customOrdersData ?? [];
 
-    console.log(displayOrders)
-
     const [statusFilter, setStatusFilter] = useState(null)
+    console.log(statusFilter)
 
     const [activeTab, setActiveTab] = useState('all')
+
     // helper to get last request in the requests-array
     const lastRequestOf = (order) =>
         Array.isArray(order.requests) && order.requests.length > 0
@@ -82,14 +99,16 @@ export default function Page() {
         const counts = {}
         TABS.forEach(({ key }) => counts[key] = 0)
 
-        // 1) First, filter by activeTab & statusFilter
+        // First, filter by activeTab & statusFilter
         const filteredOrders = displayOrders.filter((o) => {
+
             // if a status card has been clicked, short‑circuit
             if (statusFilter) {
-                return o.status === statusFilter
+                return o.status === statusFilter && !o.abondonedOrder
             }
 
             const lastReq = lastRequestOf(o)
+
             switch (activeTab) {
                 case 'website': return !o.isAppOrder && o.type === 'Regular' && !o.abondonedOrder
                 case 'app': return o.isAppOrder && o.type === 'Regular' && !o.abondonedOrder
@@ -103,7 +122,7 @@ export default function Page() {
             }
         })
 
-        // 2) Compute tab counts (ignoring statusFilter here)
+        // Compute tab counts (ignoring statusFilter here)
         TABS.forEach(({ key }) => {
             counts[key] = displayOrders.filter((o) => {
                 const lastReq = lastRequestOf(o)
@@ -130,81 +149,101 @@ export default function Page() {
         return { filteredOrders, counts, statusCounts }
     }, [displayOrders, activeTab, statusFilter])
 
-
     return (
         <InnerDashboardLayout>
-            <div className="w-full flex items-center justify-between gap-4 mb-6">
-                <h1 className="text-primary font-bold sm:text-2xl lg:text-4xl">
-                    Orders
-                </h1>
+            {/* Header */}
+            <div className="w-full flex items-center justify-between gap-4 border-b border-gray-500 pb-4">
+                <div>
+                    <h1 className="text-primary font-semibold sm:text-2xl lg:text-4xl">
+                        Orders
+                    </h1>
+                    <p className='text-xs text-gray-600 mt-2'>Showing Summary: <strong>{formattedStart}</strong> - <strong>{formattedEnd}</strong></p>
+                </div>
                 <div className="space-x-1 flex">
-                    <DateRangePicker
-                        initialDateFrom={range.from}
-                        initialDateTo={range.to}
-                        onUpdate={({ range: newRange }) => setRange(newRange)}
-                    />
-                    <POS>
-                        <Button>POS</Button>
-                    </POS>
+                    {/* button to open and collapse amount cards */}
+                    <Button variant="outline" onClick={() => setShowAmountCards(prev => !prev)}>
+                        <ChevronDown className={`transition-transform duration-300 ${showAmountCards ? '' : 'rotate-180'}`} />
+                    </Button>
+
+                    <DateRangeSelector onChange={setRange} defaultRange={initialRange} />
+                    <Button>POS</Button>
+                    {/* <POS>
+                    </POS> */}
                 </div>
             </div>
 
-            {/* ─── STATUS CARDS ─────────────────────── */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4 mb-6">
+            {/* Amount Cards */}
+            <div
+                className={`transition-all mb-6 duration-500 overflow-hidden ${showAmountCards ? 'max-h-[1000px] opacity-100 scale-100' : 'max-h-0 opacity-0 scale-95'}`}
+            >
+                <AmountCards orders={displayOrders} />
+            </div>
+
+            {/* ─── STATUS CARDS ─── */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-6">
                 {STATUS_CARDS.map((status) => (
                     <div
                         key={status}
                         className={`
-        cursor-pointer 
-        bg-white 
-        ${STATUS_BORDER[status] || 'border-gray-300'} 
-        border 
-        rounded-lg 
-        p-4 
-        text-center 
-        hover:shadow-sm 
-        transition
-      `}
+                            cursor-pointer 
+                            ${statusFilter === status ? `${STATUS_BG[status]} text-white` : 'bg-white'}
+                            ${STATUS_BORDER[status] || 'border-gray-300'} 
+                            border 
+                            rounded-lg 
+                            p-2 lg:p-4
+                            text-center 
+                            hover:shadow-sm 
+                            transition-all duration-300
+                       `}
                         onClick={() => {
-                            setStatusFilter(status)
+                            setStatusFilter(prev => prev === status ? null : status)
                             setActiveTab('all')
                         }}
                     >
                         <h2 className="text-2xl font-bold">{statusCounts[status]}</h2>
-                        <p className="text-sm text-gray-600">{status}</p>
+                        <p className={`text-xs lg:text-sm ${statusFilter === status ? `text-white` : 'text-gray-600'}`}>
+                            {status}
+                        </p>
                     </div>
                 ))}
             </div>
 
             {/* Tab bar */}
-            <div className="flex flex-wrap gap-2 mb-6">
-                {TABS.map(({ key, label }) => {
-                    const isActive = activeTab === key
-                    return (
-                        <button
-                            key={key}
-                            className={`
-          px-4 py-2 rounded text-sm font-medium transition
-          ${isActive
-                                    ? 'bg-white shadow text-primary'
-                                    : 'bg-gray-200 text-gray-600 hover:bg-white hover:text-black'}
-        `}
-                            onClick={() => {
-                                setActiveTab(key)
-                                setStatusFilter(null)
-                            }}
-                        >
-                            {label} ({counts[key]})
-                        </button>
-                    )
-                })}
-            </div>
+            <LayoutGroup>
+                <div className="flex gap-2 mb-0 overflow-x-auto bg-white scrollbar-hide relative">
+                    {TABS.map(({ key, label }) => {
+                        const isActive = activeTab === key
+                        return (
+                            <button
+                                key={key}
+                                onClick={() => {
+                                    setActiveTab(key)
+                                    setStatusFilter(null)
+                                }}
+                                className={`
+            relative px-4 py-6 text-sm font-medium transition-all duration-300 flex gap-1 w-full min-w-fit
+            ${isActive ? 'font-bold text-black' : 'text-gray-600'}
+          `}
+                            >
+                                <span>{label}</span>
+                                <span>({counts[key]})</span>
+
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="tab-indicator"
+                                        className="absolute bottom-0 left-0 right-0 h-1 bg-black rounded-full"
+                                    />
+                                )}
+                            </button>
+                        )
+                    })}
+                </div>
+            </LayoutGroup>
 
 
             {/* Table */}
-
             {isFetching ?
-                <TableSkeleton />
+                <TableSkeleton showHeader={false} />
                 : <OrdersListView
                     // error={ordersQuery.error}
                     orders={filteredOrders}

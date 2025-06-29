@@ -16,7 +16,6 @@ export const useOrders = () => {
     const canEdit = checkPermission(user, Resources.ORDERS, Actions.EDIT)
     const canDelete = checkPermission(user, Resources.ORDERS, Actions.DELETE)
 
-    // 1️⃣ All‐orders query
     const ordersQuery = useQuery({
         queryKey: ['orders', 'all'],
         enabled: canView,
@@ -25,14 +24,12 @@ export const useOrders = () => {
         onError: err => toast.error(err.message || 'Failed to fetch orders'),
     })
 
-    // 2️⃣ Imperative “get by date” helper
     const getOrdersByDate = ({ startDate, endDate }) => useQuery({
         queryKey: ['orders', 'custom', startDate, endDate],
         queryFn: () =>
             api
                 .get('/orders/custom', { params: { startDate, endDate } })
                 .then(res => {
-                    // assume API replies { data: Order[] }
                     return Array.isArray(res.data)
                         ? res.data
                         : res.data.data || []

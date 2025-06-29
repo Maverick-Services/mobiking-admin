@@ -30,7 +30,7 @@ function SalesOfOneDay() {
             <div className="text-sm text-muted-foreground flex flex-col items-end gap-2">
                 <Popover>
                     <PopoverTrigger asChild>
-                               <Button variant="outline" className="flex gap-2 items-center">
+                        <Button variant="outline" className="flex gap-2 items-center">
                             <CalendarDays className="h-4 w-4" />
                         </Button>
                     </PopoverTrigger>
@@ -38,7 +38,11 @@ function SalesOfOneDay() {
                         <Calendar
                             mode="single"
                             selected={selectedDate}
-                            onSelect={setSelectedDate}
+                            onSelect={(date) => {
+                                if (!date) return 
+                                if (format(date, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')) return
+                                setSelectedDate(date)
+                            }}
                             initialFocus
                         />
                     </PopoverContent>

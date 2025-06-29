@@ -17,6 +17,8 @@ import { format } from 'date-fns'
 import { FaWhatsapp } from 'react-icons/fa'
 import AcceptDialog from './AcceptDialog'
 import { OrderViewDialog } from './OrderViewDialog'
+import { motion, AnimatePresence } from 'framer-motion'
+
 
 // Map each order status to a Badge variant
 const STATUS_VARIANTS = {
@@ -58,8 +60,8 @@ export default function OrdersListView({ error, orders = [] }) {
 
     return (
         <div>
-            <Table>
-                <TableHeader>
+            <Table className={'p-4 rounded-none shadow-none overflow-hidden scrollbar-hide'}>
+                <TableHeader className={''}>
                     <TableRow className="bg-gray-50">
                         <TableHead>#</TableHead>
                         <TableHead>Order No.</TableHead>
@@ -72,12 +74,21 @@ export default function OrdersListView({ error, orders = [] }) {
                         <TableHead className="text-center">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
-                <TableBody>
+                <TableBody className={' scrollbar-hide'}>
+                    <AnimatePresence mode="wait">
                     {orders.map((o, i) => {
                         const customerOrderNumber = o?.userId?.orders?.length || 0
                         const variant = STATUS_VARIANTS[o.status] || 'default'
                         return (
-                            <TableRow key={o._id} className="hover:bg-gray-100">
+                            <motion.tr
+                key={o._id}
+                layout
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="hover:bg-gray-100 scrollbar-hide"
+            >
                                 <TableCell>{i + 1}</TableCell>
                                 <TableCell>{o._id.slice(0, 6).toUpperCase()}</TableCell>
                                 <TableCell className="capitalize">
@@ -126,9 +137,10 @@ export default function OrdersListView({ error, orders = [] }) {
                                         <Download />
                                     </Button>
                                 </TableCell>
-                            </TableRow>
+                            </motion.tr>
                         )
                     })}
+                    </AnimatePresence>
                 </TableBody>
             </Table>
         </div>
