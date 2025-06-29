@@ -1,14 +1,18 @@
 "use client"
 import RefreshButton from "@/components/custom/RefreshButton";
 import InnerDashboardLayout from "@/components/dashboard/InnerDashboardLayout";
-import POS from "@/components/POS";
-import { Button } from "@/components/ui/button";
+// import POS from "@/components/POS";
+// import { Button } from "@/components/ui/button";
 import { useTotalOrders } from "@/hooks/useDashboard";
 import TotalOrders from "./(dashboard)/TotalOrders";
 import TotalCustomers from "./(dashboard)/TotalCustomers";
 import TotalSales from "./(dashboard)/TotalSales";
-import { ChartLineDefault } from "@/components/home/Chart1";
-import { ChartAreaInteractive } from "@/components/home/Chart2";
+// import { ChartLineDefault } from "@/components/home/Chart1";
+// import { ChartAreaInteractive } from "@/components/home/Chart2";
+import SalesOfOneDay from "./(dashboard)/SalesOfOneDay";
+import SalesOfOneMonth from "./(dashboard)/SalesOfOneMonth";
+import Time from "./(dashboard)/Time";
+import { CustomersChart } from "./(dashboard)/CustomersChart";
 
 export default function Home() {
   const { refetch, isFetching } = useTotalOrders();
@@ -20,9 +24,9 @@ export default function Home() {
           Mobiking Admin
         </h1>
         <div className="flex gap-2 items-center justify-center">
-          <POS>
+          {/* <POS>
             <Button>POS</Button>
-          </POS>
+          </POS> */}
           <RefreshButton
             onRefresh={refetch}
             isRefreshing={isFetching}
@@ -35,10 +39,15 @@ export default function Home() {
         <TotalOrders />
         <TotalCustomers />
         <TotalSales />
+        <SalesOfOneDay/>
+        <SalesOfOneMonth/>
+        <Time/>
       </div>
 
-      <div className="mt-3">
-        <ChartAreaInteractive />
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        <CustomersChart/>
+        <CustomersChart/>
+        {/* <ChartAreaInteractive /> */}
       </div>
     </InnerDashboardLayout>
   );
