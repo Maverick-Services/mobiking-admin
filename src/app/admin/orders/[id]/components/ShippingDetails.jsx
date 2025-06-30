@@ -25,6 +25,8 @@ function ShippingDetails({ order }) {
         expectedDeliveryDate
     } = order
 
+    console.log(order)
+
     const shippingFields = [
         ["Courier", courierName],
         ["AWB Code", awbCode],

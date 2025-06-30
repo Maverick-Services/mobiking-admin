@@ -23,7 +23,7 @@ export default function CourierDialog({ open, onOpenChange, order }) {
     const [loading, setLoading] = useState(false)
     const [selectedCourier, setSelectedCourier] = useState(null)
     const [formValues, setFormValues] = useState({
-        pickup_postcode: "110001",
+        pickup_postcode: "201206",
         delivery_postcode: order.pincode || "",
         cod: order.method === "COD" ? 1 : 0,
         weight: 0.5,
@@ -75,6 +75,7 @@ export default function CourierDialog({ open, onOpenChange, order }) {
         }
     }
 
+    console.log(courierData)
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[900px] min-h-[50vh] max-h-[90vh] overflow-auto">

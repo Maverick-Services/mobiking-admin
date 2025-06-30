@@ -13,6 +13,7 @@ import Time from "./(dashboard)/Time";
 import { CustomersChart } from "./(dashboard)/CustomersChart";
 import FilteredOrdersChart from "./(dashboard)/FilteredOrdersChart";
 import { SalesChartByDate } from "./(dashboard)/SalesChartByDates";
+import PosButton from "@/components/custom/PosButton";
 
 export default function Home() {
   return (
@@ -22,9 +23,10 @@ export default function Home() {
           Mobiking Admin
         </h1>
         <div className="flex gap-2 items-center justify-center">
-          <POS>
+          {/* <POS>
             <Button>POS</Button>
-          </POS>
+          </POS> */}
+          <PosButton/>
         </div>
       </div>
 
