@@ -1,6 +1,6 @@
 import React from 'react'
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -23,24 +23,31 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import PCard from '@/components/custom/PCard';
-import { Loader2, X } from 'lucide-react';
+import { Loader2, Plus, X } from 'lucide-react';
 import MultiImageSelector from '@/components/MultiImageSelector';
 import Image from 'next/image';
+import { Textarea } from '@/components/ui/textarea';
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
     fullName: z.string().min(1, "Full name is required"),
-    price: z.number().min(0, "Price must be a positive number"),
+    price: z.number().min(0, "Selling Price is required"),
+    basePrice: z.number().min(0, "Base Price is required"),
     gst: z.number().min(0, "GST must be a positive number"),
     slug: z.string().min(1, "Slug is required"),
     active: z.boolean(),
     description: z.string().min(1, "Description is required"),
+    descriptionPoints: z.array(z.string()).nullable(),
+    keyInformation: z.array(z.object({
+        title: z.string(),
+        content: z.string()
+    })).nullable(),
     categoryId: z.string().min(1, "Category is required"),
     images: z.array(z.string().min(1, "At least one image is required")),
 });
 
 function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate, isSubmitting, error, categories }) {
-    console.log(selectedProduct)
+    // console.log(selectedProduct)
     // console.log(selectedProduct)
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -50,9 +57,12 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
             fullName: "",
             price: 0,
             gst: 0,
+            basePrice: 0,
             slug: "",
             active: true,
             description: "",
+            descriptionPoints: [],
+            keyInformation: [],
             categoryId: "",
             images: [],
         }
@@ -66,22 +76,27 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                 fullName: selectedProduct.fullName,
                 price: selectedProduct?.sellingPrice[selectedProduct.sellingPrice?.length - 1].price,
                 gst: selectedProduct.gst,
+                basePrice: selectedProduct.basePrice,
                 slug: selectedProduct.slug,
                 active: selectedProduct.active,
                 description: selectedProduct.description,
+                descriptionPoints: selectedProduct.descriptionPoints,
+                keyInformation: selectedProduct.keyInformation,
                 categoryId: selectedProduct.category?._id || "",
                 images: selectedProduct.images || [],
             });
         } else {
-            // or back to your blank defaults
             reset({
                 name: "",
                 fullName: "",
                 price: 0,
                 gst: 0,
+                basePrice: 0,
                 slug: "",
                 active: true,
                 description: "",
+                descriptionPoints: [],
+                keyInformation: [],
                 categoryId: "",
                 images: [],
             });
@@ -97,14 +112,37 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
         form.setValue("slug", slug);
     }, [watchName]);
 
+    // setting value of base price
+    const watchPrice = watch('price')
+    const watchGst = watch('gst')
+    useEffect(() => {
+        const valBase = (watchPrice * (100 / (100 + +watchGst))).toFixed(2)
+        setValue('basePrice', Number(valBase))
+    }, [watchPrice, watchGst])
+
     const images = watch("images") || [];
     const [photosDialogOpen, setPhotosDialogOpen] = useState(false);
-    // console.log(categories)
+
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: "descriptionPoints",
+    });
+
+    const {
+        fields: keyInfoFields,
+        append: appendKeyInfo,
+        remove: removeKeyInfo,
+    } = useFieldArray({
+        control,
+        name: 'keyInformation',
+    })
+
 
     async function onSubmit(values) {
         console.log(values)
         if (selectedProduct) {
             await onUpdate({ id: selectedProduct._id, data: values })
+            // console.log(values)
         } else {
             await onCreate(values)
         }
@@ -112,7 +150,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[700px] max-h-[95vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>
                         {selectedProduct ? "Edit Product" : "Add Product"}
@@ -176,7 +214,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                     <FormItem>
                                         <FormLabel>Description<span className="text-red-500"> *</span></FormLabel>
                                         <FormControl>
-                                            <textarea
+                                            <Textarea
                                                 {...field}
                                                 rows={3}
                                                 placeholder="Write something about the product..."
@@ -200,7 +238,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                                 onValueChange={field.onChange}
                                                 defaultValue={field.value}
                                             >
-                                                <SelectTrigger>
+                                                <SelectTrigger className={'w-full'}>
                                                     <SelectValue placeholder="Select a category" />
                                                 </SelectTrigger>
                                                 <SelectContent className={'w-full'}>
@@ -217,47 +255,68 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                 )}
                             />
 
-                            {/* Selling price */}
-                            <FormField
-                                control={form.control}
-                                name="price"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Selling Price<span className="text-red-500"> *</span></FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="number"
-                                                placeholder="1999"
-                                                {...field}
-                                                onChange={(e) => field.onChange(Number(e.target.value))}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                            <div className='flex gap-2'>
+                                {/* Base price */}
+                                <FormField
+                                    control={form.control}
+                                    name="basePrice"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Base Price<span className="text-red-500"> *</span></FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    placeholder="1699"
+                                                    {...field}
+                                                    disabled
+                                                    onChange={(e) => field.onChange(Number(e.target.value))}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                            {/* GST */}
-                            <FormField
-                                control={form.control}
-                                name="gst"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>GST (%)<span className="text-red-500"> *</span></FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="number"
-                                                placeholder="18"
-                                                {...field}
-                                                onChange={(e) => field.onChange(Number(e.target.value))}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                {/* GST */}
+                                <FormField
+                                    control={form.control}
+                                    name="gst"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>GST (%)<span className="text-red-500"> *</span></FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    placeholder="18"
+                                                    {...field}
+                                                    onChange={(e) => field.onChange(Number(e.target.value))}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-
+                                {/* Selling price */}
+                                <FormField
+                                    control={form.control}
+                                    name="price"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Selling Price<span className="text-red-500"> *</span></FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    placeholder="1999"
+                                                    {...field}
+                                                    onChange={(e) => field.onChange(Number(e.target.value))}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
                             {/* Active */}
                             <FormField
                                 control={form.control}
@@ -318,6 +377,104 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                     <div className="text-gray-500 italic">No images selected</div>
                                 )}
 
+                            </div>
+
+                            {/* Description Points */}
+                            <div className='bg-gray-100 rounded p-4'>
+                                <p className='font-semibold mb-3'>Description Points</p>
+
+                                <div className='space-y-2'>
+                                    {fields.map((field, index) => (
+                                        <div key={field.id} className='flex gap-2 items-center'>
+                                            <FormField
+                                                control={control}
+                                                name={`descriptionPoints.${index}`}
+                                                render={({ field }) => (
+                                                    <FormItem className={'flex-1'}>
+                                                        <FormControl>
+                                                            <Input placeholder={`Point ${index + 1}`} {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <Button
+                                                type='button'
+                                                variant={'destructive'}
+                                                onClick={() => remove(index)}
+                                            >
+                                                <X />
+                                            </Button>
+                                        </div>
+                                    ))}
+
+                                </div>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="mt-3"
+                                    onClick={() => append("")}
+                                >
+                                    <Plus size={16} className="mr-1" /> Add Point
+                                </Button>
+                            </div>
+
+                            {/* Key Information */}
+                            <div className='bg-gray-100 rounded p-4'>
+                                <p className='font-semibold mb-3'>Key Information</p>
+                                <div className='space-y-2'>
+                                    {keyInfoFields.map((field, index) => (
+                                        <div key={field.id} className="flex gap-2 border p-3 rounded-md relative items-start">
+                                            {/* Title */}
+                                            <FormField
+                                                control={control}
+                                                name={`keyInformation.${index}.title`}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Title</FormLabel>
+                                                        <FormControl>
+                                                            <Input placeholder={"e.g. Brand Name"} {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            {/* Content */}
+                                            <FormField
+                                                control={control}
+                                                name={`keyInformation.${index}.content`}
+                                                render={({ field }) => (
+                                                    <FormItem className={'flex-1'}>
+                                                        <FormLabel>Content</FormLabel>
+                                                        <FormControl>
+                                                            <Textarea className={'bg-white'} placeholder="e.g. Up to 10 hours" {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            {/* Remove Button */}
+                                            <Button
+                                                type="button"
+                                                variant="destructive"
+                                                size="sm"
+                                                className=""
+                                                onClick={() => removeKeyInfo(index)}
+                                            >
+                                                <X size={14} />
+                                            </Button>
+                                        </div>
+                                    ))}
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => appendKeyInfo({ title: "", content: "" })}
+                                    >
+                                        <Plus size={16} className="mr-1" />
+                                        Add Key Info
+                                    </Button>
+                                </div>
                             </div>
 
                             <DialogFooter>

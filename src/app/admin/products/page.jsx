@@ -22,7 +22,7 @@ export default function page() {
     const [stockEditing, setStockEditing] = useState(false)
     const [selectedStockProduct, setSelectedStockProduct] = useState()
 
-    console.log(selectedStockProduct)
+    // console.log(selectedStockProduct)
 
     const {
         productsQuery,
@@ -80,7 +80,7 @@ export default function page() {
                         <Button variant="outline">
                             Total: {allProducts.length}
                         </Button>
-                        <Select
+                        {/* <Select
                             value={categoryFilter}
                             onValueChange={setCategoryFilter}
                         >
@@ -100,7 +100,7 @@ export default function page() {
                                     </SelectItem>
                                 ))}
                             </SelectContent>
-                        </Select>
+                        </Select> */}
 
                         {/* Search Bar */}
                         <Input

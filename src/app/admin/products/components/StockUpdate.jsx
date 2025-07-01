@@ -15,6 +15,7 @@ const formSchema = z.object({
     variantName: z.string({
         required_error: 'Variant Name is required',
     }),
+    vendor: z.string().optional(),
     quantity: z.coerce.number({
         required_error: 'Quantity is required',
         invalid_type_error: 'Quantity must be a number',
@@ -35,6 +36,8 @@ function StockUpdate({ open, onOpenChange, product }) {
 
     const SProduct = product || {}
 
+    // console.log(SProduct)
+
     const stockHistory = product?.stock || []
 
     async function onSubmit(values) {
@@ -51,7 +54,7 @@ function StockUpdate({ open, onOpenChange, product }) {
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetContent className={'w-full md:min-w-xl overflow-y-auto pb-5'}>
+            <SheetContent className={'w-full md:min-w-2xl overflow-y-auto pb-5'}>
                 <SheetHeader>
                     <SheetTitle>Add Stock</SheetTitle>
                     <SheetDescription>{SProduct?.fullName}</SheetDescription>
@@ -60,20 +63,34 @@ function StockUpdate({ open, onOpenChange, product }) {
                 <div className='px-4'>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-5'>
-                            <FormField
-                                control={form.control}
-                                name='variantName'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Variant Name</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Navy Blue" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
+                            <div className='grid grid-cols-2 gap-2'>
+                                <FormField
+                                    control={form.control}
+                                    name='variantName'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Variant Name</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Navy Blue" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name='vendor'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Vendor</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="ABC Enterprises" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
                             <div className='grid grid-cols-2 gap-2'>
                                 <FormField
                                     control={form.control}
@@ -116,9 +133,20 @@ function StockUpdate({ open, onOpenChange, product }) {
                                 ) : "Add"}
                             </Button>
                         </form>
-
                     </Form>
                 </div>
+
+                <div className="flex flex-wrap gap-2 px-4">
+                    {SProduct?.variants && Object.entries(SProduct.variants).length > 0 &&
+                        Object.entries(SProduct.variants).map(([key, value], idx) => (
+                            <div key={idx} className="bg-gray-100 rounded p-3 text-sm flex gap-1">
+                                <strong>{key}:</strong>
+                                <p>{value}</p>
+                            </div>
+                        ))
+                    }
+                </div>
+
 
                 <div className="mt-6 px-4">
                     <h3 className="text-lg font-semibold mb-2">Stock History</h3>
@@ -134,6 +162,7 @@ function StockUpdate({ open, onOpenChange, product }) {
                                         <TableHead>Variant</TableHead>
                                         <TableHead>Quantity</TableHead>
                                         <TableHead>Purchase Price</TableHead>
+                                        <TableHead>Vendor</TableHead>
                                         <TableHead>Updated At</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -143,7 +172,8 @@ function StockUpdate({ open, onOpenChange, product }) {
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell>{stock.variantName || '-'}</TableCell>
                                             <TableCell>{stock.quantity}</TableCell>
-                                            <TableCell>₹{stock.purchasePrice}</TableCell>
+                                            <TableCell>₹{stock.purchasePrice}</TableCell>  
+                                            <TableCell>{stock?.vendor || '-'}</TableCell>  
                                             <TableCell>{format(new Date(stock.updatedAt), "dd MMM yyyy, hh:mm a")}</TableCell>
                                         </TableRow>
                                     ))}

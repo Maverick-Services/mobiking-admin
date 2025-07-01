@@ -21,7 +21,7 @@ export const useProducts = () => {
         queryFn: () => api.get('/products').then(res => res.data),
         staleTime: 1000 * 60 * 5, // 5 minutes cache
         onError: (err) => {
-            toast.error(err.message || 'Failed to fetch products');
+            toast.error(err?.response?.data?.message  || 'Failed to fetch products');
         }
     });
 
@@ -39,7 +39,7 @@ export const useProducts = () => {
         },
         staleTime: 1000 * 60 * 5,
         onError: (err) => {
-            toast.error(err.message || 'Failed to fetch service');
+            toast.error(err?.response?.data?.message  || 'Failed to fetch service');
         }
     });
 
@@ -53,7 +53,7 @@ export const useProducts = () => {
             toast.success('Product created successfully');
         },
         onError: (err) => {
-            toast.error(err.message || 'Failed to create Product');
+            toast.error(err?.response?.data?.message  || 'Failed to create Product');
         }
     });
 
@@ -67,7 +67,7 @@ export const useProducts = () => {
         },
         onError: (err) => {
             console.log(err)
-            toast.error(err.message || 'Failed to update Product');
+            toast.error(err?.response?.data?.message || 'Failed to update Product');
         }
     });
 
@@ -79,7 +79,7 @@ export const useProducts = () => {
             toast.success('Stock Added successfully');
         },
         onError: (err) => {
-            toast.error(err.message || 'Failed to add stock.');
+            toast.error(err?.response?.data?.message  || 'Failed to add stock.');
         }
     });
 
