@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator'
 import AmountCards from './components/AmountCards'
 import { ChevronDown } from 'lucide-react'
 import { LayoutGroup, motion } from 'framer-motion'
+import PosButton from '@/components/custom/PosButton'
 
 const TABS = [
     { key: 'all', label: 'ALL ORDERS' },
@@ -166,7 +167,8 @@ export default function Page() {
                     </Button>
 
                     <DateRangeSelector onChange={setRange} defaultRange={initialRange} />
-                    <Button>POS</Button>
+                    {/* <Button>POS</Button> */}
+                    <PosButton/>
                     {/* <POS>
                     </POS> */}
                 </div>
