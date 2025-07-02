@@ -19,23 +19,16 @@ function PersonalDetails({ order }) {
         country
     } = order
 
-    // ✅ Construct full address string
-    const fullAddress = [
-        address,
-        address2,
-        city,
-        state,
-        country,
-        pincode
-    ]
-        .filter(Boolean)
-        .join(', ')
-
     const personalFields = [
         ["Customer Name", name],
         ["Mobile Number", phoneNo],
+        ["Address", address || "—"],
+        ["Address 2", address2 || "—"],
+        ["City", city || "—"],
+        ["State", state || "—"],
+        ["Country", country || "—"],
+        ["Pincode", pincode || "—"],
         ["Email", email],
-        ["Address", fullAddress || "—"]
     ]
 
     function isEditable() {
@@ -54,7 +47,7 @@ function PersonalDetails({ order }) {
                 }
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {personalFields.map(([label, value]) => (
                     <div key={label}>
                         <span className="block text-xs font-medium uppercase text-gray-400">

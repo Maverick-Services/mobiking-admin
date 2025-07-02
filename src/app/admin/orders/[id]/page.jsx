@@ -15,11 +15,17 @@ import LoaderButton from "@/components/custom/LoaderButton";
 import CourierDialog from "./components/CourierDialog";
 import ShippingDetails from "./components/ShippingDetails";
 import { toast } from 'react-hot-toast'
+import OrderSkeletonPage from "./components/OrderSkeletonPage";
+import Scans from "./components/Scans";
+import RejectDialog from "../components/RejectOrderDialog";
+import CancelDialog from "../components/CancelDialog";
 
 function page() {
     const params = useParams();
     const id = params.id;
     const [courierOpen, setCourierOpen] = useState(false)
+    const [rejectOpen, setRejectOpen] = useState(false)
+    const [cancelOpen, setCancelOpen] = useState(false)
 
     const { getSingleOrderQuery } = useOrders()
     const { data: orderResp, isLoading, error } = getSingleOrderQuery(id)
@@ -27,24 +33,24 @@ function page() {
 
     console.log(order)
 
-    if (isLoading) return <p>Loading…</p>
+    if (isLoading) return <OrderSkeletonPage />
     if (error) return <p>Error: {error.message}</p>
 
-      function isNewOrder() {
+    function isNewOrder() {
         return order?.status === 'New'
     }
 
     async function handleGetCourierId() {
-       const { address, city, country, pincode } = order
+        const { address, city, country, pincode } = order
 
-  // if any of these is falsy, show an error
-  if (!address || !city || !country || !pincode) {
-    toast.error('Please complete the customer\'s address details before continue.')
-    return
-  }
+        // if any of these is falsy, show an error
+        if (!address || !city || !country || !pincode) {
+            toast.error('Please complete the customer\'s address details before continue.')
+            return
+        }
 
-  // all good → open the courier dialog
-  setCourierOpen(true)
+        // all good → open the courier dialog
+        setCourierOpen(true)
     }
 
 
@@ -55,20 +61,40 @@ function page() {
                     View Order
                 </h1>
                 <div className="flex gap-2">
-                    {isNewOrder() &&
-                    <LoaderButton
-                        onClick={handleGetCourierId}
-                        variant="outline"
-                        className="gap-2"
-                    >
-                        <Car className="h-4 w-4" />
-                        Delivery
-                    </LoaderButton>
+                    {isNewOrder() && !order.abondonedOrder &&
+                        <LoaderButton
+                            onClick={handleGetCourierId}
+                            variant="outline"
+                            className="gap-2"
+                        >
+                            <Car className="h-4 w-4" />
+                            Delivery
+                        </LoaderButton>
                     }
-                    <Button variant="outline" className="gap-2">
+
+                    {/* download button */}
+                    <Button variant="outline" className="gap-2" >
                         <Download className="h-4 w-4" />
                         Download
                     </Button>
+
+
+                    {order.status === 'New' &&
+                        <Button
+                            onClick={() => setRejectOpen(true)}
+                            variant="destructive"
+                            className="gap-2">
+                            Reject
+                        </Button>
+                    }
+                    {order.status === 'New' &&
+                        <Button
+                            onClick={() => setCancelOpen(true)}
+                            variant="destructive"
+                            className="gap-2">
+                            Cancel
+                        </Button>
+                    }
                 </div>
 
             </div>
@@ -77,18 +103,30 @@ function page() {
                 <UpperDetailss order={order} />
                 <PaymentDetails order={order} />
                 <PersonalDetails order={order} />
-                <ItemsTable 
-                order={order}
-                isNewOrder={isNewOrder}
-                 />
+                <ItemsTable
+                    order={order}
+                    isNewOrder={isNewOrder}
+                />
                 {order?.shipmentId &&
-                <ShippingDetails order={order}/>
-            }
+                    <ShippingDetails order={order} />
+                }
+
+                <Scans order={order} />
             </div>
             <CourierDialog
                 open={courierOpen}
                 onOpenChange={setCourierOpen}
-                order={order} 
+                order={order}
+            />
+            <RejectDialog
+                open={rejectOpen}
+                onOpenChange={setRejectOpen}
+                order={order}
+            />
+            <CancelDialog
+                open={cancelOpen}
+                onOpenChange={setCancelOpen}
+                order={order}
             />
         </InnerDashboardLayout>
     )

@@ -76,70 +76,72 @@ export default function OrdersListView({ error, orders = [] }) {
                 </TableHeader>
                 <TableBody className={' scrollbar-hide'}>
                     <AnimatePresence mode="wait">
-                    {orders.map((o, i) => {
-                        const customerOrderNumber = o?.userId?.orders?.length || 0
-                        const variant = STATUS_VARIANTS[o.status] || 'default'
-                        return (
-                            <motion.tr
-                key={o._id}
-                layout
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="hover:bg-gray-100 scrollbar-hide"
-            >
-                                <TableCell>{i + 1}</TableCell>
-                                <TableCell>{o._id.slice(0, 6).toUpperCase()}</TableCell>
-                                <TableCell className="capitalize">
-                                    {o.name || '—'}{' '}
-                                    <span className="bg-green-100 text-green-700 px-2 py-1 ml-1 font-semibold rounded-full text-[10px]">
-                                        {customerOrderNumber}
-                                    </span>
-                                </TableCell>
-                                <TableCell >
-                                    <div className="flex items-center space-x-2">
-                                        <span>{o.phoneNo}</span>
-                                        <FaWhatsapp
-                                            className="cursor-pointer text-green-500 hover:text-green-600"
-                                            size={18}
-                                            onClick={() => openWhatsApp(o.phoneNo)}
-                                        />
-                                    </div>
-                                </TableCell>
-                                <TableCell>₹{o.orderAmount.toFixed(2)}</TableCell>
-                                <TableCell>{o.method}</TableCell>
-                                <TableCell>
-                                    <Badge variant={variant}>
-                                        {o.status}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell>
-                                    <div>{format(new Date(o.createdAt), 'dd MMM yyyy')}</div>
-                                    <div className="text-gray-500">
-                                        {format(new Date(o.createdAt), 'hh:mm a')}
-                                    </div>
-                                </TableCell>
+                        {orders.map((o, i) => {
+                            const customerOrderNumber = o?.userId?.orders?.length || 0
+                            const variant = STATUS_VARIANTS[o.status] || 'default'
+                            return (
+                                <motion.tr
+                                    key={o._id}
+                                    layout
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="hover:bg-gray-100 scrollbar-hide"
+                                >
+                                    <TableCell>{i + 1}</TableCell>
+                                    <TableCell>{o._id.slice(0, 6).toUpperCase()}</TableCell>
+                                    <TableCell className="capitalize">
+                                        {o.name || '—'}{' '}
+                                        <span className="bg-green-100 text-green-700 px-2 py-1 ml-1 font-semibold rounded-full text-[10px]">
+                                            {customerOrderNumber}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell >
+                                        <div className="flex items-center space-x-2">
+                                            <span>{o.phoneNo}</span>
+                                            <FaWhatsapp
+                                                className="cursor-pointer text-green-500 hover:text-green-600"
+                                                size={18}
+                                                onClick={() => openWhatsApp(o.phoneNo)}
+                                            />
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>₹{o.orderAmount.toFixed(2)}</TableCell>
+                                    <TableCell>{o.method}</TableCell>
+                                    <TableCell>
+                                        <Badge variant={variant}>
+                                            {o.status}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div>{format(new Date(o.createdAt), 'dd MMM yyyy')}</div>
+                                        <div className="text-gray-500">
+                                            {format(new Date(o.createdAt), 'hh:mm a')}
+                                        </div>
+                                    </TableCell>
 
-                                {/* action buttons */}
-                                <TableCell className="text-center space-x-2">
-                                    <OrderViewDialog order={o}>
-                                        <Button size="icon" variant="outline">
-                                            <Eye size={16} />
-                                        </Button>
-                                    </OrderViewDialog>
+                                    {/* action buttons */}
+                                    <TableCell className="text-center space-x-2">
+                                        <OrderViewDialog order={o}>
+                                            <Button size="icon" variant="outline">
+                                                <Eye size={16} />
+                                            </Button>
+                                        </OrderViewDialog>
 
-                                    <Button
-                                        className={'h-7 w-7'}
-                                        variant="outline"
-                                        onClick={() => router.push(`/admin/orders/${o._id}`)}
-                                    >
-                                        <Download />
-                                    </Button>
-                                </TableCell>
-                            </motion.tr>
-                        )
-                    })}
+                                        {!o.abondonedOrder &&
+                                            <Button
+                                                className={'h-7 w-7'}
+                                                variant="outline"
+                                                onClick={() => router.push(`/admin/orders/${o._id}`)}
+                                            >
+                                                <Download />
+                                            </Button>
+                                        }
+                                    </TableCell>
+                                </motion.tr>
+                            )
+                        })}
                     </AnimatePresence>
                 </TableBody>
             </Table>

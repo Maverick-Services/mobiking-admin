@@ -6,7 +6,8 @@ export default function UpperDetailss({ order }) {
     const STATUS_VARIANTS = {
         New: 'yellow',           // yellow
         Accepted: 'success',      // green
-        Shipped: 'warning',       // yellow/orange
+        Rejected: 'warning',      // green
+        Shipped: 'yellow',       // yellow/orange
         Delivered: 'success',     // green
         Cancelled: 'destructive', // red
         Returned: 'destructive',  // red
@@ -32,6 +33,9 @@ export default function UpperDetailss({ order }) {
                             {order.status}
                         </Badge>
                     </span>
+                    {order.status === 'Rejected' &&
+                    <span className='mt-2 text-xs text-gray-500'>{order?.reason}</span>
+                    }
                 </div>
             </PCard>
 

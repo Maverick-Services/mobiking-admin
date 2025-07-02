@@ -72,7 +72,7 @@ export const useOrders = () => {
     })
 
     const cancelOrder = useMutation({
-        mutationFn: data => api.post('/orders/cancel', data),
+        mutationFn: ({ orderId, reason }) => api.post('/orders/cancel', { orderId, reason }),
         onSuccess: () => {
             toast.success('Order cancelled!')
             queryClient.invalidateQueries({ queryKey: ['orders'] })

@@ -20,10 +20,15 @@ export default function RejectDialog({ open, onOpenChange, order }) {
 
     const handleReject = () => {
         if (!order?._id || !reason.trim()) return
-        rejectOrder.mutateAsync({
-            orderId: order._id,
-            reason: reason
-        })
+        try {
+            rejectOrder.mutateAsync({
+                orderId: order._id,
+                reason: reason
+            })
+            onOpenChange(false)
+        } catch (error) {
+            
+        }
     }
 
     return (
@@ -31,11 +36,13 @@ export default function RejectDialog({ open, onOpenChange, order }) {
             <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Reject Order?</DialogTitle>
-                    <DialogDescription className="mt-2 space-y-1">
-                        <p><strong>Order ID:</strong> {order?.orderId || '-'}</p>
-                        <p><strong>Customer:</strong> {order?.name || '-'} ({order?.phoneNo || '-'})</p>
-                        <p><strong>Total:</strong> ₹{order?.orderAmount?.toFixed(2) ?? '-'}</p>
-                    </DialogDescription>
+                    {/* <DialogDescription> */}
+                        <div className="mt-2 space-y-1 text-sm">
+                            <p><strong>Order ID:</strong> {order?.orderId || '-'}</p>
+                            <p><strong>Customer:</strong> {order?.name || '-'} ({order?.phoneNo || '-'})</p>
+                            <p><strong>Total:</strong> ₹{order?.orderAmount?.toFixed(2) ?? '-'}</p>
+                        </div>
+                    {/* </DialogDescription> */}
                 </DialogHeader>
 
                 {/* Reason Input */}

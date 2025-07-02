@@ -8,9 +8,12 @@ import { useOrders } from '@/hooks/useOrders'
 import { toast } from 'react-hot-toast'
 import LoaderButton from '@/components/custom/LoaderButton'
 import { Input } from '@/components/ui/input' // assuming you're using shadcn/ui
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 
 export default function CancelDialog({ open, onOpenChange, order }) {
     const { cancelOrder } = useOrders()
+    const [reason, setReason] = useState('')
 
     const handleCancel = async () => {
         if (!order?._id) {
@@ -18,7 +21,10 @@ export default function CancelDialog({ open, onOpenChange, order }) {
             return
         }
         try {
-            await cancelOrder.mutateAsync({ orderId: order._id, })
+            await cancelOrder.mutateAsync({
+                orderId: order._id,
+                reason: reason
+            })
             onOpenChange(false)
         } catch (error) {
             toast.error("Failed to cancel order.")
@@ -39,6 +45,19 @@ export default function CancelDialog({ open, onOpenChange, order }) {
                     <p><strong>Order ID:</strong> {order?.orderId || '-'}</p>
                     <p><strong>Customer:</strong> {order?.name || '-'} ({order?.phoneNo || '-'})</p>
                     <p><strong>Total:</strong> ₹{order?.orderAmount?.toFixed(2) ?? '-'}</p>
+                </div>
+
+
+                {/* Reason Input */}
+                <div className="mt-4 space-y-1">
+                    <Label htmlFor="reason">Reason for cancellation</Label>
+                    <Textarea
+                        id="reason"
+                        placeholder="Please provide a reason..."
+                        value={reason}
+                        onChange={(e) => setReason(e.target.value)}
+                        disabled={cancelOrder.isPending}
+                    />
                 </div>
 
                 <DialogFooter className="flex justify-end space-x-2 mt-4">
