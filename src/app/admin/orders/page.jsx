@@ -144,7 +144,7 @@ export default function Page() {
         // 3) Compute your status‑card counts
         const statusCounts = {}
         STATUS_CARDS.forEach((status) => {
-            statusCounts[status] = displayOrders.filter(o => o.status === status).length
+            statusCounts[status] = displayOrders.filter(o => o.status === status && !o.abondonedOrder).length
         })
 
         return { filteredOrders, counts, statusCounts }
@@ -168,7 +168,7 @@ export default function Page() {
 
                     <DateRangeSelector onChange={setRange} defaultRange={initialRange} />
                     {/* <Button>POS</Button> */}
-                    <PosButton/>
+                    <PosButton />
                     {/* <POS>
                     </POS> */}
                 </div>

@@ -57,8 +57,8 @@ function ItemsTable({ order, isNewOrder }) {
         <PCard className="p-4">
             <div className="flex items-center justify-between w-full">
                 <h2 className="mb-4 text-lg font-semibold text-gray-700">Items</h2>
-                {isNewOrder() &&
-                <Button onClick={() => setAddingItem(true)} variant={'outline'}>Add Items</Button>
+                {isNewOrder() && order?.method === 'COD' &&
+                    <Button onClick={() => setAddingItem(true)} variant={'outline'}>Add Items</Button>
                 }
             </div>
 
@@ -72,9 +72,9 @@ function ItemsTable({ order, isNewOrder }) {
                             <TableHead>Qty</TableHead>
                             <TableHead>Selling Price</TableHead>
                             <TableHead>Total Price</TableHead>
-                {isNewOrder() &&
-                            <TableHead>Actions</TableHead>
-                }
+                            {isNewOrder() &&
+                                <TableHead>Actions</TableHead>
+                            }
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -84,7 +84,7 @@ function ItemsTable({ order, isNewOrder }) {
                             const name = product?.fullName || product?.name
                             const variant = item.variantName
                             const quantity = item.quantity
-                            const sellingPrice =  item.price
+                            const sellingPrice = item.price
                             const totalPrice = sellingPrice * quantity
 
                             const incKey = `${product._id}-${variant}-inc`
@@ -106,27 +106,27 @@ function ItemsTable({ order, isNewOrder }) {
                                     <TableCell>{quantity}</TableCell>
                                     <TableCell>₹{sellingPrice}</TableCell>
                                     <TableCell>₹{totalPrice}</TableCell>
-                {isNewOrder() &&
-                                    <TableCell>
-                                        <div className="flex gap-2">
-                                            <MiniLoaderButton
-                                                variant={'outline'}
-                                                onClick={() => handleIncrement(item)}
-                                                loading={loadingItemId === incKey}
-                                            >
-                                                <Plus className="cursor-pointer hover:text-green-600 transition-all duration-200 ease-in-out" />
-                                            </MiniLoaderButton>
+                                    {isNewOrder() &&
+                                        <TableCell>
+                                            <div className="flex gap-2">
+                                                <MiniLoaderButton
+                                                    variant={'outline'}
+                                                    onClick={() => handleIncrement(item)}
+                                                    loading={loadingItemId === incKey}
+                                                >
+                                                    <Plus className="cursor-pointer hover:text-green-600 transition-all duration-200 ease-in-out" />
+                                                </MiniLoaderButton>
 
-                                            <MiniLoaderButton
-                                                variant={'outline'}
-                                                onClick={() => handleDecrement(item)}
-                                                loading={loadingItemId === decKey}
-                                            >
-                                                <Minus className="cursor-pointer hover:text-red-600 transition-all duration-200 ease-in-out" />
-                                            </MiniLoaderButton>
-                                        </div>
-                                    </TableCell>
-                        }
+                                                <MiniLoaderButton
+                                                    variant={'outline'}
+                                                    onClick={() => handleDecrement(item)}
+                                                    loading={loadingItemId === decKey}
+                                                >
+                                                    <Minus className="cursor-pointer hover:text-red-600 transition-all duration-200 ease-in-out" />
+                                                </MiniLoaderButton>
+                                            </div>
+                                        </TableCell>
+                                    }
                                 </TableRow>
                             )
                         })}
