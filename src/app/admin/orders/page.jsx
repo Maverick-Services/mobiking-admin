@@ -33,7 +33,7 @@ const STATUS_CARDS = [
     'Shipped',
     'Delivered',
     'Cancelled',
-    'Hold'
+    // 'Hold'
 ]
 
 const STATUS_BORDER = {
@@ -182,7 +182,7 @@ export default function Page() {
             </div>
 
             {/* ─── STATUS CARDS ─── */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-6">
                 {STATUS_CARDS.map((status) => (
                     <div
                         key={status}

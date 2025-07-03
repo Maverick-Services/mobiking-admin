@@ -143,7 +143,7 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                 toast.success('Image Uploaded', { id: toastId })
             } catch (err) {
                 console.error(err)
-                toast.success('Error', { id: toastId })
+                toast.error('Error'+ err, { id: toastId })
             }
         }
         reader.readAsDataURL(file)

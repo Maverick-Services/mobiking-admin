@@ -21,6 +21,7 @@ import RejectDialog from "../components/RejectOrderDialog";
 import CancelDialog from "../components/CancelDialog";
 import UpdateStatus from "./components/UpdateStatus";
 import Link from "next/link";
+import GSTBillDownload from "@/components/GSTBill";
 
 function page() {
     const params = useParams();
@@ -89,10 +90,12 @@ function page() {
                         </Link>
                     }
 
-                    <Button variant="outline" className="gap-2" >
+                    {/* <Button variant="outline" className="gap-2" >
                         <Download className="h-4 w-4" />
-                        {/* Download */}
-                    </Button>
+                        Download 
+                    </Button> */}
+
+                    <GSTBillDownload billData={order}/>
 
                     {order.status === 'New' &&
                         <Button

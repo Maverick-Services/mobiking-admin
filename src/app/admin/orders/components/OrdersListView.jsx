@@ -18,6 +18,7 @@ import { FaWhatsapp } from 'react-icons/fa'
 import AcceptDialog from './AcceptDialog'
 import { OrderViewDialog } from './OrderViewDialog'
 import { motion, AnimatePresence } from 'framer-motion'
+import GSTBillDownload from '@/components/GSTBill'
 
 
 // Map each order status to a Badge variant
@@ -100,11 +101,13 @@ export default function OrdersListView({ error, orders = [] }) {
                                     <TableCell >
                                         <div className="flex items-center space-x-2">
                                             <span>{o.phoneNo}</span>
-                                            <FaWhatsapp
-                                                className="cursor-pointer text-green-500 hover:text-green-600"
-                                                size={18}
-                                                onClick={() => openWhatsApp(o.phoneNo)}
-                                            />
+                                            {o.phoneNo &&
+                                                <FaWhatsapp
+                                                    className="cursor-pointer text-green-500 hover:text-green-600"
+                                                    size={18}
+                                                    onClick={() => openWhatsApp(o.phoneNo)}
+                                                />
+                                            }
                                         </div>
                                     </TableCell>
                                     <TableCell>₹{o.orderAmount.toFixed(2)}</TableCell>
@@ -122,22 +125,28 @@ export default function OrdersListView({ error, orders = [] }) {
                                     </TableCell>
 
                                     {/* action buttons */}
-                                    <TableCell className="text-center space-x-2">
-                                        <OrderViewDialog order={o}>
-                                            <Button size="icon" variant="outline">
-                                                <Eye size={16} />
-                                            </Button>
-                                        </OrderViewDialog>
+                                    <TableCell className="text-center space-x-2 flex items-center justify-center">
+                                        {o.abondonedOrder &&
+                                            <OrderViewDialog order={o}>
+                                                <Button variant="outline">
+                                                    <Eye />
+                                                </Button>
+                                            </OrderViewDialog>
+                                        }
 
                                         {!o.abondonedOrder &&
                                             <Button
-                                                className={'h-7 w-7'}
+                                                // className={'h-7 w-7'}
                                                 variant="outline"
                                                 onClick={() => router.push(`/admin/orders/${o._id}`)}
                                             >
-                                                <Download />
+                                                <Eye />
                                             </Button>
                                         }
+                                        {!o.abondonedOrder &&
+                                            <GSTBillDownload billData={o} />
+                                        }
+
                                     </TableCell>
                                 </motion.tr>
                             )
