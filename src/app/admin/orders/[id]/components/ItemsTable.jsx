@@ -72,7 +72,7 @@ function ItemsTable({ order, isNewOrder }) {
                             <TableHead>Qty</TableHead>
                             <TableHead>Selling Price</TableHead>
                             <TableHead>Total Price</TableHead>
-                            {isNewOrder() &&
+                            {isNewOrder() && order?.method === 'COD' &&
                                 <TableHead>Actions</TableHead>
                             }
                         </TableRow>
@@ -106,7 +106,7 @@ function ItemsTable({ order, isNewOrder }) {
                                     <TableCell>{quantity}</TableCell>
                                     <TableCell>₹{sellingPrice}</TableCell>
                                     <TableCell>₹{totalPrice}</TableCell>
-                                    {isNewOrder() &&
+                                    {isNewOrder() && order?.method === 'COD' &&
                                         <TableCell>
                                             <div className="flex gap-2">
                                                 <MiniLoaderButton

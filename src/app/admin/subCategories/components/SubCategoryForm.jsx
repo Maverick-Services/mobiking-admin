@@ -37,7 +37,7 @@ const formSchema = z.object({
     active: z.boolean(),
     featured: z.boolean(),
     categoryId: z.string().min(1, "Category is required"),
-    photos: z.array(z.string()).optional(),
+    photos: z.array(z.string()).optional().nullable(),
     upperBanner: z.string().nullable(),
     lowerBanner: z.string().nullable(),
     deliveryCharge: z.coerce.number().optional(),
@@ -124,7 +124,7 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                 toast.success('Image Uploaded', { id: toastId })
             } catch (err) {
                 console.error(err)
-                toast.success('Error', { id: toastId })
+                toast.error('Error', { id: toastId })
             }
         }
         reader.readAsDataURL(file)
@@ -218,6 +218,20 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                                     </FormItem>
                                 )}
                             />
+                            
+                            <FormField
+                                control={form.control}
+                                name="deliveryCharge"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Delivery Charge<span className="text-red-500"> *</span></FormLabel>
+                                        <FormControl>
+                                            <Input type="number" placeholder="120" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         </PCard>
 
                         <PCard>
@@ -237,7 +251,7 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                             />
 
                             {/* Sequence Number */}
-                            <FormField
+                            {/* <FormField
                                 control={form.control}
                                 name="sequenceNo"
                                 render={({ field }) => (
@@ -249,7 +263,7 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                                         <FormMessage />
                                     </FormItem>
                                 )}
-                            />
+                            /> */}
 
                             {/* Active */}
                             <FormField
@@ -280,24 +294,12 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                             />
                         </PCard>
 
-                        <PCard>
+                        {/* <PCard> */}
                             {/* delivery charge */}
-                            <FormField
-                                control={form.control}
-                                name="deliveryCharge"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Delivery Charge<span className="text-red-500"> *</span></FormLabel>
-                                        <FormControl>
-                                            <Input type="number" placeholder="120" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                            
 
                             {/* min order amount */}
-                            <FormField
+                            {/* <FormField
                                 control={form.control}
                                 name="minOrderAmount"
                                 render={({ field }) => (
@@ -309,10 +311,10 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                                         <FormMessage />
                                     </FormItem>
                                 )}
-                            />
+                            /> */}
 
                             {/* min free delivery order amount */}
-                            <FormField
+                            {/* <FormField
                                 control={form.control}
                                 name="minFreeDeliveryOrderAmount"
                                 render={({ field }) => (
@@ -324,10 +326,10 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                                         <FormMessage />
                                     </FormItem>
                                 )}
-                            />
-                        </PCard>
+                            /> */}
+                        {/* </PCard> */}
 
-                        <PCard>
+                        {/* <PCard>
                             <div className="flex flex-col">
                                 <div className="flex justify-between items-center w-full">
                                     <span className="font-medium mb-2">Select Category Images</span>
@@ -349,14 +351,12 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                                                     height={200}
                                                     className="object-contain max-h-32 w-auto"
                                                 />
-                                                {/* asdf */}
                                                 <button
                                                     type='button'
                                                     className="absolute top-1 right-1 bg-white rounded-full p-1 shadow-md 
                                                  hover:bg-red-500 hover:text-white transition-colors opacity-0 group-hover:opacity-100"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        // remove exactly this one entry
                                                         setValue(
                                                             "photos",
                                                             photos.filter((p) => p !== url),
@@ -374,7 +374,7 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                                 )}
 
                             </div>
-                        </PCard>
+                        </PCard> */}
 
                             {/* upper Banner */}
                         <PCard>
@@ -395,10 +395,11 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                                         {/* 3. on click, open file picker */}
                                         {!field.value ? (
                                             <div
-                                                className="border-2 border-dashed border-gray-300 rounded-lg mt-3 h-36 flex items-center justify-center cursor-pointer"
+                                                className="border-2 border-dashed border-gray-300 rounded-lg mt-3 h-36 flex flex-col items-center justify-center cursor-pointer"
                                                 onClick={onUpperClick}
-                                            >
-                                                <span className="text-gray-500">Click to select Upper banner</span>
+                                            >                         
+                                                                   <span className="text-gray-500">Upper banner: 1080w * 540h</span>
+                                                <p className="text-gray-500 text-xs">Max size - 5mb</p>
                                             </div>
                                         ) : (
                                             <div className="relative w-full aspect-[2/1] border rounded-lg mb-2">
@@ -450,10 +451,11 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                                         {/* 3. on click, open file picker */}
                                         {!field.value ? (
                                             <div
-                                                className="border-2 border-dashed border-gray-300 rounded-lg mt-3 h-36 flex items-center justify-center cursor-pointer"
+                                                className="border-2 border-dashed border-gray-300 rounded-lg mt-3 h-36 flex flex-col items-center justify-center cursor-pointer"
                                                 onClick={onLowerClick}
                                             >
-                                                <span className="text-gray-500">Click to select Lower banner</span>
+                                                <span className="text-gray-500">Lower banner: 720w * 320h</span>
+                                                <p className="text-gray-500 text-xs">Max size - 5mb</p>
                                             </div>
                                         ) : (
                                             <div className="relative w-full aspect-[2/1] border rounded-lg mb-2">

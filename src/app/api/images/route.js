@@ -19,7 +19,8 @@ export async function POST(req) {
 
         return NextResponse.json({ imageURL: uploadResponse.secure_url }, { status: 200 });
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.log(error)
+        return NextResponse.json({ message: error }, { status: 500 });
     }
 }
 

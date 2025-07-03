@@ -1,10 +1,25 @@
+import axios from "axios"
+
 export async function uploadImage(dataUrl) {
-  const res = await fetch('/api/images', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ image: dataUrl }),
-  })
-  if (!res.ok) throw new Error('Upload failed')
-  const { imageURL } = await res.json()
-  return imageURL
+  try {
+    const res = await axios.post('/api/images', { image: dataUrl });
+
+    // Axios doesn't have `res.ok` — check status code instead
+    if (res.status !== 200) {
+      console.error('Upload failed with status:', res.status);
+      throw new Error('Image upload failed');
+    }
+
+    const imageURL = res.data?.imageURL;
+    if (!imageURL) {
+      console.error('No imageURL returned in response:', res.data);
+      throw new Error('Image URL missing from response');
+    }
+
+    console.log('Image uploaded successfully:', imageURL);
+    return imageURL;
+  } catch (error) {
+    console.error('Image upload error:', error);
+    throw error;
+  }
 }
