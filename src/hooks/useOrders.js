@@ -115,7 +115,7 @@ export const useOrders = () => {
         mutationFn: ({ data, id }) => api.put(`/orders/${id}`, data),
         onSuccess: () => {
             toast.success('Order updated successfully.')
-            queryClient.invalidateQueries({ queryKey: ['orders'] })
+            queryClient.invalidateQueries({ queryKey: ['order'] })
         },
         onError: err => {
             toast.error(err.message || 'Failed to update order')

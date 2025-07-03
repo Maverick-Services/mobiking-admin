@@ -9,7 +9,7 @@ export default function Scans({ order }) {
   if(scans.length <= 0) return null
 
   return (
-    <PCard className="space-y-2">
+    <PCard className="space-y-2" id="scan-section">
          <div className="flex w-full justify-between items-center">
                 <h2 className="text-lg font-semibold text-gray-700">Shipping Activity</h2>
             </div>

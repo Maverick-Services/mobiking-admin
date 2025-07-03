@@ -1,5 +1,5 @@
 "use client"
-import { Car, Printer, Download } from "lucide-react"
+import { Car, Printer, Download, Truck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import PCard from '@/components/custom/PCard';
 import InnerDashboardLayout from '@/components/dashboard/InnerDashboardLayout';
@@ -19,6 +19,8 @@ import OrderSkeletonPage from "./components/OrderSkeletonPage";
 import Scans from "./components/Scans";
 import RejectDialog from "../components/RejectOrderDialog";
 import CancelDialog from "../components/CancelDialog";
+import UpdateStatus from "./components/UpdateStatus";
+import Link from "next/link";
 
 function page() {
     const params = useParams();
@@ -61,6 +63,12 @@ function page() {
                     View Order
                 </h1>
                 <div className="flex gap-2">
+                    {!order.abondonedOrder && !order.shipmentId &&
+                        <UpdateStatus
+                            orderId={order?._id}
+                            status={order?.status}
+                        />
+                    }
                     {isNewOrder() && !order.abondonedOrder &&
                         <LoaderButton
                             onClick={handleGetCourierId}
@@ -72,12 +80,19 @@ function page() {
                         </LoaderButton>
                     }
 
-                    {/* download button */}
+                    {/* track shipment button */}
+                    {order?.scans.length > 0 &&
+                        <Link href={'#scan-section'}>
+                            <Button variant="outline" className="gap-2" >
+                                <Truck className="h-4 w-4" />
+                            </Button>
+                        </Link>
+                    }
+
                     <Button variant="outline" className="gap-2" >
                         <Download className="h-4 w-4" />
-                        Download
+                        {/* Download */}
                     </Button>
-
 
                     {order.status === 'New' &&
                         <Button
