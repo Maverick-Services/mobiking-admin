@@ -8,18 +8,19 @@ import { useFieldArray, useForm, useFormContext, useWatch } from 'react-hook-for
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
+import { Command, CommandInput, CommandList, CommandItem, CommandEmpty } from '@/components/ui/command'
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { useUsers } from '@/hooks/useUsers'
 import { useProducts } from '@/hooks/useProducts'
+import { useOrders } from '@/hooks/useOrders'
 import UserDialog from '../customers/components/UserDialog'
 import { Separator } from '@/components/ui/separator'
 import { Plus } from 'lucide-react'
 import LoaderButton from '@/components/custom/LoaderButton'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import PosItemsTable from './components/PosItemsTable'
-import { useOrders } from '@/hooks/useOrders'
 
 const posSchema = z.object({
-    userId: z.string().min(1, 'User is required'),
+    userId: z.string().optional(),
     name: z.string().min(1, 'User Name is required'),
     phoneNo: z.string().min(1, 'Phone Number is required'),
     gst: z.string().optional(),
@@ -32,7 +33,6 @@ const posSchema = z.object({
             productId: z.string().min(1, 'Product ID is required'),
             variantName: z.string().optional(),
             quantity: z.number().min(1, 'Quantity must be at least 1'),
-            unitPrice: z.number().min(0),
             price: z.number().min(0),
         })
     ).min(1, 'At least one item is required'),
@@ -44,99 +44,172 @@ function OrderItemRow({ index, allProducts, onRemove }) {
     const quantity = useWatch({ control, name: `items.${index}.quantity` })
 
     const selected = allProducts.find((p) => p._id === productId)
-    const variants = selected ? Object.keys(selected.variants || {}) : []
-    const unitPrice = selected?.sellingPrice?.slice(-1)[0]?.price || 0
+    const variants = selected ? Object.entries(selected.variants || {}) : []
+    const price = selected?.sellingPrice?.slice(-1)[0]?.price || 0
+
+    const [search, setSearch] = useState('')
+    const [open, setOpen] = useState(false)
 
     // reset variant when product changes
     useEffect(() => {
         const cur = getValues(`items.${index}.variantName`)
-        if (cur && !variants.includes(cur)) setValue(`items.${index}.variantName`, "")
+        const hasKey = variants.some(([key]) => key === cur)
+        if (cur && !hasKey) setValue(`items.${index}.variantName`, '')
     }, [productId, variants, getValues, setValue, index])
 
-    // sync unitPrice
+    // sync price
     useEffect(() => {
-        if (getValues(`items.${index}.unitPrice`) !== unitPrice) {
-            setValue(`items.${index}.unitPrice`, unitPrice)
+        if (getValues(`items.${index}.price`) !== price) {
+            setValue(`items.${index}.price`, price)
         }
-    }, [unitPrice, getValues, setValue, index])
+    }, [quantity, productId, price, getValues, setValue, index])
 
-    // sync total
-    useEffect(() => {
-        const total = unitPrice * (quantity || 0)
-        if (getValues(`items.${index}.price`) !== total) {
-            setValue(`items.${index}.price`, total)
-        }
-    }, [quantity, unitPrice, getValues, setValue, index])
+    const total = (quantity || 0) * price
+
+    const filteredProducts = allProducts.filter((p) =>
+        p.fullName.toLowerCase().includes(search.toLowerCase())
+    )
 
     return (
-        <div className="flex gap-4 items-end">
-            <FormField control={control} name={`items.${index}.productId`} render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Product</FormLabel>
-                    <FormControl>
-                        <select {...field} className="w-full border rounded px-2 py-1 flex-grow">
-                            <option value="">Select…</option>
-                            {allProducts.map((p) => (
-                                <option key={p._id} value={p._id}>{p.name}</option>
-                            ))}
-                        </select>
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-            )} />
+        <div className="flex gap-2 items-end w-full">
+            {/* Product with searchable popover */}
+            <FormField
+                control={control}
+                name={`items.${index}.productId`}
+                render={({ field }) => (
+                    <FormItem className="flex-[2]">
+                        <FormLabel>Product</FormLabel>
+                        <Popover open={open} onOpenChange={setOpen}>
+                            <PopoverTrigger asChild>
+                                <FormControl>
+                                    <Button variant="outline" role="combobox" className="w-full truncate justify-between">
+                                        {selected?.fullName || 'Select product...'}
+                                    </Button>
+                                </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="p-0 min-w-[300px] max-w-[400px]">
+                                <Command>
+                                    <CommandInput
+                                        placeholder="Search product..."
+                                        className="h-9"
+                                        value={search}
+                                        onValueChange={setSearch}
+                                    />
+                                    <CommandList>
+                                        <CommandEmpty>No product found.</CommandEmpty>
+                                        {filteredProducts.map((p) => (
+                                            <CommandItem
+                                                key={p._id}
+                                                value={p.fullName}
+                                                onSelect={() => {
+                                                    field.onChange(p._id)
+                                                    setOpen(false)
+                                                    setSearch('')
+                                                }}
+                                            >
+                                                {p.fullName}
+                                            </CommandItem>
+                                        ))}
+                                    </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
 
-            <FormField control={control} name={`items.${index}.variantName`} render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Variant</FormLabel>
-                    <FormControl>
-                        <select {...field} disabled={!productId} className="w-full border rounded px-2 py-1">
-                            <option value="">Select variant…</option>
-                            {variants.map((v) => (<option key={v} value={v}>{v}</option>))}
-                        </select>
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-            )} />
+            {/* Variant */}
+            <FormField
+                control={control}
+                name={`items.${index}.variantName`}
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Variant</FormLabel>
+                        <FormControl>
+                            <Select
+                                onValueChange={field.onChange}
+                                value={field.value}
+                                disabled={!productId}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Select variant…" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {variants.map(([key, qty]) => (
+                                        <SelectItem key={key} value={key}>
+                                            {key} ({qty} in stock)
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
 
-            <FormField control={control} name={`items.${index}.quantity`} render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Qty</FormLabel>
-                    <FormControl>
-                        <Input type="number" className={'w-20'} min={1} {...field} onChange={(e) => field.onChange(parseInt(e.target.value) || 1)} />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-            )} />
+            {/* Quantity */}
+            <FormField
+                control={control}
+                name={`items.${index}.quantity`}
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Qty</FormLabel>
+                        <FormControl>
+                            <Input
+                                type="number"
+                                className="w-20"
+                                min={1}
+                                {...field}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
 
-            <FormField control={control} name={`items.${index}.unitPrice`} render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Unit Price</FormLabel>
-                    <FormControl><Input className={'w-20'} type="number" {...field} disabled /></FormControl>
-                </FormItem>
-            )} />
+            {/* Price */}
+            <FormField
+                control={control}
+                name={`items.${index}.price`}
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Price</FormLabel>
+                        <FormControl>
+                            <Input className="w-20" type="number" {...field} disabled />
+                        </FormControl>
+                    </FormItem>
+                )}
+            />
 
-            <FormField control={control} name={`items.${index}.price`} render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Total</FormLabel>
-                    <FormControl><Input className={'w-20'} type="number" {...field} disabled /></FormControl>
-                </FormItem>
-            )} />
+            {/* Total static */}
+            <div className="flex flex-col">
+                <FormLabel className="mb-2">Total</FormLabel>
+                <div className="pt-2 font-medium border py-1 rounded-md px-3">₹{total}</div>
+            </div>
 
-            <Button variant="destructive" size="icon" type="button" onClick={onRemove}>&times;</Button>
+            <Button variant="destructive" size="icon" type="button" onClick={onRemove}>
+                &times;
+            </Button>
         </div>
     )
 }
+
 
 function page() {
     // users data
     const { usersQuery } = useUsers()
     const allUsers = usersQuery("user")?.data?.data || []
 
+    const { createCustomer, updateUser } = useUsers();
+
     // products data
     const { productsQuery } = useProducts()
     const allProducts = productsQuery?.data?.data || []
 
-    const {createPosOrder} = useOrders()
+    const { createPosOrder } = useOrders()
 
     const [addUserDialog, setAddUserDialog] = useState(false)
 
@@ -164,15 +237,21 @@ function page() {
         }
     })
 
+    const { watch } = form;
     const { fields, append, remove } = useFieldArray({ control: form.control, name: "items" })
     const items = useWatch({ control: form.control, name: "items" })
+    const discount = watch('discount')
 
-    // recalc order amount
     useEffect(() => {
-        const sum = items.reduce((a, i) => a + (i.price || 0), 0)
-        if (form.getValues("orderAmount") !== sum) form.setValue("orderAmount", sum)
-        if (form.getValues("subtotal") !== sum) form.setValue("subtotal", sum)
-    }, [items, form])
+        const subtotal = items.reduce((a, i) => a + (i.price || 0) * (i.quantity || 0), 0)
+        const orderAmount = subtotal - discount
+
+        if (form.getValues("subtotal") !== subtotal) form.setValue("subtotal", subtotal)
+        if (form.getValues("orderAmount") !== orderAmount) form.setValue("orderAmount", orderAmount)
+    }, [items, discount, form])
+
+    const watchSubTotal = watch('subtotal')
+    const watchOrderAmount = watch('orderAmount')
 
     // phoneNo lookup
     const [phoneQuery, setPhoneQuery] = useState("")
@@ -200,14 +279,36 @@ function page() {
         setSuggestions([])
     }
 
-    function onSubmit(values) {
-        // console.log(values)
+    async function onSubmit(values) {
         try {
-            createPosOrder.mutateAsync(values)
-        } catch (error) {
-            
+            let finalUserId = values.userId
+
+            // If user not selected (means not found in suggestions), create a new user
+            if (!finalUserId) {
+                const res = await createCustomer.mutateAsync({
+                    name: values.name,
+                    phoneNo: values.phoneNo,
+                    role: 'user',
+                })
+                // console.log(res)
+                finalUserId = res?.data?.data?._id
+
+                form.setValue('userId', finalUserId)
+            }
+
+            // Final order values with ensured userId
+            const payload = {
+                ...values,
+                userId: finalUserId,
+            }
+
+            // Create the POS order
+            await createPosOrder.mutateAsync(payload)
+        } catch (err) {
+            console.error('Error in creating order:', err)
         }
     }
+
 
     return (
         <InnerDashboardLayout>
@@ -284,6 +385,9 @@ function page() {
                                                 <Input
                                                     {...field}
                                                     placeholder="Customer name"
+                                                    onChange={(e) => {
+                                                        field.onChange(e);
+                                                    }}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -306,6 +410,7 @@ function page() {
                                         </FormItem>
                                     )} />
 
+                                {/* method */}
                                 <FormField
                                     control={form.control}
                                     name="method"
@@ -319,12 +424,13 @@ function page() {
                                                 >
                                                     <SelectTrigger className={'w-full'}>
                                                         <SelectValue
-                                                            placeholder="Select Payment Method"
+                                                            placeholder="Method"
                                                         />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="COD">COD</SelectItem>
-                                                        {/* <SelectItem value="upi">UPI</SelectItem> */}
+                                                        {/* <SelectItem value="COD">COD</SelectItem> */}
+                                                        <SelectItem value="UPI">UPI</SelectItem>
+                                                        <SelectItem value="Cash">Cash</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </FormControl>
@@ -339,7 +445,12 @@ function page() {
                             <div className="space-y-4">
                                 <div className='flex gap-2 justify-between items-center mb-4'>
                                     <h2 className='font-semibold text-xl uppercase text-gray-600'>Items</h2>
-                                    <Button variant="outline" type="button" onClick={() => append({ productId: "", variantName: "", quantity: 1, unitPrice: 0, price: 0 })}>
+                                    <Button variant="outline" type="button" onClick={() => append({
+                                        productId: "",
+                                        variantName: "",
+                                        quantity: 1,
+                                        price: 0
+                                    })}>
                                         + Add Item
                                     </Button>
                                 </div>
@@ -351,9 +462,43 @@ function page() {
                             </div>
                         </PCard>
 
+                        <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6">
+                            <div className="flex items-center justify-between sm:min-w-[250px] bg-white border rounded-md p-3 shadow-sm">
+                                <span className="text-sm text-gray-600">Subtotal:</span>
+                                <span className="font-medium">₹{watchSubTotal}</span>
+                            </div>
+
+                            <FormField
+                                control={form.control}
+                                name="discount"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Discount</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                min={0}
+                                                {...field}
+                                                onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                                                className="sm:min-w-[250px]"
+                                                placeholder="Enter discount"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+
+                            <div className="flex items-center justify-between sm:min-w-[250px] border rounded-md p-3 shadow bg-primary/10">
+                                <span className="text-sm font-semibold text-primary">Total Amount:</span>
+                                <span className="font-bold text-primary">₹{watchOrderAmount}</span>
+                            </div>
+                        </div>
+
                         {/* submit Button */}
                         <LoaderButton
-                            loading={createPosOrder.isPending}
+                            loading={createPosOrder.isPending || createCustomer.isPending}
                             // disabled={createPosOrder.isPending}
                             type="submit"
                         >
