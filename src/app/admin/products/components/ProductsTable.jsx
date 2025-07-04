@@ -101,7 +101,7 @@ export default function ProductsListView({
 
                                 {/* 3. Name */}
                                 <TableCell className=" text-sm">
-                                    <div className=' text-xs'>
+                                    <div className='max-w-32 text-wrap text-xs'>
                                         {product.name}
                                     </div>
                                 </TableCell>
@@ -150,8 +150,8 @@ export default function ProductsListView({
                                                 setSelectedProduct(product)
                                             }}
                                         >
-                                            <Badge variant={"outline"}>
-                                                <Pencil size={10} />
+                                            <Badge className={'cursor-pointer'} variant={'outline'}>
+                                                <Pencil size={10} /> Update
                                             </Badge>
                                         </div>
                                     </div>

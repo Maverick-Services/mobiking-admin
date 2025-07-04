@@ -27,11 +27,14 @@ import { Loader2, Plus, X } from 'lucide-react';
 import MultiImageSelector from '@/components/MultiImageSelector';
 import Image from 'next/image';
 import { Textarea } from '@/components/ui/textarea';
+import toast from 'react-hot-toast';
+import { uploadImage } from '@/lib/services/uploadImage';
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
     fullName: z.string().min(1, "Full name is required"),
     price: z.number().min(0, "Selling Price is required"),
+    regularPrice: z.number().optional(),
     basePrice: z.number().min(0, "Base Price is required"),
     gst: z.number().min(0, "GST must be a positive number"),
     slug: z.string().min(1, "Slug is required"),
@@ -57,6 +60,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
             fullName: "",
             price: 0,
             gst: 0,
+            regularPrice: 0,
             basePrice: 0,
             slug: "",
             active: true,
@@ -76,6 +80,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                 fullName: selectedProduct.fullName,
                 price: selectedProduct?.sellingPrice[selectedProduct.sellingPrice?.length - 1].price,
                 gst: selectedProduct.gst,
+                regularPrice: selectedProduct.regularPrice,
                 basePrice: selectedProduct.basePrice,
                 slug: selectedProduct.slug,
                 active: selectedProduct.active,
@@ -92,6 +97,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                 price: 0,
                 gst: 0,
                 basePrice: 0,
+                regularPrice: 0,
                 slug: "",
                 active: true,
                 description: "",
@@ -259,6 +265,26 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                 {/* Base price */}
                                 <FormField
                                     control={form.control}
+                                    name="regularPrice"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Regular Price</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    placeholder="1699"
+                                                    {...field}
+                                                    onChange={(e) => field.onChange(Number(e.target.value))}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {/* Base price */}
+                                <FormField
+                                    control={form.control}
                                     name="basePrice"
                                     render={({ field }) => (
                                         <FormItem>
@@ -340,44 +366,97 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                             />
 
                             {/* Images */}
-                            <div className="flex flex-col">
-                                <div className="flex justify-between items-center w-full">
-                                    <span className="font-medium mb-2">Select Images</span>
-                                    <Button type={'button'} onClick={() => setPhotosDialogOpen(true)}>
-                                        Add Images
-                                    </Button>
-                                </div>
-                                {images.length > 0 ? (
-                                    <div className="mt-4 flex flex-wrap gap-3">
-                                        {images.map((url, idx) => (
-                                            <div key={idx} className="relative border rounded-lg overflow-hidden group">
-                                                <Image
-                                                    src={url}
-                                                    alt={`Selected image ${idx + 1}`}
-                                                    height={200}
-                                                    width={200}
-                                                    className="object-cover h-32 w-full"
-                                                />
-                                                <button
-                                                    className="absolute top-1 right-1 bg-white rounded-full p-1 shadow-md 
-                     hover:bg-red-500 hover:text-white transition-colors opacity-0 group-hover:opacity-100"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        const updatedImages = [...images];
-                                                        updatedImages.splice(idx, 1); // remove by index
-                                                        setValue("images", updatedImages, { shouldValidate: true });
-                                                    }}
-                                                >
-                                                    <X size={16} />
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="text-gray-500 italic">No images selected</div>
-                                )}
+                            <FormField
+                                control={form.control}
+                                name="images"
+                                render={() => (
+                                    <FormItem>
+                                        <FormLabel>Product Images</FormLabel>
 
-                            </div>
+                                        {/* Hidden File Input */}
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            multiple
+                                            className="hidden"
+                                            ref={fileInput => (form.fileInputRef = fileInput)}
+                                            onChange={async (e) => {
+                                                const files = e.target.files;
+                                                if (!files || files.length === 0) return;
+
+                                               const toastId = toast.loading('Uploading images...');
+
+                                                const urls = [];
+                                                for (let file of files) {
+                                                    const reader = new FileReader();
+                                                    const result = await new Promise((resolve, reject) => {
+                                                        reader.onloadend = () => resolve(reader.result);
+                                                        reader.onerror = reject;
+                                                        reader.readAsDataURL(file);
+                                                    });
+                                                    try {
+                                                        const url = await uploadImage(result);
+                                                        urls.push(url);
+                                                    } catch (err) {
+                                                        console.error('Image upload failed:', err);
+                                                    }
+                                                }
+
+                                                const existing = form.getValues("images") || [];
+                                                form.setValue("images", [...existing, ...urls], { shouldValidate: true });
+                                                toast.success('Images uploaded', { id: toastId });
+
+                                                // Reset input
+                                                e.target.value = '';
+                                            }}
+                                        />
+
+                                        {/* Upload Button */}
+                                        <Button
+                                            type="button"
+                                            onClick={() => form.fileInputRef?.click()}
+                                            className="mt-2"
+                                        >
+                                            Upload Images
+                                        </Button>
+
+                                        {/* Image Preview Grid */}
+                                        {images.length > 0 ? (
+                                            <div className="mt-4 flex flex-wrap gap-3">
+                                                {images.map((url, idx) => (
+                                                    <div
+                                                        key={idx}
+                                                        className="relative border rounded-lg overflow-hidden group"
+                                                    >
+                                                        <Image
+                                                            src={url}
+                                                            alt={`Product image ${idx + 1}`}
+                                                            width={200}
+                                                            height={200}
+                                                            className="object-cover h-32 w-full"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const updated = [...images];
+                                                                updated.splice(idx, 1);
+                                                                form.setValue("images", updated, { shouldValidate: true });
+                                                            }}
+                                                            className="absolute top-1 right-1 bg-white rounded-full p-1 shadow-md 
+                                hover:bg-red-500 hover:text-white transition-colors opacity-0 group-hover:opacity-100"
+                                                        >
+                                                            <X size={16} />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="text-gray-500 italic mt-3 border-gray-600 text-center py-8 px-3 rounded-sm border-dashed border">No images yet</div>
+                                        )}
+                                    </FormItem>
+                                )}
+                            />
+
 
                             {/* Description Points */}
                             <div className='bg-gray-100 rounded p-4'>
@@ -433,7 +512,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                                     <FormItem>
                                                         <FormLabel>Title</FormLabel>
                                                         <FormControl>
-                                                            <Input placeholder={"e.g. Brand Name"} {...field} />
+                                                            <Input placeholder={"e.g. Battery Life"} {...field} />
                                                         </FormControl>
                                                         <FormMessage />
                                                     </FormItem>
@@ -488,7 +567,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                 </div>
             </DialogContent>
 
-
+            {/* 
             <MultiImageSelector
                 open={photosDialogOpen}
                 onOpenChange={setPhotosDialogOpen}
@@ -497,7 +576,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                         shouldValidate: true,
                     });
                 }}
-            />
+            /> */}
         </Dialog>
     )
 }

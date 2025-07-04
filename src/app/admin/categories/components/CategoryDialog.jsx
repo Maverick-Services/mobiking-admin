@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+'use client'
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,13 +14,33 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import clsx from "clsx";
 import { Loader2 } from 'lucide-react';
-import ImageSelector from "@/components/ImageSelector";
 import Image from "next/image";
 import { Switch } from "@/components/ui/switch";
+import { uploadImage } from "@/lib/services/uploadImage";
+import toast from "react-hot-toast";
 
-export default function CategoryDialog({ open, onOpenChange, selectedCategory, onCreate, onUpdate, isSubmitting, error, image, setImage }) {
-    const { register, handleSubmit, reset, formState: { errors }, watch, setValue } = useForm()
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
+export default function CategoryDialog({
+    open,
+    onOpenChange,
+    selectedCategory,
+    onCreate,
+    onUpdate,
+    isSubmitting,
+    error,
+    image,
+    setImage
+}) {
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors },
+        watch,
+        setValue
+    } = useForm();
+
+    const fileInputRef = useRef(null);
+    const [isUploading, setIsUploading] = useState(false);
 
     useEffect(() => {
         if (open) {
@@ -29,15 +50,17 @@ export default function CategoryDialog({ open, onOpenChange, selectedCategory, o
                     slug: selectedCategory.slug,
                     active: selectedCategory.active,
                 });
+                setImage(selectedCategory.image || null);
             } else {
                 reset({
                     name: '',
                     slug: '',
-                    active: '',
+                    active: true,
                 });
+                setImage(null);
             }
         }
-    }, [open, selectedCategory, reset]);
+    }, [open, selectedCategory, reset, setImage]);
 
     const watchName = watch("name");
 
@@ -47,34 +70,51 @@ export default function CategoryDialog({ open, onOpenChange, selectedCategory, o
             .replace(/\s+/g, '-')
             .replace(/[^a-z0-9-]/g, '');
         setValue('slug', generatedSlug);
-    }, [watchName, setValue,]);
+    }, [watchName, setValue]);
 
+    const handleImageChange = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+              const toastId = toast.loading('Uploading...')
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            try {
+                setIsUploading(true);
+                const imageUrl = await uploadImage(reader.result);
+                setImage(imageUrl);
+                toast.success('Image uploaded', { id: toastId });
+            } catch (err) {
+                console.error(err);
+                toast.error('Upload failed', { id: toastId });
+            } finally {
+                setIsUploading(false);
+            }
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleImageClick = () => {
+        fileInputRef.current?.click();
+    };
 
     const onSubmit = async (data) => {
-        console.log(data);
-        console.log({ ...data, image: image });
         try {
+            const payload = {
+                ...data,
+                image: image,
+            };
+
             if (selectedCategory?._id) {
-                await onUpdate({
-                    id: selectedCategory._id,
-                    data: {
-                        ...data,
-                        image: image
-                    }
-                });
-                onOpenChange(false);
-                setImage(null)
+                await onUpdate({ id: selectedCategory._id, data: payload });
             } else {
-                await onCreate({
-                    data: {
-                        ...data,
-                        image: image
-                    }
-                });
-                onOpenChange(false);
-                setImage(null)
+                await onCreate({ data: payload });
             }
+
+            onOpenChange(false);
+            setImage(null);
         } catch (error) {
+            console.error('Submit Error:', error);
         }
     };
 
@@ -93,37 +133,41 @@ export default function CategoryDialog({ open, onOpenChange, selectedCategory, o
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="grid gap-4 py-4">
 
-                        {/* Image URL */}
-                        {!image
-                            && <div
-                                className="flex-1 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center cursor-pointer h-48 mb-4 sm:mb-0"
-                                onClick={() => { setIsDialogOpen(true) }}
+                        {/* Image Upload */}
+                        <input
+                            type="file"
+                            accept="image/*"
+                            ref={fileInputRef}
+                            onChange={handleImageChange}
+                            className="hidden"
+                        />
+
+                        {!image ? (
+                            <div
+                                className="flex-1 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center cursor-pointer h-48"
+                                onClick={handleImageClick}
                             >
                                 <span className="text-gray-500">Click to select image</span>
                             </div>
-                        }
-                        {image
-                            && <div className="h-full w-full border rounded-xl">
-                                <Image
-                                    height={100}
-                                    width={100}
-                                    quality={100}
-                                    src={image}
-                                    alt={image}
-                                    className="w-full h-44 object-contain"
-                                />
-                            </div>
-                        }
-                        {image &&
-                            <Button
-                                type='button'
-                                onClick={() => { setIsDialogOpen(true) }}
-                            >
-                                Change Image
-                            </Button>
-                        }
+                        ) : (
+                            <>
+                                <div className="h-full w-full border rounded-xl">
+                                    <Image
+                                        height={100}
+                                        width={100}
+                                        quality={100}
+                                        src={image}
+                                        alt="category image"
+                                        className="w-full h-44 object-contain"
+                                    />
+                                </div>
+                                <Button type="button" onClick={handleImageClick} className="mt-2">
+                                    Change Image
+                                </Button>
+                            </>
+                        )}
 
-                        {/* name */}
+                        {/* Name */}
                         <div className="grid grid-cols-4 items-start gap-4">
                             <Label htmlFor="name" className="text-right mt-2">
                                 Name<span className="text-red-500"> *</span>
@@ -131,9 +175,7 @@ export default function CategoryDialog({ open, onOpenChange, selectedCategory, o
                             <div className="col-span-3">
                                 <Input
                                     id="name"
-                                    {...register("name", {
-                                        required: "Name is required",
-                                    })}
+                                    {...register("name", { required: "Name is required" })}
                                     className={clsx("w-full", {
                                         "border-red-500": errors.name,
                                     })}
@@ -147,7 +189,7 @@ export default function CategoryDialog({ open, onOpenChange, selectedCategory, o
                             </div>
                         </div>
 
-                        {/* slug */}
+                        {/* Slug */}
                         <div className="grid grid-cols-4 items-start gap-4">
                             <Label htmlFor="slug" className="text-right mt-2">
                                 Slug<span className="text-red-500"> *</span>
@@ -162,7 +204,7 @@ export default function CategoryDialog({ open, onOpenChange, selectedCategory, o
                                     })}
                                     className={clsx("w-full", { "border-red-500": errors.slug })}
                                     placeholder="sports"
-                                    disabled={true}
+                                    disabled
                                 />
                                 {errors.slug && (
                                     <p className="text-sm text-red-500 mt-1">
@@ -174,7 +216,7 @@ export default function CategoryDialog({ open, onOpenChange, selectedCategory, o
 
                         {/* Active */}
                         <div className="grid grid-cols-4 items-start gap-4">
-                            <Label htmlFor="slug" className="text-right mt-2">
+                            <Label htmlFor="active" className="text-right mt-2">
                                 Active<span className="text-red-500"> *</span>
                             </Label>
                             <div className="col-span-3">
@@ -191,19 +233,13 @@ export default function CategoryDialog({ open, onOpenChange, selectedCategory, o
                     )}
 
                     <DialogFooter>
-                        <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting && <Loader2 className="animate-spin mr-1" />}
+                        <Button type="submit" disabled={isSubmitting || isUploading}>
+                            {(isSubmitting) && <Loader2 className="animate-spin mr-1" />}
                             {selectedCategory ? "Update" : "Create"}
                         </Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
-
-            <ImageSelector
-                open={isDialogOpen}
-                onOpenChange={setIsDialogOpen}
-                setImage={setImage}
-            />
         </Dialog>
-    )
+    );
 }
