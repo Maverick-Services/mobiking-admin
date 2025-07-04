@@ -18,6 +18,7 @@ const formSchema = z.object({
     sequenceNo: z.coerce.number({ required_error: "Sequence number is required" }),
     active: z.boolean(),
     isBannerVisble: z.boolean(),
+    isBackgroundColorVisible: z.boolean(),
     banner: z.string().nullable(),
     backgroundColor: z.string().optional(),
 });
@@ -33,6 +34,7 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
             active: true,
             banner: "",
             isBannerVisble: false,
+            isBackgroundColorVisible: false,
             backgroundColor: "#ffffff", // default white
         }
     });
@@ -46,6 +48,7 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                 active: selectedGroup.active,
                 banner: selectedGroup.banner,
                 isBannerVisble: selectedGroup.isBannerVisble,
+                isBackgroundColorVisible: selectedGroup.isBackgroundColorVisible,
                 backgroundColor: selectedGroup?.backgroundColor || "#ffffff"
             });
         } else {
@@ -55,6 +58,7 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                 active: true,
                 banner: "",
                 isBannerVisble: false,
+                isBackgroundColorVisible: false,
                 backgroundColor: "#ffffff"
             });
         }
@@ -247,6 +251,29 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                                                 type="color"
                                                 className="h-10 w-full p-0 border rounded cursor-pointer"
                                                 {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* isBackgroundColorVisible */}
+                            <FormField
+                                control={form.control}
+                                name="isBackgroundColorVisible"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center justify-between rounded border border-gray-500 p-3">
+                                        <div className="space-y-0.5">
+                                            <FormLabel>Show Background Color</FormLabel>
+                                            <DialogDescription>Want to show the background color in App? </DialogDescription>
+                                        </div>
+                                        <FormControl>
+                                            <Input
+                                                type="checkbox"
+                                                className="w-5 h-5"
+                                                checked={field.value}
+                                                onChange={field.onChange}
                                             />
                                         </FormControl>
                                         <FormMessage />

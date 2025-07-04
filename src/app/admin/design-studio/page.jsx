@@ -65,7 +65,7 @@ function page() {
     return (
         <InnerDashboardLayout>
             <div className='flex items-center justify-between w-full mb-3'>
-                <h1 className="text-primary font-bold sm:text-2xl lg:text-3xl mb-3">Product Groups</h1>
+                <h1 className="text-primary font-bold sm:text-2xl lg:text-3xl mb-3">Design Studio</h1>
 
                 <Button onClick={handleAddClick}>
                     <CirclePlus className="mr-2 h-4 w-4" />

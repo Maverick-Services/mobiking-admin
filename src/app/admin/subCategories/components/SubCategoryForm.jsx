@@ -36,6 +36,7 @@ const formSchema = z.object({
     icon: z.string().min(1, "Icon is required"),
     active: z.boolean(),
     featured: z.boolean(),
+    theme: z.enum(["light", "dark"]),
     categoryId: z.string().min(1, "Category is required"),
     photos: z.array(z.string()).optional().nullable(),
     upperBanner: z.string().nullable(),
@@ -57,6 +58,7 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
             icon: "",
             active: true,
             featured: false,
+            theme: 'light',
             sequenceNo: 0,
             categoryId: "",
             photos: [],
@@ -99,7 +101,7 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
     // const [upperDialog, setUpperDialog] = useState(false)
 
     const upperInputRef = useRef(null)
-   const onUpperClick = ()=> upperInputRef.current?.click();
+    const onUpperClick = () => upperInputRef.current?.click();
 
     // const lowerBanner = watch('lowerBanner')
     // const [lowerDialog, setLowerDialog] = useState(false)
@@ -130,7 +132,7 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
         reader.readAsDataURL(file)
     }
 
-     const onUpperChange = async (e) => {
+    const onUpperChange = async (e) => {
         const file = e.target.files?.[0]
         if (!file) return
 
@@ -143,7 +145,7 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                 toast.success('Image Uploaded', { id: toastId })
             } catch (err) {
                 console.error(err)
-                toast.error('Error'+ err, { id: toastId })
+                toast.error('Error' + err, { id: toastId })
             }
         }
         reader.readAsDataURL(file)
@@ -218,7 +220,7 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                                     </FormItem>
                                 )}
                             />
-                            
+
                             <FormField
                                 control={form.control}
                                 name="deliveryCharge"
@@ -270,7 +272,7 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                                 control={form.control}
                                 name="active"
                                 render={({ field }) => (
-                                    <FormItem className="flex items-center justify-between">
+                                    <FormItem className="flex items-center justify-between border bg-gray-100 px-3 py-5 rounded-sm">
                                         <FormLabel>Active</FormLabel>
                                         <FormControl>
                                             <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -280,7 +282,7 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                             />
 
                             {/* Featured */}
-                            <FormField
+                            {/* <FormField
                                 control={form.control}
                                 name="featured"
                                 render={({ field }) => (
@@ -291,15 +293,36 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                                         </FormControl>
                                     </FormItem>
                                 )}
+                            /> */}
+
+                            <FormField
+                                control={form.control}
+                                name='theme'
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Theme for text color on App header</FormLabel>
+                                        <FormControl>
+                                            <Select onValueChange={field.onChange} value={field.value}>
+                                                <SelectTrigger className={'w-full'}>
+                                                    <SelectValue placeholder='Select theme' />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="light">Light</SelectItem>
+                                                    <SelectItem value="dark">Dark</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                    </FormItem>
+                                )}
                             />
                         </PCard>
 
                         {/* <PCard> */}
-                            {/* delivery charge */}
-                            
+                        {/* delivery charge */}
 
-                            {/* min order amount */}
-                            {/* <FormField
+
+                        {/* min order amount */}
+                        {/* <FormField
                                 control={form.control}
                                 name="minOrderAmount"
                                 render={({ field }) => (
@@ -313,8 +336,8 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                                 )}
                             /> */}
 
-                            {/* min free delivery order amount */}
-                            {/* <FormField
+                        {/* min free delivery order amount */}
+                        {/* <FormField
                                 control={form.control}
                                 name="minFreeDeliveryOrderAmount"
                                 render={({ field }) => (
@@ -376,15 +399,15 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                             </div>
                         </PCard> */}
 
-                            {/* upper Banner */}
+                        {/* upper Banner */}
                         <PCard>
                             <input
-                            type="file"
-                            accept="image/*,.gif"
-                            ref={upperInputRef}
-                            className="hidden"
-                            onChange={onUpperChange}
-                        />
+                                type="file"
+                                accept="image/*,.gif"
+                                ref={upperInputRef}
+                                className="hidden"
+                                onChange={onUpperChange}
+                            />
                             <FormField
                                 control={control}
                                 name="upperBanner"
@@ -397,8 +420,8 @@ export default function SubCategoryForm({ defaultValues, onSubmit, loading, erro
                                             <div
                                                 className="border-2 border-dashed border-gray-300 rounded-lg mt-3 h-36 flex flex-col items-center justify-center cursor-pointer"
                                                 onClick={onUpperClick}
-                                            >                         
-                                                                   <span className="text-gray-500">Upper banner: 1080w * 540h</span>
+                                            >
+                                                <span className="text-gray-500">Upper banner: 1080w * 540h</span>
                                                 <p className="text-gray-500 text-xs">Max size - 5mb</p>
                                             </div>
                                         ) : (
