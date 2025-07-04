@@ -13,6 +13,17 @@ import ProductsListView from "./components/ProductsTable"
 import ProductDialog from "./components/ProductDialog"
 import StockUpdate from "./components/StockUpdate"
 import TableSkeleton from "@/components/custom/TableSkeleton"
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination"
+import { getPaginationRange } from "@/lib/services/getPaginationRange"
+
 
 export default function page() {
     const [categoryFilter, setCategoryFilter] = useState("all")
@@ -22,6 +33,8 @@ export default function page() {
     const [stockEditing, setStockEditing] = useState(false)
     const [selectedStockProduct, setSelectedStockProduct] = useState()
 
+    const [page, setPage] = useState(1)
+    const [limit, setLimit] = useState(10)
     // console.log(selectedStockProduct)
 
     const {
@@ -29,14 +42,14 @@ export default function page() {
         createProduct: { mutateAsync: createProductAsync, isPending: creating, error: createError, reset: resetCreate },
         updateProduct: { mutateAsync: updateProductAsync, isPending: updating, error: updateError, reset: resetUpdate },
         permissions: { canView, canAdd, canDelete, canEdit },
-    } = useProducts()
+    } = useProducts({ page, limit })
 
     const { subCategoriesQuery } = useSubCategories()
     const subCategories = subCategoriesQuery.data?.data || []
 
-
-
-    const allProducts = productsQuery.data?.data || []
+    const allProducts = productsQuery.data?.products || []
+    const totalPages = productsQuery.data?.pagination?.totalPages || 1
+    const paginationRange = getPaginationRange(page, totalPages)
 
     // 1️⃣ Filter by category ID if set
     const afterCategoryFilter = allProducts.filter((prod) => {
@@ -80,27 +93,6 @@ export default function page() {
                         <Button variant="outline">
                             Total: {allProducts.length}
                         </Button>
-                        {/* <Select
-                            value={categoryFilter}
-                            onValueChange={setCategoryFilter}
-                        >
-                            <SelectTrigger className="w-48 bg-white">
-                                <SelectValue>
-                                    {categoryFilter === "all"
-                                        ? "All Categories"
-                                        : subCategories.find((c) => c._id === categoryFilter)?.name ||
-                                        "Unknown"}
-                                </SelectValue>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Sub-Categories</SelectItem>
-                                {subCategories.map((c) => (
-                                    <SelectItem key={c._id} value={c._id}>
-                                        {c.name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select> */}
 
                         {/* Search Bar */}
                         <Input
@@ -122,7 +114,7 @@ export default function page() {
                 {/* Table */}
                 {(productsQuery.isLoading || subCategoriesQuery.isLoading)
                     ? <TableSkeleton showHeader={false} />
-                    : <ProductsListView
+                    : <><ProductsListView
                         error={productsQuery.error}
                         products={finalFiltered}
                         // onDelete={deleteAsync}
@@ -134,7 +126,61 @@ export default function page() {
                         setStockEditing={setStockEditing}
                         setSelectedProduct={setSelectedStockProduct}
                     />
+                    </>
                 }
+
+
+                <div className="flex w-full justify-end gap-2 items-center">
+                    {/* Limit Dropdown */}
+                    <Select value={String(limit)} onValueChange={(val) => { setPage(1); setLimit(Number(val)) }}>
+                        <SelectTrigger className="w-[120px]">
+                            <SelectValue placeholder="Items per page" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {[1, 5, 10, 20, 50].map((n) => (
+                                <SelectItem key={n} value={String(n)}>
+                                    {n} / page
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    {/* Pagination */}
+                    <Pagination className={'inline justify-end mx-1 w-fit'}>
+                        <PaginationContent>
+                            {page > 1 && (
+                                <PaginationItem>
+                                    <PaginationPrevious href="#" onClick={() => setPage((p) => p - 1)} />
+                                </PaginationItem>
+                            )}
+
+                            {paginationRange.map((p, i) => (
+                                <PaginationItem key={i}>
+                                    {p === 'ellipsis-left' || p === 'ellipsis-right' ? (
+                                        <PaginationEllipsis />
+                                    ) : (
+                                        <PaginationLink
+                                            href="#"
+                                            isActive={p === page}
+                                            onClick={(e) => {
+                                                e.preventDefault()
+                                                setPage(p)
+                                            }}
+                                        >
+                                            {p}
+                                        </PaginationLink>
+                                    )}
+                                </PaginationItem>
+                            ))}
+
+                            {page < totalPages && (
+                                <PaginationItem>
+                                    <PaginationNext href="#" onClick={() => setPage((p) => p + 1)} />
+                                </PaginationItem>
+                            )}
+                        </PaginationContent>
+                    </Pagination>
+                </div>
 
                 <ProductDialog
                     open={isDialogOpen}

@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import { Actions, checkPermission, Resources } from '@/lib/permissions';
 import { useAuthStore } from '@/store/useAuthStore';
 
-export const useProducts = () => {
+export const useProducts = ({ page = 1, limit = 10 } = {}) => {
     const { user } = useAuthStore()
     const queryClient = useQueryClient();
 
@@ -14,14 +14,18 @@ export const useProducts = () => {
     const canEdit = checkPermission(user, Resources.PRODUCTS, Actions.EDIT)
     const canDelete = checkPermission(user, Resources.PRODUCTS, Actions.DELETE)
 
-    // Get all SubCategories
+    // Get all products
     const productsQuery = useQuery({
-        queryKey: ['products'],
+        queryKey: ['products', page, limit],
         enabled: canView,
-        queryFn: () => api.get('/products').then(res => res.data),
-        staleTime: 1000 * 60 * 5, // 5 minutes cache
+        queryFn: () =>
+            api
+                .get(`/products/all/paginated?page=${page}&limit=${limit}`)
+                .then((res) => res.data.data),
+        keepPreviousData: true,
+        staleTime: 1000 * 60 * 5,
         onError: (err) => {
-            toast.error(err?.response?.data?.message  || 'Failed to fetch products');
+            toast.error(err?.response?.data?.message || 'Failed to fetch products');
         }
     });
 
@@ -39,7 +43,7 @@ export const useProducts = () => {
         },
         staleTime: 1000 * 60 * 5,
         onError: (err) => {
-            toast.error(err?.response?.data?.message  || 'Failed to fetch service');
+            toast.error(err?.response?.data?.message || 'Failed to fetch service');
         }
     });
 
@@ -53,7 +57,7 @@ export const useProducts = () => {
             toast.success('Product created successfully');
         },
         onError: (err) => {
-            toast.error(err?.response?.data?.message  || 'Failed to create Product');
+            toast.error(err?.response?.data?.message || 'Failed to create Product');
         }
     });
 
@@ -79,7 +83,7 @@ export const useProducts = () => {
             toast.success('Stock Added successfully');
         },
         onError: (err) => {
-            toast.error(err?.response?.data?.message  || 'Failed to add stock.');
+            toast.error(err?.response?.data?.message || 'Failed to add stock.');
         }
     });
 
