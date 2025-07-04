@@ -1,145 +1,111 @@
 "use client"
 import InnerDashboardLayout from '@/components/dashboard/InnerDashboardLayout'
-import { useGroups } from '@/hooks/useGroups'
-import { useHome } from '@/hooks/useHome'
-import React, { useEffect, useState } from 'react'
-import GroupTable from './components/GroupTable'
-import CategoryTable from './components/CategoryTable'
-import { useSubCategories } from '@/hooks/useSubCategories'
-import PCard from '@/components/custom/PCard'
-import Image from 'next/image'
-import MultiImageSelector from '@/components/MultiImageSelector'
-import { Button } from '@/components/ui/button'
-import { Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button';
+import { CirclePlus } from 'lucide-react'
+import React, { useState } from 'react'
+import GroupDialog from './components/GroupDialog';
+import { useProducts } from '@/hooks/useProducts';
+import { useGroups } from '@/hooks/useGroups';
+import GroupsTable from './components/GroupsTable';
+import GroupProductsSheet from './components/GroupProductsSheet';
 
 function page() {
-    const { homeQuery, updateHome } = useHome()
-    const { groupsQuery } = useGroups()
-    const { subCategoriesQuery } = useSubCategories()
+    const { productsQuery } = useProducts()
+    const { groupsQuery, createGroup, updateGroup, updateProductsInGroup } = useGroups()
+    const [selectedGroup, setSelectedGroup] = useState(null)
 
-    const allGroups = groupsQuery?.data?.data || []
-    const allCategories = subCategoriesQuery?.data?.data || []
+    const [prdouctsSheet, setPrdouctsSheet] = useState(false)
+    const [groupForProducts, setGroupForProducts] = useState()
 
-    const homeData = homeQuery?.data?.data || {}
-    const initialData = homeData.groups || []
+    const groupsData = groupsQuery?.data || []
 
-    const initialCategoriesData = (homeData.categories || [])
+    const {
+        mutateAsync: createGroupAsync,
+        isPending: creating,
+        error: createError,
+        reset: resetCreate,
+    } = createGroup;
 
-    const [banners, setBanners] = useState([])
-    const [photosDialogOpen, setPhotosDialogOpen] = useState(false);
+    const {
+        mutateAsync: updateGroupAsync,
+        isPending: updating,
+        error: updateError,
+        reset: resetUpdate,
+    } = updateGroup;
 
-    useEffect(() => {
-        setBanners(homeData?.banners)
-    }, [homeData])
+    const {
+        mutateAsync: updateProductsInGroupAsync,
+        isPending: updatingProducts,
+        error: updateProductsError,
+    } = updateProductsInGroup;
 
-    const [bannerLoading, setBannerLoading] = useState(false)
+    // console.log(groupsQuery.data)
+
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    // open dialog to add new 
+    const handleAddClick = () => {
+        resetCreate();
+        resetUpdate();
+        // resetDelete();
+        setSelectedGroup(undefined)
+        // setSelectedProduct(undefined);
+        setIsDialogOpen(true);
+    };
+
+    const handleEditClick = (group) => {
+        resetCreate();
+        resetUpdate();
+        setIsDialogOpen(true);
+        setSelectedGroup(group)
+    }
 
 
-    console.log(homeData)
+    // console.log(productsQuery.data)
 
     return (
         <InnerDashboardLayout>
-            <div className='w-full flex items-center justify-between text-primary mb-5'>
-                <h1 className='font-bold sm:text-2xl lg:text-4xl w-full'>Design Studio</h1>
+            <div className='flex items-center justify-between w-full mb-3'>
+                <h1 className="text-primary font-bold sm:text-2xl lg:text-3xl mb-3">Product Groups</h1>
+
+                <Button onClick={handleAddClick}>
+                    <CirclePlus className="mr-2 h-4 w-4" />
+                    Add New
+                </Button>
             </div>
 
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4'>
-                <PCard>
-                    <GroupTable
-                        initialData={initialData}
-                        allGroups={allGroups}
-                        onSave={(newSequence) => {
-                            console.log('New sequence of IDs:', newSequence)
-                            const data = {
-                                ...homeData,
-                                groups: newSequence
-                            }
-                            updateHome.mutateAsync(data)
-                            // console.log(data)
-                        }}
-                    />
-                </PCard>
-
-                <PCard>
-                    {/* Categories section */}
-                    <CategoryTable
-                        initialData={initialCategoriesData}
-                        allCategories={allCategories}
-                        onSave={(newSeq) => {
-                            const data = {
-                                ...homeData,
-                                categories: newSeq
-                            }
-                            updateHome.mutateAsync(data)
-                            console.log('Categories saved:', newSeq)
-                        }}
-                    />
-                </PCard>
-            </div>
-
-            <PCard className={''}>
-                <div className='w-full flex items-center justify-between text-primary mb-5'>
-                    <h2 className='font-bold'>Website Banners</h2>
-                    <div className='flex items-center gap-2'>
-                        {bannerLoading && <Loader2 className='animate-spin text-muted-foreground' />}
-                        <Button onClick={() => setPhotosDialogOpen(true)}>Add More</Button>
-                        <Button
-                            onClick={async () => {
-                                try {
-                                    setBannerLoading(true)
-                                    await updateHome.mutateAsync({
-                                        ...homeData,
-                                        banners: banners,
-                                    })
-                                } finally {
-                                    setBannerLoading(false)
-                                }
-                            }}
-                        >
-                            Save Banners
-                        </Button>
-                    </div>
-                </div>
-
-                {banners?.length === 0 ? (
-                    <p className='text-muted-foreground'>No banners added yet.</p>
-                ) : (
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                        {banners?.map((url, idx) => (
-                            <div key={idx} className='relative group'>
-                                <Image
-                                    src={url}
-                                    alt={`banner-${idx}`}
-                                    height={500}
-                                    width={2000}
-                                    className='h-64 w-full object-cover rounded-xl'
-                                />
-                                <button
-                                    onClick={() => {
-                                        const updatedBanners = banners.filter((_, i) => i !== idx)
-                                        setBanners(updatedBanners)
-                                    }}
-                                    className='absolute top-2 right-2 bg-white text-red-500 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition'
-                                    title='Remove Banner'
-                                >
-                                    ✕
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </PCard>
-
-
-            <MultiImageSelector
-                open={photosDialogOpen}
-                onOpenChange={setPhotosDialogOpen}
-                onChange={(newUrls) => {
-                    setBanners([...(banners || []), ...newUrls])
-                }}
+            <GroupsTable
+                groups={groupsData}
+                onEdit={handleEditClick}
+                isLoading={groupsQuery.isLoading}
+                setGroupForProducts={setGroupForProducts}
+                setPrdouctsSheet={setPrdouctsSheet}
             />
 
-        </InnerDashboardLayout>
+            <GroupDialog
+                open={isDialogOpen}
+                onOpenChange={setIsDialogOpen}
+                products={productsQuery.data}
+                onCreate={createGroupAsync}
+                // isSubmitting={creating}
+                // error={createError}
+                selectedGroup={selectedGroup}
+                // selectedProduct={selectedProduct}
+                // categories={subCategories}
+                isSubmitting={creating || updating}
+                error={createError || updateError}
+                // onCreate={createProductAsync}
+                onUpdate={updateGroupAsync}
+            />
+
+            <GroupProductsSheet
+                open={prdouctsSheet}
+                onOpenChange={setPrdouctsSheet}
+                group={groupForProducts}
+                onProductsAdd={updateProductsInGroupAsync}
+                updatingProducts={updatingProducts}
+                updateProductsError={updateProductsError}
+            />
+        </InnerDashboardLayout >
     )
 }
 

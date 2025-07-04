@@ -46,8 +46,10 @@
     "react-hook-form": "^7.57.0",
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0",
+    "react-sortablejs": "^6.1.4",
     "recharts": "^2.15.3",
     "sonner": "^2.0.5",
+    "sortablejs": "^1.15.6",
     "tailwind-merge": "^3.3.0",
     "zod": "^3.25.50",
     "zustand": "^5.0.5"

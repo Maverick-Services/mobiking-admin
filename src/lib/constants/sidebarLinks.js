@@ -67,16 +67,16 @@ export const ADMIN_SIDEBAR_LINKS = [
         icon: <FaBoxOpen />,
     },
     {
-        key: 'groups',
-        label: 'Product Groups',
-        href: '/admin/groups',
-        icon: <FaCaretSquareDown />,
-    },
-    {
         key: 'design-studio',
         label: 'Design Studio',
         href: '/admin/design-studio',
         icon: <FaCamera />,
+    },
+    {
+        key: 'homeLayout',
+        label: 'Home Layout',
+        href: '/admin/home-layout',
+        icon: <FaHome />,
     },
     {
         key: 'media',
