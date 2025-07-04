@@ -17,8 +17,11 @@ const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
     sequenceNo: z.coerce.number({ required_error: "Sequence number is required" }),
     active: z.boolean(),
+    isBannerVisble: z.boolean(),
     banner: z.string().nullable(),
+    backgroundColor: z.string().optional(),
 });
+
 
 function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, isSubmitting, error, }) {
     const form = useForm({
@@ -26,9 +29,11 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
         mode: 'onSubmit',
         defaultValues: selectedGroup || {
             name: "",
-            sequenceNo: "",
+            sequenceNo: 0,
             active: true,
             banner: "",
+            isBannerVisble: false,
+            backgroundColor: "#ffffff", // default white
         }
     });
     const { watch, setValue, control, reset } = form;
@@ -40,6 +45,8 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                 sequenceNo: selectedGroup.sequenceNo,
                 active: selectedGroup.active,
                 banner: selectedGroup.banner,
+                isBannerVisble: selectedGroup.isBannerVisble,
+                backgroundColor: selectedGroup?.backgroundColor || "#ffffff"
             });
         } else {
             reset({
@@ -47,6 +54,8 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                 sequenceNo: 0,
                 active: true,
                 banner: "",
+                isBannerVisble: false,
+                backgroundColor: "#ffffff"
             });
         }
     }, [selectedGroup, reset]);
@@ -150,6 +159,30 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                                 )}
                             />
 
+                            {/* isBannerVisble */}
+                            <FormField
+                                control={form.control}
+                                name="isBannerVisble"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center justify-between rounded border border-gray-500 p-3">
+                                        <div className="space-y-0.5">
+                                            <FormLabel>Show Banner</FormLabel>
+                                            <DialogDescription>Want to show the banner on App? </DialogDescription>
+                                        </div>
+                                        <FormControl>
+                                            <Input
+                                                type="checkbox"
+                                                className="w-5 h-5"
+                                                checked={field.value}
+                                                onChange={field.onChange}
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
                             {/* Banner */}
                             <input
                                 type="file"
@@ -163,7 +196,7 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                                 name="banner"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Group Banner<span className="text-red-500"> *</span></FormLabel>
+                                        <FormLabel>Group Banner (720w * 256h)<span className="text-red-500"> *</span></FormLabel>
 
                                         {!field.value ? (
                                             <div
@@ -173,7 +206,7 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                                                 <span className="text-gray-500">Click to select Upper banner</span>
                                             </div>
                                         ) : (
-                                            <div className="relative w-full aspect-[10/8] border rounded-lg mb-2">
+                                            <div className="relative w-full aspect-[720/256] border rounded-lg mb-2">
                                                 <Image
                                                     src={field.value}
                                                     alt="Selected Upper Banner"
@@ -201,6 +234,26 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                                     </FormItem>
                                 )}
                             />
+
+                            {/* Background color */}
+                            <FormField
+                                control={form.control}
+                                name="backgroundColor"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Background Color</FormLabel>
+                                        <FormControl>
+                                            <input
+                                                type="color"
+                                                className="h-10 w-full p-0 border rounded cursor-pointer"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
 
                             <DialogFooter>
                                 <Button type="submit" disabled={isSubmitting}>
