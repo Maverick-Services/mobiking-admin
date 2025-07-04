@@ -25,7 +25,6 @@ Font.register({
     ],
 })
 
-
 // Styles
 const styles = StyleSheet.create({
     page: {
@@ -41,7 +40,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#000',
         paddingBottom: 10,
-        alignItems: 'flex-start', // Added for better alignment
+        alignItems: 'flex-start',
     },
     sellerDetails: {
         width: '60%',
@@ -135,17 +134,17 @@ const styles = StyleSheet.create({
         backgroundColor: '#f0f0f0',
         fontWeight: 600,
         padding: 3,
-       flex: 1, // Adjusted width
+        flex: 1,
     },
     taxCell: {
         padding: 3,
         borderRightWidth: 1,
         borderStyle: 'solid',
-        flex: 1, // Adjusted width
+        flex: 1,
     },
     taxTotalCell: {
         padding: 3,
-        flex: 1, // Adjusted width
+        flex: 1,
         fontWeight: 600,
     }
 });
@@ -205,30 +204,75 @@ const numberToWords = (num) => {
 
 // GST Bill Component
 const GSTBill = ({ data }) => {
-    // Calculate exclusive rates and taxes
-    const productGstRate = data.items[0].productId.gst || 18;
-    const deliveryGstRate = 18;
-
-    // Product calculations
-    const productExclusiveRate = data.items[0].price / (1 + productGstRate / 100);
-    const productTaxableValue = productExclusiveRate * data.items[0].quantity;
-    const productTaxAmount = productTaxableValue * (productGstRate / 100);
-
-    // Delivery calculations
-    const deliveryExclusive = data.deliveryCharge / (1 + deliveryGstRate / 100);
-    const deliveryTaxAmount = deliveryExclusive * (deliveryGstRate / 100);
-
-    // Totals
-    const totalTaxableValue = productTaxableValue + deliveryExclusive;
-    const totalTaxAmount = productTaxAmount + deliveryTaxAmount;
-    const totalAmount = (totalTaxableValue + totalTaxAmount).toFixed(2);
-
     // Format dates
     const invoiceDate = new Date(data.createdAt).toLocaleDateString('en-IN', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
     });
+
+    // Calculate product totals
+    let productTaxableValue = 0;
+    let productTaxAmount = 0;
+    let totalTaxableValue = 0;
+    let totalTaxAmount = 0;
+    
+    // Process all items
+    const processedItems = data.items.map(item => {
+        const gstRate = item.productId.gst || 18;
+        const exclusiveRate = item.price / (1 + gstRate / 100);
+        const taxableValue = exclusiveRate * item.quantity;
+        const taxAmount = taxableValue * (gstRate / 100);
+        
+        productTaxableValue += taxableValue;
+        productTaxAmount += taxAmount;
+        
+        return {
+            ...item,
+            gstRate,
+            exclusiveRate,
+            taxableValue,
+            taxAmount
+        };
+    });
+
+    // Calculate delivery if applicable
+    let deliveryData = null;
+    if (data.deliveryCharge && data.deliveryCharge > 0) {
+        const deliveryGstRate = 18;
+        const deliveryExclusive = data.deliveryCharge / (1 + deliveryGstRate / 100);
+        const deliveryTaxAmount = deliveryExclusive * (deliveryGstRate / 100);
+        
+        deliveryData = {
+            exclusiveRate: deliveryExclusive,
+            taxableValue: deliveryExclusive,
+            taxAmount: deliveryTaxAmount,
+            gstRate: deliveryGstRate
+        };
+    }
+
+    // Calculate totals
+    totalTaxableValue = productTaxableValue;
+    totalTaxAmount = productTaxAmount;
+    
+    if (deliveryData) {
+        totalTaxableValue += deliveryData.taxableValue;
+        totalTaxAmount += deliveryData.taxAmount;
+    }
+
+    // Apply discount if exists
+    let discountApplied = 0;
+    let afterDiscountAmount = totalTaxableValue;
+    
+    if (data.discount && data.discount > 0) {
+        discountApplied = data.discount;
+        afterDiscountAmount = totalTaxableValue - discountApplied;
+        // Recalculate tax on discounted amount (proportionally)
+        const taxMultiplier = afterDiscountAmount / totalTaxableValue;
+        totalTaxAmount = totalTaxAmount * taxMultiplier;
+    }
+
+    const totalAmount = (afterDiscountAmount + totalTaxAmount).toFixed(2);
 
     // Amount in words
     const amountInWords = numberToWords(Math.floor(totalAmount))
@@ -241,10 +285,9 @@ const GSTBill = ({ data }) => {
             <Page size="A4" style={styles.page}>
                 <Text style={styles.watermark}>ORIGINAL COPY</Text>
 
-                {/* Header - Fixed layout */}
+                {/* Header */}
                 <View style={styles.header}>
                     <View style={styles.sellerDetails}>
-                        {/* Logo removed */}
                         <Text style={{ ...styles.heading, marginTop: 0 }}>MOBIKING WHOLESALE</Text>
                         <Text>3rd floor B-91 opp.isckon temple east of kailash,</Text>
                         <Text>New Delhi 110065</Text>
@@ -284,47 +327,66 @@ const GSTBill = ({ data }) => {
                         <Text style={{ ...styles.cell, width: '10%' }}>AMOUNT (₹)</Text>
                     </View>
 
-                    {/* Product Row */}
-                    <View style={styles.row}>
-                        <Text style={{ ...styles.cell, width: '5%' }}>1</Text>
-                        <Text style={{ ...styles.cell, width: '45%', textAlign: 'left' }}>
-                            {data.items[0].productId.fullName}
-                        </Text>
-                        <Text style={{ ...styles.cell, width: '10%' }}>85182100</Text>
-                        <Text style={{ ...styles.cell, width: '8%' }}>{data.items[0].quantity}</Text>
-                        <Text style={{ ...styles.cell, width: '12%' }}>
-                            {productExclusiveRate.toFixed(2)}
-                        </Text>
-                        <Text style={{ ...styles.cell, width: '10%' }}>{productGstRate}%</Text>
-                        <Text style={{ ...styles.cell, width: '10%' }}>
-                            {productTaxableValue.toFixed(2)}
-                        </Text>
-                    </View>
+                    {/* Product Rows */}
+                    {processedItems.map((item, index) => (
+                        <View style={styles.row} key={index}>
+                            <Text style={{ ...styles.cell, width: '5%' }}>{index + 1}</Text>
+                            <Text style={{ ...styles.cell, width: '45%', textAlign: 'left' }}>
+                                {item.productId.fullName}
+                            </Text>
+                            <Text style={{ ...styles.cell, width: '10%' }}>85182100</Text>
+                            <Text style={{ ...styles.cell, width: '8%' }}>{item.quantity}</Text>
+                            <Text style={{ ...styles.cell, width: '12%' }}>
+                                {item.exclusiveRate.toFixed(2)}
+                            </Text>
+                            <Text style={{ ...styles.cell, width: '10%' }}>{item.gstRate}%</Text>
+                            <Text style={{ ...styles.cell, width: '10%' }}>
+                                {item.taxableValue.toFixed(2)}
+                            </Text>
+                        </View>
+                    ))}
 
-                    {/* Delivery Row */}
-                    <View style={styles.row}>
-                        <Text style={{ ...styles.cell, width: '5%' }}>2</Text>
-                        <Text style={{ ...styles.cell, width: '45%', textAlign: 'left' }}>
-                            Delivery Charges
-                        </Text>
-                        <Text style={{ ...styles.cell, width: '10%' }}>996511</Text>
-                        <Text style={{ ...styles.cell, width: '8%' }}></Text>
-                        <Text style={{ ...styles.cell, width: '12%' }}>
-                            {deliveryExclusive.toFixed(2)}
-                        </Text>
-                        <Text style={{ ...styles.cell, width: '10%' }}>18%</Text>
-                        <Text style={{ ...styles.cell, width: '10%' }}>
-                            {deliveryExclusive.toFixed(2)}
-                        </Text>
-                    </View>
+                    {/* Delivery Row - Conditionally rendered */}
+                    {deliveryData && (
+                        <View style={styles.row}>
+                            <Text style={{ ...styles.cell, width: '5%' }}>{processedItems.length + 1}</Text>
+                            <Text style={{ ...styles.cell, width: '45%', textAlign: 'left' }}>
+                                Delivery Charges
+                            </Text>
+                            <Text style={{ ...styles.cell, width: '10%' }}>996511</Text>
+                            <Text style={{ ...styles.cell, width: '8%' }}></Text>
+                            <Text style={{ ...styles.cell, width: '12%' }}>
+                                {deliveryData.exclusiveRate.toFixed(2)}
+                            </Text>
+                            <Text style={{ ...styles.cell, width: '10%' }}>18%</Text>
+                            <Text style={{ ...styles.cell, width: '10%' }}>
+                                {deliveryData.taxableValue.toFixed(2)}
+                            </Text>
+                        </View>
+                    )}
                 </View>
 
-                {/* Summary with CGST/SGST split */}
+                {/* Summary */}
                 <View style={styles.summary}>
                     <View style={styles.summaryRow}>
                         <Text>Sub Total:</Text>
                         <Text>₹ {totalTaxableValue.toFixed(2)}</Text>
                     </View>
+
+                    {/* Discount - Conditionally rendered */}
+                    {discountApplied > 0 && (
+                        <>
+                            <View style={styles.summaryRow}>
+                                <Text>Discount:</Text>
+                                <Text>- ₹ {discountApplied.toFixed(2)}</Text>
+                            </View>
+                            <View style={styles.summaryRow}>
+                                <Text>Total:</Text>
+                                <Text>₹ {afterDiscountAmount.toFixed(2)}</Text>
+                            </View>
+                        </>
+                    )}
+
                     <View style={styles.summaryRow}>
                         <Text>CGST:</Text>
                         <Text>₹ {(totalTaxAmount / 2).toFixed(2)}</Text>
@@ -359,30 +421,34 @@ const GSTBill = ({ data }) => {
                             <Text style={{ ...styles.taxHeaderCell, width: '16%' }}>SGST Amt (₹)</Text>
                         </View>
 
-                        {/* Product Tax */}
-                        <View style={{ flexDirection: 'row', borderBottomWidth: 1 }}>
-                            <Text style={{ ...styles.taxCell, width: '16%' }}>85182100</Text>
-                            <Text style={{ ...styles.taxCell, width: '16%' }}>{productTaxableValue.toFixed(2)}</Text>
-                            <Text style={{ ...styles.taxCell, width: '16%' }}>{productGstRate / 2}%</Text>
-                            <Text style={{ ...styles.taxCell, width: '16%' }}>{productGstRate / 2}%</Text>
-                            <Text style={{ ...styles.taxCell, width: '16%' }}>{(productTaxAmount / 2).toFixed(2)}</Text>
-                            <Text style={{ ...styles.taxCell, width: '16%' }}>{(productTaxAmount / 2).toFixed(2)}</Text>
-                        </View>
+                        {/* Product Tax Rows */}
+                        {processedItems.map((item, index) => (
+                            <View style={{ flexDirection: 'row', borderBottomWidth: 1 }} key={index}>
+                                <Text style={{ ...styles.taxCell, width: '16%' }}>85182100</Text>
+                                <Text style={{ ...styles.taxCell, width: '16%' }}>{item.taxableValue.toFixed(2)}</Text>
+                                <Text style={{ ...styles.taxCell, width: '16%' }}>{item.gstRate / 2}%</Text>
+                                <Text style={{ ...styles.taxCell, width: '16%' }}>{item.gstRate / 2}%</Text>
+                                <Text style={{ ...styles.taxCell, width: '16%' }}>{(item.taxAmount / 2).toFixed(2)}</Text>
+                                <Text style={{ ...styles.taxCell, width: '16%' }}>{(item.taxAmount / 2).toFixed(2)}</Text>
+                            </View>
+                        ))}
 
-                        {/* Delivery Tax */}
-                        <View style={{ flexDirection: 'row', borderBottomWidth: 1 }}>
-                            <Text style={{ ...styles.taxCell, width: '16%' }}>996511</Text>
-                            <Text style={{ ...styles.taxCell, width: '16%' }}>{deliveryExclusive.toFixed(2)}</Text>
-                            <Text style={{ ...styles.taxCell, width: '16%' }}>9%</Text>
-                            <Text style={{ ...styles.taxCell, width: '16%' }}>9%</Text>
-                            <Text style={{ ...styles.taxCell, width: '16%' }}>{(deliveryTaxAmount / 2).toFixed(2)}</Text>
-                            <Text style={{ ...styles.taxCell, width: '16%' }}>{(deliveryTaxAmount / 2).toFixed(2)}</Text>
-                        </View>
+                        {/* Delivery Tax Row - Conditionally rendered */}
+                        {deliveryData && (
+                            <View style={{ flexDirection: 'row', borderBottomWidth: 1 }}>
+                                <Text style={{ ...styles.taxCell, width: '16%' }}>996511</Text>
+                                <Text style={{ ...styles.taxCell, width: '16%' }}>{deliveryData.taxableValue.toFixed(2)}</Text>
+                                <Text style={{ ...styles.taxCell, width: '16%' }}>9%</Text>
+                                <Text style={{ ...styles.taxCell, width: '16%' }}>9%</Text>
+                                <Text style={{ ...styles.taxCell, width: '16%' }}>{(deliveryData.taxAmount / 2).toFixed(2)}</Text>
+                                <Text style={{ ...styles.taxCell, width: '16%' }}>{(deliveryData.taxAmount / 2).toFixed(2)}</Text>
+                            </View>
+                        )}
 
                         {/* Total Tax */}
                         <View style={{ flexDirection: 'row', ...styles.bold }}>
                             <Text style={{ ...styles.taxTotalCell, width: '16%' }}>TOTAL</Text>
-                            <Text style={{ ...styles.taxTotalCell, width: '16%' }}>{totalTaxableValue.toFixed(2)}</Text>
+                            <Text style={{ ...styles.taxTotalCell, width: '16%' }}>{afterDiscountAmount.toFixed(2)}</Text>
                             <Text style={{ ...styles.taxTotalCell, width: '16%' }}>-</Text>
                             <Text style={{ ...styles.taxTotalCell, width: '16%' }}>-</Text>
                             <Text style={{ ...styles.taxTotalCell, width: '16%' }}>{(totalTaxAmount / 2).toFixed(2)}</Text>
@@ -441,7 +507,7 @@ const GSTBillDownload = ({ billData }) => {
                 loading={isLoading}
                 variant={'outline'}
             >
-               <Download/>
+                <Download />
             </MiniLoaderButton>
         </div>
     )

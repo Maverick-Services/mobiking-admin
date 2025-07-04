@@ -64,12 +64,13 @@ function page() {
                     View Order
                 </h1>
                 <div className="flex gap-2">
-                    {!order.abondonedOrder && !order.shipmentId &&
+                    {!order.abondonedOrder && !order.shipmentId && order.status !== 'Delivered' &&
                         <UpdateStatus
                             orderId={order?._id}
                             status={order?.status}
                         />
                     }
+
                     {isNewOrder() && !order.abondonedOrder &&
                         <LoaderButton
                             onClick={handleGetCourierId}

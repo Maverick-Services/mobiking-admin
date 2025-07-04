@@ -84,10 +84,10 @@ export default function OrdersListView({ error, orders = [] }) {
                             const variant = STATUS_VARIANTS[o.status] || 'default'
 
                             const returnedOrders = (o?.userId?.orders?.filter(item => item.status === 'Returned')).length;
-                            const returnPercent = ((returnedOrders / customerOrderNumber) *100).toFixed(2)
+                            const returnPercent = ((returnedOrders / customerOrderNumber) *100).toFixed(1)
                             
                             const cancelledOrders = (o?.userId?.orders?.filter(item => item.status === 'Cancelled')).length;
-                            const cancelPercent = ((cancelledOrders / customerOrderNumber) *100).toFixed(2)
+                            const cancelPercent = ((cancelledOrders / customerOrderNumber) *100).toFixed(1)
 
                             console.log(cancelPercent)
 
@@ -102,7 +102,12 @@ export default function OrdersListView({ error, orders = [] }) {
                                     className="hover:bg-gray-100 scrollbar-hide"
                                 >
                                     <TableCell>{i + 1}</TableCell>
-                                    <TableCell>{o._id.slice(0, 6).toUpperCase()}</TableCell>
+
+                                            <OrderViewDialog order={o}>
+                                    <TableCell className={'cursor-pointer'}>
+                                        {o._id.slice(0, 6).toUpperCase()}
+                                        </TableCell>
+</OrderViewDialog>
 
                                     <TableCell className="capitalize flex-col">
                                         {o.name || '—'}

@@ -135,15 +135,19 @@ function ItemsTable({ order, isNewOrder }) {
 
                 {/* Summary */}
                 <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6">
-                    <div className="flex items-center justify-between sm:min-w-[250px] border rounded-md p-3 shadow-sm bg-muted/50">
+                    <div className="flex items-center justify-between sm:min-w-[200px] border rounded-md p-3 shadow-sm bg-muted/50">
                         <span className="text-sm text-gray-600">Subtotal:</span>
                         <span className="font-medium">₹{order.subtotal}</span>
                     </div>
-                    <div className="flex items-center justify-between sm:min-w-[250px] border rounded-md p-3 shadow-sm bg-muted/50">
+                    <div className="flex items-center justify-between sm:min-w-[200px] border rounded-md p-3 shadow-sm bg-muted/50">
+                        <span className="text-sm text-gray-600">Discount:</span>
+                        <span className="font-medium">₹{order.discount}</span>
+                    </div>
+                    <div className="flex items-center justify-between sm:min-w-[200px] border rounded-md p-3 shadow-sm bg-muted/50">
                         <span className="text-sm text-gray-600">Delivery Charges:</span>
                         <span className="font-medium">₹{order.deliveryCharge}</span>
                     </div>
-                    <div className="flex items-center justify-between sm:min-w-[250px] border rounded-md p-3 shadow bg-primary/10">
+                    <div className="flex items-center justify-between sm:min-w-[200px] border rounded-md p-3 shadow bg-primary/10">
                         <span className="text-sm font-semibold text-primary">Total Amount:</span>
                         <span className="font-bold text-primary">₹{order.orderAmount}</span>
                     </div>
