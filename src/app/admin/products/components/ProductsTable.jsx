@@ -55,7 +55,6 @@ export default function ProductsListView({
         );
     }
 
-
     return (
         <section className="w-full">
             <div className="overflow-x-auto rounded-md border border-gray-200">
