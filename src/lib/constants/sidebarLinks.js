@@ -109,12 +109,6 @@ export const ADMIN_SIDEBAR_LINKS = [
         icon: <FaChartLine />,
     },
     {
-        key: 'settings',
-        label: 'Settings',
-        href: '/admin/settings',
-        icon: <FaCogs />,
-    },
-    {
         key: 'policies',
         label: 'Policies',
         href: '/admin/policies',
@@ -154,6 +148,13 @@ export const ADMIN_SIDEBAR_LINKS = [
 //     icon: <FaExchangeAlt />,
 // },
 
+
+    // {
+    //     key: 'settings',
+    //     label: 'Settings',
+    //     href: '/admin/settings',
+    //     icon: <FaCogs />,
+    // },
 
 // {
 //     key: 'coupons',
