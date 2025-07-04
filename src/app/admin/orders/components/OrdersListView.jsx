@@ -59,6 +59,8 @@ export default function OrdersListView({ error, orders = [] }) {
         window.open(url, '_blank')
     }
 
+    console.log(orders)
+
     return (
         <div>
             <Table className={'p-4 rounded-none shadow-none overflow-hidden scrollbar-hide'}>
@@ -80,6 +82,15 @@ export default function OrdersListView({ error, orders = [] }) {
                         {orders.map((o, i) => {
                             const customerOrderNumber = o?.userId?.orders?.length || 0
                             const variant = STATUS_VARIANTS[o.status] || 'default'
+
+                            const returnedOrders = (o?.userId?.orders?.filter(item => item.status === 'Returned')).length;
+                            const returnPercent = ((returnedOrders / customerOrderNumber) *100).toFixed(2)
+                            
+                            const cancelledOrders = (o?.userId?.orders?.filter(item => item.status === 'Cancelled')).length;
+                            const cancelPercent = ((cancelledOrders / customerOrderNumber) *100).toFixed(2)
+
+                            console.log(cancelPercent)
+
                             return (
                                 <motion.tr
                                     key={o._id}
@@ -92,12 +103,19 @@ export default function OrdersListView({ error, orders = [] }) {
                                 >
                                     <TableCell>{i + 1}</TableCell>
                                     <TableCell>{o._id.slice(0, 6).toUpperCase()}</TableCell>
-                                    <TableCell className="capitalize">
-                                        {o.name || '—'}{' '}
-                                        <span className="bg-green-100 text-green-700 px-2 py-1 ml-1 font-semibold rounded-full text-[10px]">
-                                            {customerOrderNumber}
+
+                                    <TableCell className="capitalize flex-col">
+                                        {o.name || '—'}
+                                        <div className='flex gap-1 mt-1'>
+                                        <span className="bg-purple-100 text-purple-700 px-1 font-medium rounded text-[10px]">
+                                          RTO: {returnPercent} %
                                         </span>
+                                        <span className="bg-amber-100 text-amber-700 px-1 font-medium rounded text-[10px]">
+                                          Cancel: {cancelPercent} %
+                                        </span>
+                                        </div>
                                     </TableCell>
+
                                     <TableCell >
                                         <div className="flex items-center space-x-2">
                                             <span>{o.phoneNo}</span>
