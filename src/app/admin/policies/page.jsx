@@ -1,10 +1,53 @@
-import React from 'react'
+"use client"
+import React, { useState } from 'react'
+import InnerDashboardLayout from '@/components/dashboard/InnerDashboardLayout'
+import { Button } from '@/components/ui/button'
+import PolicyTable from './components/PolicyTable'
+import PrivacyForm from './components/PrivacyForm'
+import { usePolicies } from '@/hooks/usePolicies'
+import TableSkeleton from '@/components/custom/TableSkeleton'
 
 function page() {
+    const { policyQuery, createPolicy, updatePolicy } = usePolicies();
+    const [policyForm, setPolicyForm] = useState(false);
+    const [selectedPolicy, setSelectedPolicy] = useState(null);
+
+    const policies = policyQuery?.data?.data || [];
+
     return (
-        <div className="space-y-4">
-            <h1 className="text-2xl font-bold">Policies</h1>
-        </div>
+        <InnerDashboardLayout>
+            <div className='flex items-center justify-between w-full mb-3'>
+                <h1 className="text-primary font-bold sm:text-2xl lg:text-3xl mb-3">Policies</h1>
+
+                <Button onClick={() => {
+                    setSelectedPolicy(undefined)
+                    setPolicyForm(true)
+                }}>
+                    Create New
+                </Button>
+            </div>
+
+            {
+                policyQuery.isLoading ?
+                    <TableSkeleton />
+                    : <PolicyTable
+                        policies={policies}
+                        setSelected={setSelectedPolicy}
+                        openForm={setPolicyForm}
+                    />
+                // : null
+            }
+
+            <PrivacyForm
+                open={policyForm}
+                onOpenChange={setPolicyForm}
+                setSelected={setSelectedPolicy}
+                data={selectedPolicy}
+                onCreate={createPolicy}
+                onUpdate={updatePolicy}
+            />
+
+        </InnerDashboardLayout>
     )
 }
 
