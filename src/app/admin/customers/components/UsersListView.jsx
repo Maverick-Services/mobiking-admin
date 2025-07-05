@@ -81,7 +81,13 @@ export default function UsersListView({
                                 <TableCell>{user.phoneNo}</TableCell>
                                 <TableCell>{user.email}</TableCell>
                                 <TableCell>
-                                    {format(user.createdAt, 'dd MMM yyyy, hh:mm a')}
+                                    {(() => {
+                                        try {
+                                            return format(new Date(user.createdAt), "dd MMM yyyy, hh:mm a");
+                                        } catch (e) {
+                                            return "-";
+                                        }
+                                    })()}
                                 </TableCell>
                                 <TableCell className="flex justify-center items-center gap-2">
                                     {canEdit &&
