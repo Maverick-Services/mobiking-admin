@@ -27,7 +27,7 @@ const formSchema = z.object({
 });
 
 function StockUpdate({ open, onOpenChange, product }) {
-    const { addProductStock } = useProducts()
+    const { addProductStock } = useProducts({ page: 1, limit: 10 })
 
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -39,6 +39,8 @@ function StockUpdate({ open, onOpenChange, product }) {
     // console.log(SProduct)
 
     const stockHistory = product?.stock || []
+
+    console.log(product)
 
     async function onSubmit(values) {
         const data = {
@@ -172,9 +174,17 @@ function StockUpdate({ open, onOpenChange, product }) {
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell>{stock.variantName || '-'}</TableCell>
                                             <TableCell>{stock.quantity}</TableCell>
-                                            <TableCell>₹{stock.purchasePrice}</TableCell>  
-                                            <TableCell>{stock?.vendor || '-'}</TableCell>  
-                                            <TableCell>{format(new Date(stock.updatedAt), "dd MMM yyyy, hh:mm a")}</TableCell>
+                                            <TableCell>₹{stock.purchasePrice}</TableCell>
+                                            <TableCell>{stock?.vendor || '-'}</TableCell>
+                                            <TableCell>
+                                                {(() => {
+                                                    try {
+                                                        return format(new Date(stock.updatedAt), "dd MMM yyyy, hh:mm a");
+                                                    } catch (e) {
+                                                        return "-";
+                                                    }
+                                                })()}
+                                            </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>

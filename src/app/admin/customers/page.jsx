@@ -7,11 +7,23 @@ import React, { useState } from 'react'
 import UsersListView from './components/UsersListView';
 import UserDialog from './components/UserDialog';
 // import UsersTable from './UsersTable';
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, } from "@/components/ui/select"
+import { getPaginationRange } from "@/lib/services/getPaginationRange"
 
 function page() {
     const [roleFilter, setRoleFilter] = useState('user')
-    // const [page, setPage] = useState(1)
-    // const [pageSize, setPageSize] = useState(10)
+    const [page, setPage] = useState(1)
+    const [limit, setLimit] = useState(10)
+
 
     // fetch users query
     const {
@@ -28,8 +40,12 @@ function page() {
     } = useUsers();
     // } = useUsers({ role: roleFilter, page, pageSize });
 
-    const users = usersQuery(roleFilter)
-    console.log(users.data)
+    const users = usersQuery({ roleFilter, page, limit })
+
+    const allUsers = users.data?.data?.users || []
+    console.log(allUsers)
+    const totalPages = users.data?.pagination?.totalPages || 1
+    const paginationRange = getPaginationRange(page, totalPages)
     // console.log(usersQuery?.data)
 
     // destructure updateUser mutation
@@ -85,7 +101,7 @@ function page() {
                     <UsersListView
                         isLoading={users.isLoading}
                         error={users.error}
-                        users={users?.data?.data || []}
+                        users={allUsers || []}
                         // page={page}
                         // pageCount={Math.ceil((usersQuery.data?.totalCount || 0) / pageSize)}
                         // onPageChange={setPage}
@@ -97,6 +113,57 @@ function page() {
                         deleteError={deleteError}
                     />
                 }
+                <div className="flex w-full justify-end gap-2 items-center">
+                    {/* Limit Dropdown */}
+                    <Select value={String(limit)} onValueChange={(val) => { setPage(1); setLimit(Number(val)) }}>
+                        <SelectTrigger className="w-[120px]">
+                            <SelectValue placeholder="Items per page" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {[1, 5, 10, 20, 50].map((n) => (
+                                <SelectItem key={n} value={String(n)}>
+                                    {n} / page
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    {/* Pagination */}
+                    <Pagination className={'inline justify-end mx-1 w-fit'}>
+                        <PaginationContent>
+                            {page > 1 && (
+                                <PaginationItem>
+                                    <PaginationPrevious href="#" onClick={() => setPage((p) => p - 1)} />
+                                </PaginationItem>
+                            )}
+
+                            {paginationRange.map((p, i) => (
+                                <PaginationItem key={i}>
+                                    {p === 'ellipsis-left' || p === 'ellipsis-right' ? (
+                                        <PaginationEllipsis />
+                                    ) : (
+                                        <PaginationLink
+                                            href="#"
+                                            isActive={p === page}
+                                            onClick={(e) => {
+                                                e.preventDefault()
+                                                setPage(p)
+                                            }}
+                                        >
+                                            {p}
+                                        </PaginationLink>
+                                    )}
+                                </PaginationItem>
+                            ))}
+
+                            {page < totalPages && (
+                                <PaginationItem>
+                                    <PaginationNext href="#" onClick={() => setPage((p) => p + 1)} />
+                                </PaginationItem>
+                            )}
+                        </PaginationContent>
+                    </Pagination>
+                </div>
 
                 {/* <UsersTable /> */}
 
