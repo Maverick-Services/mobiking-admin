@@ -18,12 +18,12 @@ export const useUsers = () => {
     const onlyAdmin = onlyAdminPermission(user)
 
     // // Get all users
-    const usersQuery = ({ role, page = 1, limit = 10 }) => useQuery({
-        queryKey: ['users', role],
+    const usersQuery = ({ role = "user", page = 1, limit = 10 }) => useQuery({
+        queryKey: ['users', role, page, limit],
         queryFn: () => api.get(`/users/all/paginated?role=${role}&page=${page}&limit=${limit}`).then(res => res.data),
         keepPreviousData: true,
         enabled: canView,
-        staleTime: 1000 * 60 * 5, 
+        staleTime: 1000 * 60 * 5,
         onError: (err) => {
             toast.error(err.message || 'Failed to fetch users');
         },

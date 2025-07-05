@@ -42,9 +42,9 @@ function page() {
 
     const users = usersQuery({ roleFilter, page, limit })
 
+    console.log(users?.data?.data)
     const allUsers = users.data?.data?.users || []
-    console.log(allUsers)
-    const totalPages = users.data?.pagination?.totalPages || 1
+    const totalPages = users.data?.data?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
     // console.log(usersQuery?.data)
 
@@ -113,7 +113,7 @@ function page() {
                         deleteError={deleteError}
                     />
                 }
-                <div className="flex w-full justify-end gap-2 items-center">
+                <div className="flex w-full justify-end gap-2 items-center mt-4">
                     {/* Limit Dropdown */}
                     <Select value={String(limit)} onValueChange={(val) => { setPage(1); setLimit(Number(val)) }}>
                         <SelectTrigger className="w-[120px]">
