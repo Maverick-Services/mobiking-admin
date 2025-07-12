@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import { Actions, checkPermission, Resources } from '@/lib/permissions';
 import { useAuthStore } from '@/store/useAuthStore';
 
-export const useProducts = ({ page = 1, limit = 10 } = {}) => {
+export const useProducts = () => {
     const { user } = useAuthStore()
     const queryClient = useQueryClient();
 
@@ -16,18 +16,26 @@ export const useProducts = ({ page = 1, limit = 10 } = {}) => {
 
     // Get all products
     const productsQuery = useQuery({
-        queryKey: ['products', page, limit],
+        queryKey: ['products'],
         enabled: canView,
-        queryFn: () =>
-            api
-                .get(`/products/all/paginated?page=${page}&limit=${limit}`)
-                .then((res) => res.data.data),
-        keepPreviousData: true,
+        queryFn: () => api.get(`/products`).then((res) => res.data.data),
         staleTime: 1000 * 60 * 5,
         onError: (err) => {
             toast.error(err?.response?.data?.message || 'Failed to fetch products');
         }
     });
+
+    const productsPaginationQuery = ({ page, limit }) => useQuery({
+        queryKey: ['productsPagination', page, limit],
+        queryFn: () => api
+            .get(`/products/all/paginated?page=${page}&limit=${limit}`)
+            .then((res) => res.data.data),
+        keepPreviousData: true,
+        staleTime: 1000 * 60 * 5,
+        onError: (err) => {
+            toast.error(err?.response?.data?.message || 'Failed to fetch products');
+        }
+    })
 
     const getProductQuery = (slug) => useQuery({
         queryKey: ['product', slug],
@@ -103,6 +111,7 @@ export const useProducts = ({ page = 1, limit = 10 } = {}) => {
     return {
         productsQuery, createProduct, getProductQuery, updateProduct, addProductStock,
         // productsQuery, deleteProduct, updateProduct, createProduct, getProductQuery,
+        productsPaginationQuery,
         permissions: {
             canView,
             canAdd,

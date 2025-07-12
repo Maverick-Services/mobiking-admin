@@ -77,7 +77,7 @@ export default function ProductsListView({
                     <TableBody>
                         {products?.map((product, index) => (
                             <TableRow
-                                key={product._id || index}
+                                key={product?._id || index}
                                 className="even:bg-gray-50 hover:bg-gray-100 transition"
                             >
                                 {/* 1. Index */}
@@ -89,8 +89,8 @@ export default function ProductsListView({
                                 <TableCell className="">
                                     <div className="py-2">
                                         <img
-                                            src={product.images[0]}
-                                            alt={product.name}
+                                            src={product?.images[0]}
+                                            alt={product?.name}
                                             width={60}
                                             height={60}
                                             className="object-contain rounded"
@@ -101,35 +101,35 @@ export default function ProductsListView({
                                 {/* 3. Name */}
                                 <TableCell className=" text-sm">
                                     <div className='max-w-32 text-wrap text-xs'>
-                                        {product.name}
+                                        {product?.name}
                                     </div>
                                 </TableCell>
 
                                 {/* 3. full Name */}
                                 <TableCell className="">
                                     <div className='max-w-52 text-wrap text-xs'>
-                                        {product.fullName}
+                                        {product?.fullName}
                                     </div>
                                 </TableCell>
 
                                 {/* 3. category */}
                                 <TableCell className="">
                                     <div className=' text-xs'>
-                                        {product.category.name}
+                                        {product?.category?.name}
                                     </div>
                                 </TableCell>
 
                                 {/* price */}
                                 <TableCell className="">
                                     <div className=' text-xs'>
-                                        ₹{product.sellingPrice[product.sellingPrice.length - 1].price}
+                                        ₹{product?.sellingPrice[product?.sellingPrice?.length - 1]?.price}
                                     </div>
                                 </TableCell>
 
                                 {/* quantity */}
                                 <TableCell className="">
                                     <div className=' text-xs'>
-                                        {product.totalStock}
+                                        {product?.totalStock}
                                     </div>
                                 </TableCell>
 

@@ -24,12 +24,14 @@ import {
 } from "@/components/ui/pagination"
 import { getPaginationRange } from "@/lib/services/getPaginationRange"
 
-
 export default function page() {
     const [categoryFilter, setCategoryFilter] = useState("all")
+
     const [searchTerm, setSearchTerm] = useState("")
+
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState();
+
     const [stockEditing, setStockEditing] = useState(false)
     const [selectedStockProduct, setSelectedStockProduct] = useState()
 
@@ -39,25 +41,30 @@ export default function page() {
 
     const {
         productsQuery,
+        productsPaginationQuery,
         createProduct: { mutateAsync: createProductAsync, isPending: creating, error: createError, reset: resetCreate },
         updateProduct: { mutateAsync: updateProductAsync, isPending: updating, error: updateError, reset: resetUpdate },
         permissions: { canView, canAdd, canDelete, canEdit },
-    } = useProducts({ page, limit })
+    } = useProducts()
 
     const { subCategoriesQuery } = useSubCategories()
     const subCategories = subCategoriesQuery.data?.data || []
 
-    const allProducts = productsQuery.data?.products || []
-    const totalPages = productsQuery.data?.pagination?.totalPages || 1
+    const products = productsPaginationQuery({ page: page, limit: limit })
+
+    // console.log(ab?.data)
+
+    const allProducts = products.data?.products || []
+    const totalPages = products.data?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
 
-    // 1️⃣ Filter by category ID if set
+    // Filter by category ID if set
     const afterCategoryFilter = allProducts.filter((prod) => {
         if (categoryFilter === "all") return true
         return prod.parentCategory === categoryFilter
     })
 
-    // 2️⃣ Filter by search term (case-insensitive match on name)
+    // Filter by search term (case-insensitive match on name)
     const finalFiltered = afterCategoryFilter.filter((prod) =>
         prod.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
     )

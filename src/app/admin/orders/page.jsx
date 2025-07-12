@@ -14,6 +14,8 @@ import AmountCards from './components/AmountCards'
 import { ChevronDown } from 'lucide-react'
 import { LayoutGroup, motion } from 'framer-motion'
 import PosButton from '@/components/custom/PosButton'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 const TABS = [
     { key: 'all', label: 'ALL ORDERS' },
@@ -210,6 +212,27 @@ export default function Page() {
                 ))}
             </div>
 
+            {/* Search & filter */}
+            <div className='flex items-center gap-3 mb-3 '>
+                {/* Search bar */}
+                <Input
+                    type={'text'}
+                    placeholder="Search"
+                    className={'border-gray-300'}
+                />
+
+                {/* filter by */}
+                <Select>
+                    <SelectTrigger className="min-w-[150px] border-gray-300">
+                        <SelectValue placeholder="Filter by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="customer">Customer</SelectItem>
+                        <SelectItem value="order">Order</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+
             {/* Tab bar */}
             <LayoutGroup>
                 <div className="flex gap-2 mb-0 overflow-x-auto bg-white scrollbar-hide relative">
@@ -241,7 +264,6 @@ export default function Page() {
                     })}
                 </div>
             </LayoutGroup>
-
 
             {/* Table */}
             {isFetching ?
