@@ -6,17 +6,26 @@ import { CirclePlus } from 'lucide-react';
 import React, { useState } from 'react'
 import UsersListView from './components/UsersListView';
 import UserDialog from './components/UserDialog';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-// import UsersTable from './UsersTable';
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, } from "@/components/ui/select"
+import { getPaginationRange } from "@/lib/services/getPaginationRange"
 
 function page() {
     const [roleFilter, setRoleFilter] = useState('employee')
-    // const [page, setPage] = useState(1)
-    // const [pageSize, setPageSize] = useState(10)
+    const [page, setPage] = useState(1)
+    const [limit, setLimit] = useState(10)
 
     // fetch users query
     const {
-        usersQuery,
+        employeesQuery,
         createUser,
         updateUser,
         deleteUser,
@@ -28,12 +37,12 @@ function page() {
             canEdit,
             onlyAdmin }
     } = useUsers();
-    // } = useUsers({ role: roleFilter, page, pageSize });
 
-    const users = usersQuery(roleFilter)
-    console.log(users.data)
-    // console.log(usersQuery?.data)
-    // destructure createUser mutation
+    const users = employeesQuery({ role: roleFilter, page: page, limit: limit });
+
+    const allUsers = users.data?.data?.users || []
+    const totalPages = users.data?.data?.pagination?.totalPages || 1
+    const paginationRange = getPaginationRange(page, totalPages)
 
     const {
         mutateAsync: createUserAsync,
@@ -111,10 +120,7 @@ function page() {
                     <UsersListView
                         isLoading={users.isLoading}
                         error={users.error}
-                        users={users?.data?.data || []}
-                        // page={page}
-                        // pageCount={Math.ceil((usersQuery.data?.totalCount || 0) / pageSize)}
-                        // onPageChange={setPage}
+                        users={allUsers}
                         onEdit={handleEditClick}
                         canEdit={canEdit}
                         canDelete={canDelete}
@@ -124,7 +130,57 @@ function page() {
                     />
                 }
 
-                {/* <UsersTable /> */}
+                <div className="flex w-full justify-end gap-2 items-center mt-4">
+                    {/* Limit Dropdown */}
+                    <Select value={String(limit)} onValueChange={(val) => { setPage(1); setLimit(Number(val)) }}>
+                        <SelectTrigger className="w-[120px]">
+                            <SelectValue placeholder="Items per page" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {[1, 5, 10, 20, 50].map((n) => (
+                                <SelectItem key={n} value={String(n)}>
+                                    {n} / page
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    {/* Pagination */}
+                    <Pagination className={'inline justify-end mx-1 w-fit'}>
+                        <PaginationContent>
+                            {page > 1 && (
+                                <PaginationItem>
+                                    <PaginationPrevious href="#" onClick={() => setPage((p) => p - 1)} />
+                                </PaginationItem>
+                            )}
+
+                            {paginationRange.map((p, i) => (
+                                <PaginationItem key={i}>
+                                    {p === 'ellipsis-left' || p === 'ellipsis-right' ? (
+                                        <PaginationEllipsis />
+                                    ) : (
+                                        <PaginationLink
+                                            href="#"
+                                            isActive={p === page}
+                                            onClick={(e) => {
+                                                e.preventDefault()
+                                                setPage(p)
+                                            }}
+                                        >
+                                            {p}
+                                        </PaginationLink>
+                                    )}
+                                </PaginationItem>
+                            ))}
+
+                            {page < totalPages && (
+                                <PaginationItem>
+                                    <PaginationNext href="#" onClick={() => setPage((p) => p + 1)} />
+                                </PaginationItem>
+                            )}
+                        </PaginationContent>
+                    </Pagination>
+                </div>
 
                 <UserDialog
                     open={isDialogOpen}

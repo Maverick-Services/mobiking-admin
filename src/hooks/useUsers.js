@@ -32,6 +32,21 @@ export const useUsers = () => {
         }
     });
 
+    // Get all employees
+    const employeesQuery = ({ role, page, limit }) => useQuery({
+        queryKey: ['employees', role, page, limit],
+        queryFn: () => api.get(`/users/all/paginated?role=${role}&page=${page}&limit=${limit}`).then(res => res.data),
+        keepPreviousData: true,
+        enabled: canView,
+        staleTime: 1000 * 60 * 5,
+        onError: (err) => {
+            toast.error(err.message || 'Failed to fetch employees');
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries(['employees']);
+        }
+    });
+
     // Create User mutation
     const createUser = useMutation({
         mutationFn: (data) => api.post('/users/createUser', data),
@@ -102,6 +117,7 @@ export const useUsers = () => {
         createUser,
         updateUser,
         deleteUser,
+        employeesQuery,
         // changePassword,
         createCustomer,
         permissions: {

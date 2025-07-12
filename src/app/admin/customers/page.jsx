@@ -24,13 +24,11 @@ function page() {
     const [page, setPage] = useState(1)
     const [limit, setLimit] = useState(10)
 
-
     // fetch users query
     const {
         usersQuery,
         updateUser,
         deleteUser,
-        // changePassword,
         permissions: {
             canView,
             canAdd,
@@ -38,15 +36,12 @@ function page() {
             canEdit,
             onlyAdmin }
     } = useUsers();
-    // } = useUsers({ role: roleFilter, page, pageSize });
 
-    const users = usersQuery({ roleFilter, page, limit })
+    const users = usersQuery({ roleFilter, page, limit });
 
-    console.log(users?.data?.data)
     const allUsers = users.data?.data?.users || []
     const totalPages = users.data?.data?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
-    // console.log(usersQuery?.data)
 
     // destructure updateUser mutation
     const {
@@ -102,9 +97,6 @@ function page() {
                         isLoading={users.isLoading}
                         error={users.error}
                         users={allUsers || []}
-                        // page={page}
-                        // pageCount={Math.ceil((usersQuery.data?.totalCount || 0) / pageSize)}
-                        // onPageChange={setPage}
                         onEdit={handleEditClick}
                         canEdit={canEdit}
                         canDelete={canDelete}
