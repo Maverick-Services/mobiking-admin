@@ -19,7 +19,7 @@ const TABS = [
     { key: 'all', label: 'ALL ORDERS' },
     { key: 'website', label: 'WEBSITE' },
     { key: 'app', label: 'APP' },
-    { key: 'regular', label: 'REGULAR' },
+    // { key: 'regular', label: 'REGULAR' },
     { key: 'pos', label: 'POS' },
     { key: 'returns', label: 'RETURNS' },
     { key: 'cancelled', label: 'CANCEL REQUESTS' },
