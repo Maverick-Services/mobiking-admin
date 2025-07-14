@@ -25,7 +25,7 @@ import {
 import { getPaginationRange } from "@/lib/services/getPaginationRange"
 
 export default function page() {
-    const [categoryFilter, setCategoryFilter] = useState("all")
+    // const [categoryFilter, setCategoryFilter] = useState("all")
 
     // debounce hook
     function useDebouncedValue(value, delay = 500) {

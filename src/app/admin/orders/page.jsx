@@ -88,7 +88,7 @@ export default function Page() {
     const displayOrders = customOrdersData ?? [];
 
     const [statusFilter, setStatusFilter] = useState(null)
-    console.log(statusFilter)
+    // console.log(statusFilter)
 
     const [activeTab, setActiveTab] = useState('all')
 

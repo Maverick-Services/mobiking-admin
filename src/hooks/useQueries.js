@@ -15,6 +15,23 @@ export const useQueries = () => {
         }
     });
 
+    const getQueriesByDate = ({ page, limit, startDate, endDate, searchQuery }) => useQuery({
+        queryKey: ['queries', startDate, endDate, searchQuery, page, limit],
+        queryFn: () =>
+            api
+                .get('/queries/all/paginated', { params: { page, limit, startDate, endDate, searchQuery } })
+                .then(res => {
+                    return Array.isArray(res.data)
+                        ? res.data
+                        : res.data.data || []
+                }),
+        staleTime: 1000 * 60 * 5,
+        onError: (err) => {
+            toast.error(err.message || 'Failed to fetch orders');
+            console.log(err)
+        }
+    });
+
     const assignQueries = useMutation({
         mutationFn: (data) => api.post('/queries/assign', data),
         onSuccess: () => {
@@ -49,6 +66,6 @@ export const useQueries = () => {
     })
 
     return {
-        queriesQuery, assignQueries, sendReply, closeQuery
+        queriesQuery, assignQueries, sendReply, closeQuery, getQueriesByDate
     }
 }

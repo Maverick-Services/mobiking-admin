@@ -1,10 +1,11 @@
 'use client'
+
 import React, { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Eye } from "lucide-react"
+import { Eye, Inbox } from "lucide-react"
 import QuerySheet from "./QuerySheet"
 import { AnimatePresence, motion } from "framer-motion"
 
@@ -12,11 +13,22 @@ function QueryTable({ data = [] }) {
     const [selectedQuery, setSelectedQuery] = useState(null)
     const [sheetOpen, setSheetOpen] = useState(false)
 
+    // Empty state
+    if (!data.length) {
+        return (
+            <div className="flex flex-col items-center justify-center py-12 bg-white border">
+                <Inbox className="w-12 h-12 text-gray-400" />
+                <h3 className="mt-4 text-xl font-semibold text-gray-700">No Queries Found</h3>
+                <p className="mt-2 text-sm text-gray-500">There are no queries to display right now.</p>
+            </div>
+        )
+    }
+
     return (
         <>
-            <div className="">
-                <Table className={'overflow-hidden scrollbar-hide'}>
-                    <TableHeader className={' scrollbar-hide'}>
+            <div className="overflow-hidden scrollbar-hide">
+                <Table>
+                    <TableHeader>
                         <TableRow>
                             <TableHead>#</TableHead>
                             <TableHead>Title</TableHead>
@@ -27,7 +39,7 @@ function QueryTable({ data = [] }) {
                             <TableHead>Actions</TableHead>
                         </TableRow>
                     </TableHeader>
-                    <TableBody className={'scrollbar-hide'}>
+                    <TableBody className="scrollbar-hide">
                         <AnimatePresence mode="wait">
                             {data.map((query, index) => (
                                 <motion.tr
@@ -54,7 +66,7 @@ function QueryTable({ data = [] }) {
                                         )}
                                     </TableCell>
                                     <TableCell>
-                                        {query.rating ? query.rating + "/10" : "-"}
+                                        {query.rating ? `${query.rating}/10` : "-"}
                                     </TableCell>
                                     <TableCell>
                                         <Button
@@ -63,7 +75,6 @@ function QueryTable({ data = [] }) {
                                             onClick={() => {
                                                 setSelectedQuery(query)
                                                 setSheetOpen(true)
-                                                console.log(query)
                                             }}
                                         >
                                             <Eye className="w-4 h-4" />
