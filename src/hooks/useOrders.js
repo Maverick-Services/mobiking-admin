@@ -41,6 +41,21 @@ export const useOrders = () => {
         }
     });
 
+    const getCancelRequestOrders = ({ requestType, page, limit, startDate, endDate, }) => useQuery({
+        queryKey: ['orders', requestType, startDate, endDate, page, limit],
+        queryFn: () => api
+            .get('/orders/request', { params: { requestType, startDate, endDate, page, limit } })
+            .then(res => {
+                return Array.isArray(res.data)
+                    ? res.data
+                    : res.data.data
+            }),
+        onError: (err) => {
+            toast.error(err.message || 'Failed to fetch orders');
+            console.log(err)
+        }
+    })
+
     const acceptOrder = useMutation({
         mutationFn: ({ orderId, courierId }) =>
             api.post('/orders/accept', { orderId, courierId }).then(res => res.data),
@@ -167,6 +182,7 @@ export const useOrders = () => {
         updateOrder,
         addItemInOrder,
         removeItemFromOrder,
+        getCancelRequestOrders,
         permissions: { canView, canAdd, canEdit, canDelete },
     }
 }
