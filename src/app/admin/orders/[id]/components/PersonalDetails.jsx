@@ -32,7 +32,7 @@ function PersonalDetails({ order }) {
     ]
 
     function isEditable() {
-        return order.status === 'New' 
+        return order.status === 'New'
     }
 
     return (
@@ -42,7 +42,6 @@ function PersonalDetails({ order }) {
                 {isEditable() &&
                     <Button variant="outline" className="gap-2" onClick={() => setOpen(true)}>
                         <Pencil className="h-4 w-4" />
-                        Edit
                     </Button>
                 }
             </div>

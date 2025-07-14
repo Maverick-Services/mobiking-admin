@@ -21,7 +21,7 @@ function Page() {
                 <h1 className="font-bold sm:text-2xl lg:text-4xl w-full">Queries</h1>
             </div>
 
-            <QueryCards
+            {/* <QueryCards
                 queries={allQueries}
                 onTabChange={(tab) => {
                     if (tab === 'all') {
@@ -32,7 +32,7 @@ function Page() {
                         setFilteredData(allQueries.filter(q => q.isResolved))
                     }
                 }}
-            />
+            /> */}
 
             {queriesQuery.isLoading
                 ? <TableSkeleton showHeader={false} />

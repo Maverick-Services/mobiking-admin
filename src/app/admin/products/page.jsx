@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import InnerDashboardLayout from "@/components/dashboard/InnerDashboardLayout"
 import { useProducts } from "@/hooks/useProducts"
 import { useSubCategories } from "@/hooks/useSubCategories"
@@ -27,7 +27,19 @@ import { getPaginationRange } from "@/lib/services/getPaginationRange"
 export default function page() {
     const [categoryFilter, setCategoryFilter] = useState("all")
 
+    // debounce hook
+    function useDebouncedValue(value, delay = 500) {
+        const [debouncedValue, setDebouncedValue] = useState(value);
+
+        useEffect(() => {
+            const handler = setTimeout(() => setDebouncedValue(value), delay);
+            return () => clearTimeout(handler);
+        }, [value, delay]);
+
+        return debouncedValue;
+    }
     const [searchTerm, setSearchTerm] = useState("")
+    const debouncedSearch = useDebouncedValue(searchTerm, 500);
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState();
@@ -50,7 +62,7 @@ export default function page() {
     const { subCategoriesQuery } = useSubCategories()
     const subCategories = subCategoriesQuery.data?.data || []
 
-    const products = productsPaginationQuery({ page: page, limit: limit })
+    const products = productsPaginationQuery({ page: page, limit: limit, searchQuery: debouncedSearch })
 
     // console.log(ab?.data)
 
@@ -59,15 +71,15 @@ export default function page() {
     const paginationRange = getPaginationRange(page, totalPages)
 
     // Filter by category ID if set
-    const afterCategoryFilter = allProducts.filter((prod) => {
-        if (categoryFilter === "all") return true
-        return prod.parentCategory === categoryFilter
-    })
+    // const afterCategoryFilter = allProducts.filter((prod) => {
+    //     if (categoryFilter === "all") return true
+    //     return prod.parentCategory === categoryFilter
+    // })
 
     // Filter by search term (case-insensitive match on name)
-    const finalFiltered = afterCategoryFilter.filter((prod) =>
-        prod.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
-    )
+    // const finalFiltered = afterCategoryFilter.filter((prod) =>
+    //     prod.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
+    // )
 
     // open dialog to add new 
     const handleAddClick = () => {
@@ -119,20 +131,21 @@ export default function page() {
                 </div>
 
                 {/* Table */}
-                {(productsQuery.isLoading || subCategoriesQuery.isLoading)
+                {(products.isLoading || products.isFetching || productsQuery.isLoading || subCategoriesQuery.isLoading)
                     ? <TableSkeleton showHeader={false} />
-                    : <><ProductsListView
-                        error={productsQuery.error}
-                        products={finalFiltered}
-                        // onDelete={deleteAsync}
-                        // isDeleting={isDeleting}
-                        // deleteError={deleteError}
-                        canDelete={canDelete}
-                        canEdit={canEdit}
-                        onEdit={handleEditClick}
-                        setStockEditing={setStockEditing}
-                        setSelectedProduct={setSelectedStockProduct}
-                    />
+                    : <>
+                        <ProductsListView
+                            error={productsQuery.error}
+                            products={allProducts}
+                            // onDelete={deleteAsync}
+                            // isDeleting={isDeleting}
+                            // deleteError={deleteError}
+                            canDelete={canDelete}
+                            canEdit={canEdit}
+                            onEdit={handleEditClick}
+                            setStockEditing={setStockEditing}
+                            setSelectedProduct={setSelectedStockProduct}
+                        />
                     </>
                 }
 

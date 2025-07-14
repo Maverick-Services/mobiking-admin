@@ -19,13 +19,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 const TABS = [
     { key: 'all', label: 'ALL ORDERS' },
-    { key: 'website', label: 'WEBSITE' },
-    { key: 'app', label: 'APP' },
+    { key: 'website', label: 'WEBSITE ORDERS' },
+    { key: 'app', label: 'APP ORDERS' },
     // { key: 'regular', label: 'REGULAR' },
-    { key: 'pos', label: 'POS' },
-    { key: 'returns', label: 'RETURNS' },
-    { key: 'cancelled', label: 'CANCEL REQUESTS' },
-    { key: 'warranty', label: 'WARRANTY' },
+    { key: 'pos', label: 'POS ORDERS' },
+    // { key: 'returns', label: 'RETURNS' },
+    // { key: 'cancelled', label: 'CANCEL REQUESTS' },
+    // { key: 'warranty', label: 'WARRANTY' },
     { key: 'abandoned', label: 'ABANDONED CHECKOUT ORDERS' },
 ]
 
@@ -246,7 +246,7 @@ export default function Page() {
                                     setStatusFilter(null)
                                 }}
                                 className={`
-            relative px-4 py-6 text-sm font-medium transition-all duration-300 flex gap-1 w-full min-w-fit
+            relative px-4 py-6 text-sm font-medium transition-all duration-300 flex gap-1 w-full min-w-fit items-center justify-center
             ${isActive ? 'font-bold text-black' : 'text-gray-600'}
           `}
                             >

@@ -43,6 +43,18 @@ export const ADMIN_SIDEBAR_LINKS = [
         icon: <FaShoppingCart />,
     },
     {
+        key: 'returnRequests',
+        label: 'Return Requests',
+        href: '/admin/return-requests',
+        icon: <FaExchangeAlt />,
+    },
+    {
+        key: 'cancelRequests',
+        label: 'Cancel Requests',
+        href: '/admin/cancel-requests',
+        icon: <FaCaretSquareDown />,
+    },
+    {
         key: 'queries',
         label: 'Queries',
         href: '/admin/queries',
@@ -114,19 +126,20 @@ export const ADMIN_SIDEBAR_LINKS = [
         href: '/admin/policies',
         icon: <FaFileContract />,
     },
-    {
-        key: 'about-us',
-        label: 'About Us',
-        href: '/admin/about-us',
-        icon: <FaInfoCircle />,
-    },
-    {
-        key: 'contact-us',
-        label: 'Contact Us',
-        href: '/admin/contact-us',
-        icon: <FaPhoneAlt />,
-    },
+    // {
+    //     key: 'about-us',
+    //     label: 'About Us',
+    //     href: '/admin/about-us',
+    //     icon: <FaInfoCircle />,
+    // },
+    // {
+    //     key: 'contact-us',
+    //     label: 'Contact Us',
+    //     href: '/admin/contact-us',
+    //     icon: <FaPhoneAlt />,
+    // },
 ];
+
 
 
 // {
@@ -149,12 +162,12 @@ export const ADMIN_SIDEBAR_LINKS = [
 // },
 
 
-    // {
-    //     key: 'settings',
-    //     label: 'Settings',
-    //     href: '/admin/settings',
-    //     icon: <FaCogs />,
-    // },
+// {
+//     key: 'settings',
+//     label: 'Settings',
+//     href: '/admin/settings',
+//     icon: <FaCogs />,
+// },
 
 // {
 //     key: 'coupons',

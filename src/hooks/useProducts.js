@@ -25,10 +25,10 @@ export const useProducts = () => {
         }
     });
 
-    const productsPaginationQuery = ({ page, limit }) => useQuery({
-        queryKey: ['productsPagination', page, limit],
+    const productsPaginationQuery = ({ page, limit, searchQuery }) => useQuery({
+        queryKey: ['productsPagination', page, limit, searchQuery],
         queryFn: () => api
-            .get(`/products/all/paginated?page=${page}&limit=${limit}`)
+            .get(`/products/all/paginated?page=${page}&limit=${limit}&searchQuery=${searchQuery}`)
             .then((res) => res.data.data),
         keepPreviousData: true,
         staleTime: 1000 * 60 * 5,
