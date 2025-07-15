@@ -6,18 +6,10 @@ import { CirclePlus } from 'lucide-react';
 import React, { useState } from 'react'
 import UsersListView from './components/UsersListView';
 import UserDialog from './components/UserDialog';
-// import UsersTable from './UsersTable';
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination"
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from "@/components/ui/pagination"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, } from "@/components/ui/select"
 import { getPaginationRange } from "@/lib/services/getPaginationRange"
+import NotAuthorizedPage from '@/components/notAuthorized';
 
 function page() {
     const [roleFilter, setRoleFilter] = useState('user')
@@ -34,7 +26,7 @@ function page() {
             canAdd,
             canDelete,
             canEdit,
-            onlyAdmin }
+        }
     } = useUsers();
 
     const users = usersQuery({ roleFilter, page, limit });
@@ -72,12 +64,15 @@ function page() {
 
     // open dialog to edit
     const handleEditClick = (id) => {
-        resetCreate();
         resetUpdate();
         resetDelete();
         setSelectedUser(id);
         setIsDialogOpen(true);
     };
+
+    if (!canView) {
+        return <NotAuthorizedPage />
+    }
 
     return (
         <div>

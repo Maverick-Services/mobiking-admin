@@ -3,16 +3,18 @@ import api from '@/lib/api';
 import { toast } from 'react-hot-toast';
 import { Actions, checkPermission, Resources } from '@/lib/permissions';
 import { useAuthStore } from '@/store/useAuthStore';
+import { usePermissions } from './usePermissions';
 
 export const useCategories = () => {
-    const { user } = useAuthStore()
     const queryClient = useQueryClient();
 
-    // Check permissions
-    const canView = checkPermission(user, Resources.CATEGORIES, Actions.VIEW)
-    const canAdd = checkPermission(user, Resources.CATEGORIES, Actions.ADD)
-    const canEdit = checkPermission(user, Resources.CATEGORIES, Actions.EDIT)
-    const canDelete = checkPermission(user, Resources.CATEGORIES, Actions.DELETE)
+    const { checkView, checkAdd, checkEdit, checkDelete } = usePermissions()
+
+    // Permissions
+    const canView = checkView(Resources.CATEGORIES)
+    const canAdd = checkAdd(Resources.CATEGORIES)
+    const canEdit = checkEdit(Resources.CATEGORIES)
+    const canDelete = checkDelete(Resources.CATEGORIES)
 
     // Get all Categories
     const categoriesQuery = useQuery({

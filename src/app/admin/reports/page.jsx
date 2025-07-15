@@ -27,6 +27,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import NotAuthorizedPage from "@/components/notAuthorized"
 
 // Zod schema
 const reportSchema = z.object({
@@ -80,7 +81,13 @@ const columnOptions = {
 }
 
 export default function Page() {
-    const { reportMutation } = useReports()
+    const { reportMutation, permissions: {
+        canView,
+        canAdd,
+        canEdit,
+        canDelete,
+    } } = useReports()
+
     const form = useForm({
         resolver: zodResolver(reportSchema),
         mode: "onSubmit",
@@ -120,16 +127,22 @@ export default function Page() {
         exportToExcel(values.columns, data, `${values.model}-report.xlsx`)
     }
 
+    if (!canView) {
+        return <NotAuthorizedPage />
+    }
+
     return (
         <InnerDashboardLayout>
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-primary font-bold text-2xl">Generate Report</h1>
-                <LoaderButton
-                    loading={reportMutation.isPending}
-                    onClick={handleSubmit(onSubmit)}
-                >
-                    Generate Report
-                </LoaderButton>
+                {canAdd &&
+                    <LoaderButton
+                        loading={reportMutation.isPending}
+                        onClick={handleSubmit(onSubmit)}
+                    >
+                        Generate Report
+                    </LoaderButton>
+                }
             </div>
 
             <Card>
@@ -178,16 +191,16 @@ export default function Page() {
                                     <FormItem>
                                         <div className="flex justify-between items-center mb-4">
                                             <FormLabel>Columns to Include</FormLabel>
-                                            <Button 
+                                            <Button
                                                 type="button"
-                                                variant="outline" 
+                                                variant="outline"
                                                 size="sm"
                                                 onClick={toggleSelectAll}
                                             >
                                                 {selectAll ? "Deselect All" : "Select All"}
                                             </Button>
                                         </div>
-                                        
+
                                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[300px] overflow-y-auto p-2 border rounded-lg">
                                             {columnOptions[selectedModel].map((column) => (
                                                 <div key={column} className="flex items-center space-x-2">
@@ -205,13 +218,13 @@ export default function Page() {
                                                 </div>
                                             ))}
                                         </div>
-                                        
+
                                         {errors.columns && (
                                             <p className="text-sm font-medium text-destructive mt-2">
                                                 {errors.columns.message}
                                             </p>
                                         )}
-                                        
+
                                         <div className="mt-4">
                                             <FormLabel>Selected Columns:</FormLabel>
                                             <div className="flex flex-wrap gap-2 mt-2">

@@ -22,7 +22,6 @@ export default function UsersListView({
     deleteError,
     canDelete,
     canEdit,
-    onlyAdmin
 }) {
     const [deletingUserId, setDeletingUserId] = useState(null)
 

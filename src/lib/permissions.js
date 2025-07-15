@@ -4,18 +4,24 @@
 export const Resources = {
     DASHBOARD: 'dashboard',
     ORDERS: 'orders',
-    CUSTOMERS: 'customers',
-    NOTIFICATIONS: 'notifications',
+    RETURN_REQUESTS: "return-requests",
+    CANCEL_REQUESTS: "cancel-requests",
+    QUERIES: 'queries',
     CATEGORIES: 'categories',
     SUB_CATEGORIES: 'subCategories',
     PRODUCTS: 'products',
     PRODUCT_GROUPS: 'product-groups',
+    HOME_LAYOUT: 'home-layout',
+    CUSTOMERS: 'customers',
+    EMPLOYEES: 'employees',
+    NOTIFICATIONS: 'notifications',
     MEDIA: 'media',
-    USERS: 'users',
-    SETTINGS: 'settings',
+    // USERS: 'users',
+    // SETTINGS: 'settings',
     POLICIES: 'policies',
-    ABOUT_US: 'about-us',
-    CONTACT_US: 'contact-us',
+    REPORTS: 'reports',
+    // ABOUT_US: 'about-us',
+    // CONTACT_US: 'contact-us',
 };
 
 // possible actions
@@ -30,7 +36,7 @@ export const Actions = {
 export function checkPermission(user, resource, action) {
     if (!user) return false;
     if (user.role === 'admin') return true;
-    if (user.role === 'sub-admin') {
+    if (user.role === 'employee') {
         const perms = user.permissions?.[resource];
         return !!perms?.[action];
     }

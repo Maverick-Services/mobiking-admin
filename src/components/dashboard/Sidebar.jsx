@@ -19,11 +19,25 @@ import {
 import { IMAGES } from "@/lib/constants/assets";
 import { ADMIN_SIDEBAR_LINKS } from "@/lib/constants/sidebarLinks";
 import { useAuthStore } from "@/store/useAuthStore";
+import { usePermissions } from "@/hooks/usePermissions";
+import SidebarSkeleton from "../custom/SidebarSkeleton";
 
 export default function Sidebar({ isOpen, setIsSidebarOpen }) {
+    const { data, isLoading, error } = usePermissions();
     const pathname = usePathname();
     const router = useRouter();
     const { user, clearAuth } = useAuthStore();
+
+    const role = data?.role;
+    const perms = data?.permissions || {};
+
+    function can(resource, action) {
+        if (role === 'admin') return true;
+        if (role === 'employee') return !!perms?.[resource]?.[action];
+        return false;
+    }
+
+    const allowedLinks = ADMIN_SIDEBAR_LINKS.filter(link => can(link.key, 'view'));
 
     // console.log(user)
 
@@ -76,41 +90,43 @@ export default function Sidebar({ isOpen, setIsSidebarOpen }) {
             </div>
 
             {/* Navigation Links */}
-            <div className="w-full flex flex-col gap-3 transition-all duration-300 ease-in-out">
-                {ADMIN_SIDEBAR_LINKS.map(({ href, label, icon }) => {
-                    const rootPath = `/${href.split("/")[1]}`;
-                    const isActive =
-                        href === rootPath ? pathname === rootPath : pathname.startsWith(href);
+            {isLoading ? <div><SidebarSkeleton /></div>
+                : <div className="w-full flex flex-col gap-3 transition-all duration-300 ease-in-out">
+                    {ADMIN_SIDEBAR_LINKS.map(({ href, label, icon }) => {
+                        const rootPath = `/${href.split("/")[1]}`;
+                        const isActive =
+                            href === rootPath ? pathname === rootPath : pathname.startsWith(href);
 
-                    return (
-                        <Link
-                            key={href}
-                            href={href}
-                            onClick={onLinkClick}
-                            className={`
+                        return (
+                            <Link
+                                key={href}
+                                href={href}
+                                onClick={onLinkClick}
+                                className={`
                 group flex items-center gap-4 px-4 py-2 rounded-lg
                 transition-all duration-300
                 ${isActive
-                                    ? "bg-gray-700 shadow-md text-white"
-                                    : "hover:bg-gray-800 hover:translate-x-1 text-gray-300 hover:text-white"
-                                }
-              `}
-                        >
-                            <span
-                                className={`
-                  p-2 rounded-lg ${isActive ? "bg-white/10" : "bg-gray-800 group-hover:bg-gray-700"
+                                        ? "bg-gray-700 shadow-md text-white"
+                                        : "hover:bg-gray-800 hover:translate-x-1 text-gray-300 hover:text-white"
                                     }
-                `}
+              `}
                             >
-                                <span className="text-sm text-gray-100">{icon}</span>
-                            </span>
-                            <span className="text-sm font-medium opacity-90 group-hover:opacity-100 transition-opacity">
-                                {label}
-                            </span>
-                        </Link>
-                    );
-                })}
-            </div>
+                                <span
+                                    className={`
+                  p-2 rounded-lg ${isActive ? "bg-white/10" : "bg-gray-800 group-hover:bg-gray-700"
+                                        }
+                `}
+                                >
+                                    <span className="text-sm text-gray-100">{icon}</span>
+                                </span>
+                                <span className="text-sm font-medium opacity-90 group-hover:opacity-100 transition-opacity">
+                                    {label}
+                                </span>
+                            </Link>
+                        );
+                    })}
+                </div>
+            }
 
             {/* Profile Section */}
             <div className="mt-auto w-full border-t border-gray-700 pt-6">

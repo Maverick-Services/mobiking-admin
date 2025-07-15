@@ -90,12 +90,12 @@ export const ADMIN_SIDEBAR_LINKS = [
         href: '/admin/home-layout',
         icon: <FaHome />,
     },
-    {
-        key: 'media',
-        label: 'Media',
-        href: '/admin/media',
-        icon: <FaPaintBrush />,
-    },
+    // {
+    //     key: 'media',
+    //     label: 'Media',
+    //     href: '/admin/media',
+    //     icon: <FaPaintBrush />,
+    // },
     {
         key: 'customers',
         label: 'Customers',

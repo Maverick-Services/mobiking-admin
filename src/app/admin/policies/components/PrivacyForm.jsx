@@ -21,10 +21,10 @@ const policySchema = z.object({
     slug: z.string().optional(),
     heading: z.string().min(1, "Heading is required"),
     content: z.string().min(1, "Content is required"),
-    lastUpdated: z.string().min(1, "Last Updated date is required"), 
+    lastUpdated: z.string().min(1, "Last Updated date is required"),
 });
 
-function PrivacyForm({ open, onOpenChange, data, onCreate, onUpdate, setSelected }) {
+function PrivacyForm({ open, onOpenChange, data, onCreate, onUpdate, setSelected, canEdit, canAdd }) {
     const [loading, setLoading] = useState(false);
 
     const {
@@ -45,26 +45,26 @@ function PrivacyForm({ open, onOpenChange, data, onCreate, onUpdate, setSelected
         },
     });
 
-useEffect(() => {
-    if (data) {
-        const formattedDate = data.lastUpdated?.split('T')[0] || '';
-        reset({
-            policyName: data.policyName || '',
-            slug: data.slug || '',
-            heading: data.heading || '',
-            content: data.content,
-            lastUpdated: formattedDate,
-        });
-    } else {
-        reset({
-            policyName: '',
-            slug: '',
-            heading: '',
-            content: '',
-            lastUpdated: '',
-        });
-    }
-}, [data, reset]);
+    useEffect(() => {
+        if (data) {
+            const formattedDate = data.lastUpdated?.split('T')[0] || '';
+            reset({
+                policyName: data.policyName || '',
+                slug: data.slug || '',
+                heading: data.heading || '',
+                content: data.content,
+                lastUpdated: formattedDate,
+            });
+        } else {
+            reset({
+                policyName: '',
+                slug: '',
+                heading: '',
+                content: '',
+                lastUpdated: '',
+            });
+        }
+    }, [data, reset]);
 
 
     async function onSubmit(values) {
@@ -89,7 +89,7 @@ useEffect(() => {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="lg:min-w-5xl max-h-[80vh] overflow-y-auto">
+            <DialogContent className="min-w-[90vw] lg:min-w-5xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>{data ? "Edit Privacy Policy" : "Add Privacy Policy"}</DialogTitle>
                 </DialogHeader>
@@ -138,9 +138,16 @@ useEffect(() => {
                         >
                             Cancel
                         </Button>
-                        <LoaderButton type="submit" loading={loading}>
-                            Save Changes
-                        </LoaderButton>
+                        {data && canEdit &&
+                            <LoaderButton type="submit" loading={loading}>
+                                Update
+                            </LoaderButton>
+                        }
+                        {!data && canAdd &&
+                            <LoaderButton type="submit" loading={loading}>
+                                Add
+                            </LoaderButton>
+                        }
                     </div>
                 </form>
             </DialogContent>

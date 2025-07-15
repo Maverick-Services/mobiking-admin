@@ -68,7 +68,7 @@ export default function GroupsTable({
                             <TableHead className="">Banner</TableHead>
                             <TableHead className="">Name</TableHead>
                             <TableHead className="">Products</TableHead>
-                            <TableHead className="">Sequence</TableHead>
+                            {/* <TableHead className="">Sequence</TableHead> */}
                             <TableHead className="text-center">Status</TableHead>
                             <TableHead className="text-center">Actions</TableHead>
                         </TableRow>
@@ -111,23 +111,25 @@ export default function GroupsTable({
                                         <Button variant={'outline'}>
                                             {group?.products.length}
                                         </Button>
-                                        <div
-                                            onClick={() => {
-                                                setPrdouctsSheet(true)
-                                                setGroupForProducts(group)
-                                            }}
-                                        >
-                                            <Pencil size={15} className='hover:text-black text-gray-500 cursor-pointer' />
-                                        </div>
+                                        {canEdit &&
+                                            <div
+                                                onClick={() => {
+                                                    setPrdouctsSheet(true)
+                                                    setGroupForProducts(group)
+                                                }}
+                                            >
+                                                <Pencil size={15} className='hover:text-black text-gray-500 cursor-pointer' />
+                                            </div>
+                                        }
                                     </div>
                                 </TableCell>
 
                                 {/* 3. sequence */}
-                                <TableCell className="">
+                                {/* <TableCell className="">
                                     <div className=''>
                                         {group?.sequenceNo}
                                     </div>
-                                </TableCell>
+                                </TableCell> */}
 
 
                                 {/* 5. Status Switch - FIXED ALIGNMENT */}
@@ -146,23 +148,23 @@ export default function GroupsTable({
                                 <TableCell className="">
                                     <div className="flex items-center justify-center gap-2">
 
-                                        {/* {canEdit && */}
-                                        <Button
-                                            size="icon"
-                                            variant="outline"
-                                            onClick={() => onEdit(group)}
-                                        >
-                                            <Pencil size={16} />
-                                        </Button>
-                                        {/* } */}
-                                        {/* {canDelete && */}
-                                        <Button
-                                            variant="destructive"
-                                        // onClick={() => handleDeleteClick(group._id)}
-                                        >
-                                            <Trash size={16} />
-                                        </Button>
-                                        {/* } */}
+                                        {canEdit &&
+                                            <Button
+                                                size="icon"
+                                                variant="outline"
+                                                onClick={() => onEdit(group)}
+                                            >
+                                                <Pencil size={16} />
+                                            </Button>
+                                        }
+                                        {canDelete &&
+                                            <Button
+                                                variant="destructive"
+                                            // onClick={() => handleDeleteClick(group._id)}
+                                            >
+                                                <Trash size={16} />
+                                            </Button>
+                                        }
                                     </div>
                                 </TableCell>
                             </TableRow>

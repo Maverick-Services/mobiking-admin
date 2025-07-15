@@ -8,7 +8,12 @@ import { usePolicies } from '@/hooks/usePolicies'
 import TableSkeleton from '@/components/custom/TableSkeleton'
 
 function page() {
-    const { policyQuery, createPolicy, updatePolicy } = usePolicies();
+    const { policyQuery, createPolicy, updatePolicy, permissions: {
+        canView,
+        canAdd,
+        canEdit,
+        canDelete,
+    } } = usePolicies();
     const [policyForm, setPolicyForm] = useState(false);
     const [selectedPolicy, setSelectedPolicy] = useState(null);
 
@@ -19,23 +24,24 @@ function page() {
             <div className='flex items-center justify-between w-full mb-3'>
                 <h1 className="text-primary font-bold sm:text-2xl lg:text-3xl mb-3">Policies</h1>
 
-                <Button onClick={() => {
-                    setSelectedPolicy(undefined)
-                    setPolicyForm(true)
-                }}>
-                    Create New
-                </Button>
+                {canAdd &&
+                    <Button onClick={() => {
+                        setSelectedPolicy(undefined)
+                        setPolicyForm(true)
+                    }}>
+                        Create New
+                    </Button>
+                }
             </div>
 
-            {
+            {canView &&
                 policyQuery.isLoading ?
-                    <TableSkeleton />
-                    : <PolicyTable
-                        policies={policies}
-                        setSelected={setSelectedPolicy}
-                        openForm={setPolicyForm}
-                    />
-                // : null
+                <TableSkeleton />
+                : <PolicyTable
+                    policies={policies}
+                    setSelected={setSelectedPolicy}
+                    openForm={setPolicyForm}
+                />
             }
 
             <PrivacyForm
@@ -45,6 +51,8 @@ function page() {
                 data={selectedPolicy}
                 onCreate={createPolicy}
                 onUpdate={updatePolicy}
+                canEdit={canEdit}
+                canAdd={canAdd}
             />
 
         </InnerDashboardLayout>

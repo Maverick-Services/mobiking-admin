@@ -8,10 +8,16 @@ import { useProducts } from '@/hooks/useProducts';
 import { useGroups } from '@/hooks/useGroups';
 import GroupsTable from './components/GroupsTable';
 import GroupProductsSheet from './components/GroupProductsSheet';
+import NotAuthorizedPage from '@/components/notAuthorized';
 
 function page() {
     const { productsQuery } = useProducts()
-    const { groupsQuery, createGroup, updateGroup, updateProductsInGroup } = useGroups()
+    const { groupsQuery, createGroup, updateGroup, updateProductsInGroup, permissions: {
+        canView,
+        canAdd,
+        canEdit,
+        canDelete
+    } } = useGroups()
     const [selectedGroup, setSelectedGroup] = useState(null)
 
     const [prdouctsSheet, setPrdouctsSheet] = useState(false)
@@ -59,18 +65,22 @@ function page() {
         setSelectedGroup(group)
     }
 
+    if (!canView) {
+        return <NotAuthorizedPage />
+    }
 
-    // console.log(productsQuery.data)
 
     return (
         <InnerDashboardLayout>
             <div className='flex items-center justify-between w-full mb-3'>
                 <h1 className="text-primary font-bold sm:text-2xl lg:text-3xl mb-3">Design Studio</h1>
 
-                <Button onClick={handleAddClick}>
-                    <CirclePlus className="mr-2 h-4 w-4" />
-                    Add New
-                </Button>
+                {canAdd &&
+                    <Button onClick={handleAddClick}>
+                        <CirclePlus className="mr-2 h-4 w-4" />
+                        Add New
+                    </Button>
+                }
             </div>
 
             <GroupsTable
@@ -79,6 +89,8 @@ function page() {
                 isLoading={groupsQuery.isLoading}
                 setGroupForProducts={setGroupForProducts}
                 setPrdouctsSheet={setPrdouctsSheet}
+                canDelete={canDelete}
+                canEdit={canEdit}
             />
 
             <GroupDialog
@@ -86,14 +98,9 @@ function page() {
                 onOpenChange={setIsDialogOpen}
                 products={productsQuery.data}
                 onCreate={createGroupAsync}
-                // isSubmitting={creating}
-                // error={createError}
                 selectedGroup={selectedGroup}
-                // selectedProduct={selectedProduct}
-                // categories={subCategories}
                 isSubmitting={creating || updating}
                 error={createError || updateError}
-                // onCreate={createProductAsync}
                 onUpdate={updateGroupAsync}
             />
 

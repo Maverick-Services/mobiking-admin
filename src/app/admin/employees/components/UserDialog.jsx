@@ -15,17 +15,20 @@ import PasswordDialog from "./PasswordDialog";
 const permissionSections = [
     { id: 'dashboard', name: 'Dashboard' },
     { id: 'orders', name: 'Orders' },
-    { id: 'customers', name: 'Customers' },
-    { id: 'notifications', name: 'Notifications' },
+    { id: 'return-requests', name: 'Return Requests' },
+    { id: 'cancel-requests', name: 'Cancel Requests' },
+    { id: 'queries', name: 'Queries' },
     { id: 'categories', name: 'Categories' },
     { id: 'subCategories', name: 'Sub Categories' },
     { id: 'products', name: 'Products' },
-    { id: 'product-groups', name: 'Product Groups' },
-    { id: 'users', name: 'Users' },
-    { id: 'settings', name: 'Settings' },
+    { id: 'product-groups', name: 'Design Studio' },
+    { id: 'home-layout', name: 'Home Layout' },
+    { id: 'customers', name: 'Customers' },
+    { id: 'employees', name: 'Employees' },
+    { id: 'notifications', name: 'Notifications' },
     { id: 'policies', name: 'Policies' },
-    { id: 'about-us', name: 'About Us' },
-    { id: 'contact-us', name: 'Contact Us' },
+    // { id: 'about-us', name: 'About Us' },
+    // { id: 'contact-us', name: 'Contact Us' },
 ];
 
 const permissionTypes = [

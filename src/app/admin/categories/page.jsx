@@ -6,11 +6,16 @@ import CategoriesListView from './components/CategoriesListView';
 import CategoryDialog from './components/CategoryDialog';
 import { useState } from 'react';
 import { useCategories } from '@/hooks/useCategories';
+import NotAuthorizedPage from '@/components/notAuthorized';
 
 export default function Page() {
     // fetch categories query
-    const { categoriesQuery, createCategory, deleteCategory, updateCategory } = useCategories();
-    // const { categoriesQuery, createCategory, deleteCategory, updateCategory } = useCategories();
+    const { categoriesQuery, createCategory, deleteCategory, updateCategory, permissions: {
+        canView,
+        canAdd,
+        canEdit,
+        canDelete
+    } } = useCategories();
 
     // destructure createCategory mutation
     const {
@@ -60,7 +65,10 @@ export default function Page() {
         setIsDialogOpen(true);
     };
 
-    console.log(categoriesQuery?.data?.data);
+    if (!canView) {
+        return <NotAuthorizedPage />
+    }
+
 
     return (
         <InnerDashboardLayout>
@@ -73,20 +81,26 @@ export default function Page() {
                     <Button variant="outline">
                         Categories: {categoriesQuery.data?.data?.length || 0}
                     </Button>
-                    <Button onClick={handleAddClick}>
-                        <CirclePlus className="mr-2 h-4 w-4" /> Add New
-                    </Button>
+                    {canAdd &&
+                        <Button onClick={handleAddClick}>
+                            <CirclePlus className="mr-2 h-4 w-4" /> Add New
+                        </Button>
+                    }
                 </div>
 
-                <CategoriesListView
-                    categories={categoriesQuery?.data?.data}
-                    onEdit={handleEditClick}
-                    isLoading={categoriesQuery.isLoading}
-                    error={categoriesQuery.error}
-                    onDelete={deleteCategoryAsync}
-                    isDeleting={isDeleting}
-                    deleteError={deleteError}
-                />
+                {canView &&
+                    <CategoriesListView
+                        categories={categoriesQuery?.data?.data}
+                        onEdit={handleEditClick}
+                        isLoading={categoriesQuery.isLoading}
+                        error={categoriesQuery.error}
+                        onDelete={deleteCategoryAsync}
+                        isDeleting={isDeleting}
+                        deleteError={deleteError}
+                        canEdit={canEdit}
+                        canDelete={canDelete}
+                    />
+                }
 
                 <CategoryDialog
                     open={isDialogOpen}
@@ -94,10 +108,8 @@ export default function Page() {
                     selectedCategory={selectedCategory}
                     onCreate={createCategoryAsync}
                     onUpdate={updateCategoryAsync}
-                    // isSubmitting={isCreating}
                     isSubmitting={isCreating || isUpdating}
                     error={createError?.message || updateError?.message}
-                    // error={createError?.message}
                     image={image}
                     setImage={setImage}
                 />

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/pagination"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, } from "@/components/ui/select"
 import { getPaginationRange } from "@/lib/services/getPaginationRange"
+import NotAuthorizedPage from '@/components/notAuthorized';
 
 function page() {
     const [roleFilter, setRoleFilter] = useState('employee')
@@ -31,11 +32,12 @@ function page() {
         deleteUser,
         // changePassword,
         permissions: {
-            canView,
-            canAdd,
-            canDelete,
-            canEdit,
-            onlyAdmin }
+            canViewEmployee,
+            canAddEmployee,
+            canDeleteEmployee,
+            canEditEmployee,
+            // onlyAdmin 
+        }
     } = useUsers();
 
     const users = employeesQuery({ role: roleFilter, page: page, limit: limit });
@@ -88,6 +90,10 @@ function page() {
         setIsDialogOpen(true);
     };
 
+    if (!canViewEmployee) {
+        return <NotAuthorizedPage />
+    }
+
     return (
         <div>
             <InnerDashboardLayout>
@@ -109,26 +115,26 @@ function page() {
                         </SelectContent>
                     </Select>
 
-                    {canAdd &&
+                    {canAddEmployee &&
                         <Button onClick={handleAddClick}>
                             <CirclePlus className="mr-2 h-4 w-4" /> Add New Employee
                         </Button>
                     }
                 </div>
 
-                {canView &&
-                    <UsersListView
-                        isLoading={users.isLoading}
-                        error={users.error}
-                        users={allUsers}
-                        onEdit={handleEditClick}
-                        canEdit={canEdit}
-                        canDelete={canDelete}
-                        onDelete={deleteUserAsync}
-                        isDeleting={isDeleting}
-                        deleteError={deleteError}
-                    />
-                }
+                {/* {canViewEmployee && */}
+                <UsersListView
+                    isLoading={users.isLoading}
+                    error={users.error}
+                    users={allUsers}
+                    onEdit={handleEditClick}
+                    canEdit={canEditEmployee}
+                    canDelete={canDeleteEmployee}
+                    onDelete={deleteUserAsync}
+                    isDeleting={isDeleting}
+                    deleteError={deleteError}
+                />
+                {/* } */}
 
                 <div className="flex w-full justify-end gap-2 items-center mt-4">
                     {/* Limit Dropdown */}
@@ -194,7 +200,7 @@ function page() {
                     error={createError?.message || updateError?.message}
                     // changePassword={changePassword}
                     // onlyAdmin={onlyAdmin}
-                    canEdit={canEdit}
+                    canEdit={canEditEmployee}
                 />
 
             </InnerDashboardLayout>

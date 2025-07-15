@@ -17,7 +17,7 @@ import {
 import TableSkeleton from '@/components/custom/TableSkeleton';
 import { AnimatePresence, motion } from "framer-motion";
 
-export default function CategoriesListView({ isLoading, error, categories, onEdit, onDelete, isDeleting, deleteError }) {
+export default function CategoriesListView({ isLoading, error, categories, onEdit, onDelete, isDeleting, deleteError, canEdit, canDelete }) {
     const [deletingCategoryId, setDeletingCategoryId] = useState(null);
 
     const handleDeleteClick = (categoryId) => {
@@ -75,12 +75,16 @@ export default function CategoriesListView({ isLoading, error, categories, onEdi
                                     <TableCell className="text-center align-middle">{item.slug}</TableCell>
                                     <TableCell className="text-center align-middle">
                                         <div className="flex justify-center gap-2">
-                                            <Button size="icon" variant="outline" onClick={() => onEdit(item)}>
-                                                <Pencil size={16} />
-                                            </Button>
-                                            <Button variant="destructive" onClick={() => handleDeleteClick(item._id)}>
-                                                <Trash size={16} />
-                                            </Button>
+                                            {canEdit &&
+                                                <Button size="icon" variant="outline" onClick={() => onEdit(item)}>
+                                                    <Pencil size={16} />
+                                                </Button>
+                                            }
+                                            {canDelete &&
+                                                <Button variant="destructive" onClick={() => handleDeleteClick(item._id)}>
+                                                    <Trash size={16} />
+                                                </Button>
+                                            }
                                         </div>
                                     </TableCell>
                                 </motion.tr>

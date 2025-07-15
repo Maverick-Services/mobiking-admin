@@ -1,24 +1,24 @@
 import { useQuery } from '@tanstack/react-query';
-import { Resources, Actions } from '@/lib/permissions';
+import { Actions } from '@/lib/permissions';
+import api from '@/lib/api';
 
 export function usePermissions() {
     const { data, error, isLoading } = useQuery({
         queryKey: ['permissions'],
         queryFn: () =>
-            fetch('/api/auth/permissions')
-                .then(res => res.json())
-                .then(json => {
-                    if (json.error) throw new Error(json.error);
-                    return json;
-                }),
-        staleTime: 60 * 1000, // cache for 1 minute
+            api.get(`/users/permissions`)
+                .then(res => res?.data?.data),
+        staleTime: 30 * 1000, // cache for 30 secs
     });
+
+    console.log(data)
+
     const role = data?.role;
     const perms = data?.permissions || {};
 
     function can(resource, action) {
         if (role === 'admin') return true;
-        if (role === 'sub-admin') return !!perms[resource]?.[action];
+        if (role === 'employee') return !!perms[resource]?.[action];
         return false;
     }
 

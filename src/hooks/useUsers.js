@@ -1,21 +1,25 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { toast } from 'react-hot-toast';
-import { Actions, checkPermission, onlyAdminPermission, Resources } from '@/lib/permissions';
-import { useAuthStore } from '@/store/useAuthStore';
+import { Resources } from '@/lib/permissions';
+import { usePermissions } from './usePermissions';
 
 export const useUsers = () => {
-    // export const useUsers = ({ role, page = 1, pageSize = 10 }) => {
-    // const { data: session } = useSession();
-    // const user = session?.user
-    const { user } = useAuthStore()
     const queryClient = useQueryClient();
+    const { checkView, checkAdd, checkEdit, checkDelete } = usePermissions()
 
-    const canView = checkPermission(user, Resources.USERS, Actions.VIEW)
-    const canAdd = checkPermission(user, Resources.USERS, Actions.ADD)
-    const canEdit = checkPermission(user, Resources.USERS, Actions.EDIT)
-    const canDelete = checkPermission(user, Resources.USERS, Actions.DELETE)
-    const onlyAdmin = onlyAdminPermission(user)
+    // Permissions
+    const canView = checkView(Resources.CUSTOMERS)
+    const canAdd = checkAdd(Resources.CUSTOMERS)
+    const canEdit = checkEdit(Resources.CUSTOMERS)
+    const canDelete = checkDelete(Resources.CUSTOMERS)
+
+    const canViewEmployee = checkView(Resources.EMPLOYEES)
+    const canAddEmployee = checkAdd(Resources.EMPLOYEES)
+    const canEditEmployee = checkEdit(Resources.EMPLOYEES)
+    const canDeleteEmployee = checkDelete(Resources.EMPLOYEES)
+
+
 
     // // Get all users
     const usersQuery = ({ role = "user", page = 1, limit = 10 }) => useQuery({
@@ -125,7 +129,10 @@ export const useUsers = () => {
             canAdd,
             canDelete,
             canEdit,
-            onlyAdmin
+            canViewEmployee,
+            canAddEmployee,
+            canDeleteEmployee,
+            canEditEmployee,
         }
     };
 };

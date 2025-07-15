@@ -14,8 +14,18 @@ import { CustomersChart } from "./(dashboard)/CustomersChart";
 import FilteredOrdersChart from "./(dashboard)/FilteredOrdersChart";
 import { SalesChartByDate } from "./(dashboard)/SalesChartByDates";
 import PosButton from "@/components/custom/PosButton";
+import { usePermissions } from "@/hooks/usePermissions";
+import NotAuthorizedPage from "@/components/notAuthorized";
+import { Resources } from "@/lib/permissions";
 
 export default function Home() {
+  const { checkView } = usePermissions()
+
+  // Permissions
+  const canView = checkView(Resources.DASHBOARD)
+
+  if (!canView) return <NotAuthorizedPage />
+
   return (
     <InnerDashboardLayout>
       <div className="w-full flex justify-between items-center gap-4 mb-4">
@@ -26,7 +36,7 @@ export default function Home() {
           {/* <POS>
             <Button>POS</Button>
           </POS> */}
-          <PosButton/>
+          <PosButton />
         </div>
       </div>
 
@@ -42,13 +52,13 @@ export default function Home() {
       <div className="mt-3 grid grid-cols-2 gap-3">
         <CustomersChart />
         {/* <OrdersChart /> */}
-        <SalesChartByDate/>
+        <SalesChartByDate />
       </div>
       <div>
 
-<div className="mt-3">
-        <FilteredOrdersChart />
-</div>
+        <div className="mt-3">
+          <FilteredOrdersChart />
+        </div>
       </div>
     </InnerDashboardLayout>
   );
