@@ -19,12 +19,10 @@ export const useUsers = () => {
     const canEditEmployee = checkEdit(Resources.EMPLOYEES)
     const canDeleteEmployee = checkDelete(Resources.EMPLOYEES)
 
-
-
     // // Get all users
-    const usersQuery = ({ role = "user", page = 1, limit = 10 }) => useQuery({
-        queryKey: ['users', role, page, limit],
-        queryFn: () => api.get(`/users/all/paginated?role=${role}&page=${page}&limit=${limit}`).then(res => res.data),
+    const usersQuery = ({ role = "user", page = 1, limit = 10, searchQuery, type }) => useQuery({
+        queryKey: ['users', role, page, limit, searchQuery, type],
+        queryFn: () => api.get(`/users/all/paginated?role=${role}&page=${page}&limit=${limit}&searchQuery=${searchQuery}&type=${type}`).then(res => res.data),
         keepPreviousData: true,
         enabled: canView,
         staleTime: 1000 * 60 * 5,
@@ -37,7 +35,7 @@ export const useUsers = () => {
     });
 
     // Get all employees
-    const employeesQuery = ({ role, page, limit }) => useQuery({
+    const employeesQuery = ({ role, page, limit, }) => useQuery({
         queryKey: ['employees', role, page, limit],
         queryFn: () => api.get(`/users/all/paginated?role=${role}&page=${page}&limit=${limit}`).then(res => res.data),
         keepPreviousData: true,
