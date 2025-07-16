@@ -91,6 +91,7 @@ function page() {
                 setPrdouctsSheet={setPrdouctsSheet}
                 canDelete={canDelete}
                 canEdit={canEdit}
+            // onDelete={}
             />
 
             <GroupDialog

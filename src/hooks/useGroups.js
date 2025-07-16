@@ -57,10 +57,23 @@ export const useGroups = () => {
         }
     });
 
-    // Update Group mutation
+    // Update Group status
     const updateGroup = useMutation({
         mutationFn: ({ id, data }) => api.put(`/groups/${id}`, data),
         enabled: canEdit,
+        onSuccess: () => {
+            queryClient.invalidateQueries(['groups']);
+            toast.success('Group updated successfully');
+        },
+        onError: (err) => {
+            console.log(err)
+            toast.error(err.message || 'Failed to update Group');
+        }
+    });
+
+    // Update Group mutation
+    const updateGroupStatus = useMutation({
+        mutationFn: ({ id, data }) => api.put(`/groups/${id}`, data),
         onSuccess: () => {
             queryClient.invalidateQueries(['groups']);
             toast.success('Group updated successfully');
@@ -97,7 +110,7 @@ export const useGroups = () => {
     // });
 
     return {
-        groupsQuery, createGroup, updateGroup, updateProductsInGroup,
+        groupsQuery, createGroup, updateGroup, updateProductsInGroup, updateGroupStatus,
         // groupsQuery, deleteGroup, updateGroup, createGroup, getGroupQuery,
         permissions: {
             canView,

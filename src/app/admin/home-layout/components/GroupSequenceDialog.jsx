@@ -43,7 +43,7 @@ export default function GroupSequenceDialog({ allGroups = [], initialGroups = []
         <Button>Edit</Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Reorder & Add Groups</DialogTitle>
         </DialogHeader>

@@ -9,20 +9,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Loader2, X } from 'lucide-react';
 import Image from 'next/image';
-import ImageSelector from '@/components/ImageSelector';
 import toast from 'react-hot-toast';
 import { uploadImage } from '@/lib/services/uploadImage';
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
-    sequenceNo: z.coerce.number({ required_error: "Sequence number is required" }),
+    sequenceNo: z.number().optional(),
     active: z.boolean(),
     isBannerVisble: z.boolean(),
     isBackgroundColorVisible: z.boolean(),
     banner: z.string().nullable(),
     backgroundColor: z.string().optional(),
 });
-
 
 function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, isSubmitting, error, }) {
     const form = useForm({
@@ -126,7 +124,7 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                             />
 
                             {/* seq number */}
-                            <FormField
+                            {/* <FormField
                                 control={form.control}
                                 name="sequenceNo"
                                 render={({ field }) => (
@@ -138,7 +136,7 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                                         <FormMessage />
                                     </FormItem>
                                 )}
-                            />
+                            /> */}
 
                             {/* Active */}
                             <FormField

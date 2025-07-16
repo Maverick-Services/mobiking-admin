@@ -14,8 +14,10 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import Loader from '@/components/Loader';
-import DeleteConfirmationDialog from './DeleteConfirmationDialog ';
 import TableSkeleton from '@/components/custom/TableSkeleton';
+import { useGroups } from '@/hooks/useGroups';
+import { toast } from 'react-hot-toast';
+import DeleteConfirmationDialog from './DeleteConfirmationDialog ';
 
 export default function GroupsTable({
     error,
@@ -30,33 +32,24 @@ export default function GroupsTable({
     setPrdouctsSheet,
     isLoading
 }) {
+    const { updateGroupStatus } = useGroups();
 
-    // console.log(groups.data)
+    // const {
+    //     mutateAsync: updateGroupAsync,
+    //     isPending: updating,
+    // } = updateGroupStatus;
 
-    const groupsData = groups?.data || []
-
-    const router = useRouter();
+    const groupsData = groups?.data || [];
     const [deletingId, setDeletingId] = useState(null);
 
-    const handleDeleteClick = (id) => {
-        setDeletingId(id);
-    };
-
+    const handleDeleteClick = id => setDeletingId(id);
     const handleDeleteConfirm = async () => {
         await onDelete(deletingId);
         setDeletingId(null);
     };
 
     if (isLoading) return <TableSkeleton showHeader={false} />;
-
-    if (error) {
-        return (
-            <div className="text-red-600 p-4">
-                Error: {error.message}
-            </div>
-        );
-    }
-
+    if (error) return <div className="text-red-600 p-4">Error: {error.message}</div>;
 
     return (
         <section className="w-full">
@@ -65,106 +58,76 @@ export default function GroupsTable({
                     <TableHeader>
                         <TableRow className="bg-gray-50">
                             <TableHead className="w-[50px]">#</TableHead>
-                            <TableHead className="">Banner</TableHead>
-                            <TableHead className="">Name</TableHead>
-                            <TableHead className="">Products</TableHead>
-                            {/* <TableHead className="">Sequence</TableHead> */}
+                            <TableHead>Banner</TableHead>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Products</TableHead>
                             <TableHead className="text-center">Status</TableHead>
                             <TableHead className="text-center">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
-
                     <TableBody>
                         {groupsData.map((group, index) => (
-                            <TableRow
-                                key={group._id || index}
-                                className="even:bg-gray-50 hover:bg-gray-100 transition"
-                            >
-                                {/* 1. Index */}
-                                <TableCell className="">
-                                    {index + 1}
+                            <TableRow key={group._id || index} className="even:bg-gray-50 hover:bg-gray-100 transition">
+                                <TableCell>{index + 1}</TableCell>
+                                <TableCell>
+                                    <img
+                                        src={group.banner}
+                                        alt={group.name}
+                                        width={60}
+                                        height={60}
+                                        className="object-contain rounded"
+                                    />
                                 </TableCell>
-
-                                {/* 2. Image */}
-                                <TableCell className="">
-                                    <div className="py-2">
-                                        <img
-                                            src={group?.banner}
-                                            alt={group?.name || 'img'}
-                                            width={60}
-                                            height={60}
-                                            className="object-contain rounded"
-                                        />
-                                    </div>
-                                </TableCell>
-
-                                {/* 3. Name */}
-                                <TableCell className="">
-                                    <div className=''>
-                                        {group?.name}
-                                    </div>
-                                </TableCell>
-
-                                {/* 3. products */}
-                                <TableCell className="">
-                                    <div className='flex items-center justify-start gap-2'>
-                                        <Button variant={'outline'}>
-                                            {group?.products.length}
-                                        </Button>
-                                        {canEdit &&
-                                            <div
+                                <TableCell>{group.name}</TableCell>
+                                <TableCell>
+                                    <div className="flex items-center gap-2">
+                                        <Button variant="outline">{group.products.length}</Button>
+                                        {canEdit && (
+                                            <Pencil
+                                                size={15}
+                                                className="hover:text-black text-gray-500 cursor-pointer"
                                                 onClick={() => {
-                                                    setPrdouctsSheet(true)
-                                                    setGroupForProducts(group)
+                                                    setPrdouctsSheet(true);
+                                                    setGroupForProducts(group);
                                                 }}
-                                            >
-                                                <Pencil size={15} className='hover:text-black text-gray-500 cursor-pointer' />
-                                            </div>
-                                        }
+                                            />
+                                        )}
                                     </div>
                                 </TableCell>
-
-                                {/* 3. sequence */}
-                                {/* <TableCell className="">
-                                    <div className=''>
-                                        {group?.sequenceNo}
-                                    </div>
-                                </TableCell> */}
-
-
-                                {/* 5. Status Switch - FIXED ALIGNMENT */}
                                 <TableCell className="align-middle">
                                     <div className="flex justify-center">
                                         <Switch
                                             checked={group.active}
-                                            onCheckedChange={(checked) => {
-                                                // TODO: call your API/mutation to toggle `group.status`
+                                            disabled={updateGroupStatus.isPending}
+                                            onCheckedChange={async checked => {
+                                                const toastId = toast.loading('Updating status…');
+                                                try {
+                                                    await updateGroupStatus.mutateAsync({ id: group._id, data: { active: checked } });
+                                                } catch (e) {
+                                                    // error toast is already handled in your mutation onError
+                                                } finally {
+                                                    toast.dismiss(toastId);
+                                                }
                                             }}
                                         />
                                     </div>
                                 </TableCell>
-
-                                {/* 6. Actions Dropdown */}
-                                <TableCell className="">
+                                <TableCell>
                                     <div className="flex items-center justify-center gap-2">
-
-                                        {canEdit &&
-                                            <Button
-                                                size="icon"
-                                                variant="outline"
-                                                onClick={() => onEdit(group)}
-                                            >
+                                        {canEdit && (
+                                            <Button size="icon" variant="outline" onClick={() => onEdit(group)}>
                                                 <Pencil size={16} />
                                             </Button>
-                                        }
-                                        {canDelete &&
+                                        )}
+                                        {canDelete && (
                                             <Button
+                                                size="icon"
                                                 variant="destructive"
-                                            // onClick={() => handleDeleteClick(group._id)}
+                                                onClick={() => handleDeleteClick(group._id)}
                                             >
                                                 <Trash size={16} />
                                             </Button>
-                                        }
+                                        )}
                                     </div>
                                 </TableCell>
                             </TableRow>
@@ -175,9 +138,7 @@ export default function GroupsTable({
 
             <DeleteConfirmationDialog
                 isOpen={!!deletingId}
-                onOpenChange={(open) => {
-                    if (!open) setDeletingId(null);
-                }}
+                onOpenChange={open => open || setDeletingId(null)}
                 onConfirm={handleDeleteConfirm}
                 isLoading={isDeleting}
                 error={deleteError}
