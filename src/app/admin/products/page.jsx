@@ -228,6 +228,8 @@ export default function page() {
                                 onEdit={handleEditClick}
                                 setStockEditing={setStockEditing}
                                 setSelectedProduct={setSelectedStockProduct}
+                                onUpdate={updateProductAsync}
+
                             />
                         </>
                     }

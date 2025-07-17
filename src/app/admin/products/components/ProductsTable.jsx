@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MoreHorizontal, Eye, Pencil, Trash } from 'lucide-react';
+import { MoreHorizontal, Eye, Pencil, Trash, ThumbsUp, TrendingUp, Star } from 'lucide-react';
 import {
     Table,
     TableHeader,
@@ -15,6 +15,8 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import Loader from '@/components/Loader';
 import DeleteConfirmationDialog from './DeleteConfirmationDialog ';
+import toast from 'react-hot-toast';
+import { useGroups } from '@/hooks/useGroups';
 
 export default function ProductsListView({
     error,
@@ -26,12 +28,15 @@ export default function ProductsListView({
     canEdit,
     onEdit,
     setStockEditing,
-    setSelectedProduct
+    setSelectedProduct,
+    onUpdate
 }) {
 
     // console.log(products)
     const router = useRouter();
     const [deletingId, setDeletingId] = useState(null);
+
+    const { updateProductsInGroup } = useGroups();
 
     const handleView = (product) => {
         // setSelectedService(product);
@@ -55,6 +60,8 @@ export default function ProductsListView({
         );
     }
 
+    console.log(products)
+
     return (
         <section className="w-full">
             <div className="overflow-x-auto rounded-md border border-gray-200">
@@ -62,6 +69,7 @@ export default function ProductsListView({
                     <TableHeader>
                         <TableRow className="bg-gray-50 ">
                             <TableHead className="w-[50px]">#</TableHead>
+                            <TableHead className="">Quickers</TableHead>
                             <TableHead className="">Image</TableHead>
                             <TableHead className="">Name</TableHead>
                             <TableHead className="">Full Name</TableHead>
@@ -83,6 +91,52 @@ export default function ProductsListView({
                                 {/* 1. Index */}
                                 <TableCell className=" text-sm">
                                     {index + 1}
+                                </TableCell>
+
+                                {/* 1. Quickers */}
+                                <TableCell className=" text-sm">
+                                    <div className='flex gap-2 items-center'>
+
+                                        <Star
+                                            className={`cursor-pointer scale-100 duration-200 transition-all ease-in-out hover:scale-125 ${product.groups?.some(g => g._id === '6878e1f1ffe77ca83720210e') ? 'text-red-500' : 'text-black'
+                                                }`}
+                                            size={18}
+                                            onClick={async () => {
+                                                try {
+                                                    const data = {
+                                                        products: [product._id],
+                                                        groupId: '6878e1f1ffe77ca83720210e',
+                                                    };
+                                                    await updateProductsInGroup.mutateAsync(data);
+                                                    // toast.success("Added to Featured group");
+                                                } catch (err) {
+                                                    console.error(err);
+                                                    toast.error("Failed to update group");
+                                                }
+                                            }}
+                                        />
+
+                                        <TrendingUp
+                                            className={`cursor-pointer scale-100 duration-200 transition-all ease-in-out hover:scale-125 ${product.groups?.some(g => g._id === '6878e1fd027b19bf5c7d7d5c') ? 'text-green-500' : 'text-black'
+                                                }`}
+                                            size={18}
+                                            onClick={async () => {
+                                                try {
+                                                    const data = {
+                                                        products: [product._id],
+                                                        groupId: '6878e1fd027b19bf5c7d7d5c',
+                                                    };
+                                                    await updateProductsInGroup.mutateAsync(data);
+                                                    // toast.success("Added to Trending group");
+                                                } catch (err) {
+                                                    console.error(err);
+                                                    toast.error("Failed to update group");
+                                                }
+                                            }}
+                                        />
+
+
+                                    </div>
                                 </TableCell>
 
                                 {/* 2. Image */}
@@ -133,8 +187,6 @@ export default function ProductsListView({
                                     </div>
                                 </TableCell>
 
-                                {/* _____________________________________________________________________________________________________________________________________________________________ */}
-
                                 {/* 4. stock */}
                                 <TableCell className="align-middle">
                                     <div className='flex flex-col gap-2 items-center text-xs'>
@@ -161,8 +213,22 @@ export default function ProductsListView({
                                     <div className="flex justify-center">
                                         <Switch
                                             checked={product.active}
-                                            onCheckedChange={(checked) => {
-                                                // TODO: call your API/mutation to toggle `product.status`
+                                            onCheckedChange={async checked => {
+                                                const toastId = toast.loading('Updating status…');
+                                                // console.log(product.categoryId)
+                                                try {
+                                                    await onUpdate({
+                                                        id: product._id,
+                                                        data: {
+                                                            active: checked,
+                                                            categoryId: product.category._id
+                                                        }
+                                                    });
+                                                } catch (e) {
+                                                    // error toast is already handled in your mutation onError
+                                                } finally {
+                                                    toast.dismiss(toastId);
+                                                }
                                             }}
                                         />
                                     </div>
@@ -191,14 +257,14 @@ export default function ProductsListView({
                                                 <Pencil size={16} />
                                             </Button>
                                         }
-                                        {canDelete &&
+                                        {/* {canDelete &&
                                             <Button
                                                 variant="destructive"
                                                 onClick={() => handleDeleteClick(product._id)}
                                             >
                                                 <Trash size={16} />
                                             </Button>
-                                        }
+                                        } */}
                                     </div>
                                 </TableCell>
                             </TableRow>

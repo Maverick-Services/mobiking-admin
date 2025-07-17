@@ -20,10 +20,7 @@ const formSchema = z.object({
         required_error: 'Quantity is required',
         invalid_type_error: 'Quantity must be a number',
     }),
-    purchasePrice: z.coerce.number({
-        required_error: 'Purchase price is required',
-        invalid_type_error: 'Purchase price must be a number',
-    }),
+    purchasePrice: z.number().optional()
 });
 
 function StockUpdate({ open, onOpenChange, product }) {
@@ -172,9 +169,9 @@ function StockUpdate({ open, onOpenChange, product }) {
                                     {stockHistory.map((stock, index) => (
                                         <TableRow key={index}>
                                             <TableCell>{index + 1}</TableCell>
-                                            <TableCell>{stock.variantName || '-'}</TableCell>
-                                            <TableCell>{stock.quantity}</TableCell>
-                                            <TableCell>₹{stock.purchasePrice}</TableCell>
+                                            <TableCell>{stock?.variantName || '-'}</TableCell>
+                                            <TableCell>{stock?.quantity || '-'}</TableCell>
+                                            <TableCell>₹{stock?.purchasePrice || '-'}</TableCell>
                                             <TableCell>{stock?.vendor || '-'}</TableCell>
                                             <TableCell>
                                                 {(() => {

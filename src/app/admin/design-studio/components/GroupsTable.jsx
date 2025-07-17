@@ -50,7 +50,7 @@ export default function GroupsTable({
 
     if (isLoading) return <TableSkeleton showHeader={false} />;
     if (error) return <div className="text-red-600 p-4">Error: {error.message}</div>;
-
+    console.log(groupsData)
     return (
         <section className="w-full">
             <div className="overflow-x-auto rounded-md border border-gray-200">
@@ -70,13 +70,16 @@ export default function GroupsTable({
                             <TableRow key={group._id || index} className="even:bg-gray-50 hover:bg-gray-100 transition">
                                 <TableCell>{index + 1}</TableCell>
                                 <TableCell>
-                                    <img
-                                        src={group.banner}
-                                        alt={group.name}
-                                        width={60}
-                                        height={60}
-                                        className="object-contain rounded"
-                                    />
+                                    {group.banner ?
+                                        <img
+                                            src={group.banner}
+                                            alt={group.name}
+                                            width={60}
+                                            height={60}
+                                            className="object-contain rounded"
+                                        />
+                                        : '-'
+                                    }
                                 </TableCell>
                                 <TableCell>{group.name}</TableCell>
                                 <TableCell>

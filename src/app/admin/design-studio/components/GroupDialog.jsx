@@ -85,15 +85,13 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
     }
 
     async function onSubmit(values) {
-        console.log(values)
-        console.log(selectedGroup._id)
-        // if (selectedGroup) {
-        //     await onUpdate({ id: selectedGroup._id, data: values })
-        //     onOpenChange(false)
-        // } else {
-        //     await onCreate(values)
-        //     onOpenChange(false)
-        // }
+        if (selectedGroup) {
+            await onUpdate({ id: selectedGroup._id, data: values })
+            onOpenChange(false)
+        } else {
+            await onCreate(values)
+            onOpenChange(false)
+        }
     }
 
     return (
