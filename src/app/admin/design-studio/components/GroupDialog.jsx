@@ -33,7 +33,7 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
             banner: "",
             isBannerVisble: false,
             isBackgroundColorVisible: false,
-            backgroundColor: "#ffffff", // default white
+            backgroundColor: "#ffffff",
         }
     });
     const { watch, setValue, control, reset } = form;
@@ -70,7 +70,6 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
         if (!file) return
 
         const toastId = toast.loading('Uploading...')
-        // Optional: you can show a spinner here
         const reader = new FileReader()
         reader.onloadend = async () => {
             try {
@@ -86,14 +85,15 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
     }
 
     async function onSubmit(values) {
-        // console.log(values)
-        if (selectedGroup) {
-            await onUpdate({ id: selectedGroup._id, data: values })
-            onOpenChange(false)
-        } else {
-            await onCreate(values)
-            onOpenChange(false)
-        }
+        console.log(values)
+        console.log(selectedGroup._id)
+        // if (selectedGroup) {
+        //     await onUpdate({ id: selectedGroup._id, data: values })
+        //     onOpenChange(false)
+        // } else {
+        //     await onCreate(values)
+        //     onOpenChange(false)
+        // }
     }
 
     return (

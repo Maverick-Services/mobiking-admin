@@ -25,17 +25,37 @@ export const useProducts = () => {
         }
     });
 
-    const productsPaginationQuery = ({ page, limit, searchQuery }) => useQuery({
-        queryKey: ['productsPagination', page, limit, searchQuery],
-        queryFn: () => api
-            .get(`/products/all/paginated?page=${page}&limit=${limit}&searchQuery=${searchQuery}`)
-            .then((res) => res.data.data),
-        keepPreviousData: true,
-        staleTime: 1000 * 60 * 5,
-        onError: (err) => {
-            toast.error(err?.response?.data?.message || 'Failed to fetch products');
-        }
-    })
+    // const productsPaginationQuery = ({ page, limit, searchQuery, category }) => useQuery({
+    //     queryKey: ['productsPagination', page, limit, searchQuery, category],
+    //     queryFn: () => api
+    //         .get(`/products/all/paginated?page=${page}&limit=${limit}&searchQuery=${searchQuery}&category=${category}`)
+    //         .then((res) => res.data.data),
+    //     keepPreviousData: true,
+    //     staleTime: 1000 * 60 * 5,
+    //     onError: (err) => {
+    //         toast.error(err?.response?.data?.message || 'Failed to fetch products');
+    //     }
+    // })
+
+    const productsPaginationQuery = (params) => {
+        // Filter out undefined or null params
+        const filteredParams = Object.fromEntries(
+            Object.entries(params).filter(([_, value]) => value !== undefined && value !== null && value !== '')
+        );
+
+        return useQuery({
+            queryKey: ['productsPagination', filteredParams],
+            queryFn: () =>
+                api.get(`/products/all/paginated`, {
+                    params: filteredParams,
+                }).then((res) => res.data.data),
+            keepPreviousData: true,
+            staleTime: 1000 * 60 * 5,
+            onError: (err) => {
+                toast.error(err?.response?.data?.message || 'Failed to fetch products');
+            }
+        });
+    };
 
     const getProductQuery = (slug) => useQuery({
         queryKey: ['product', slug],

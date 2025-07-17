@@ -23,9 +23,27 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination"
 import { getPaginationRange } from "@/lib/services/getPaginationRange"
+import { LayoutGroup, motion } from 'framer-motion';
+
+const TABS = [
+    { key: '', label: 'ALL PRODUCTS' },
+    { key: 'fast', label: 'FAST MOVING PRODUCTS' },
+    { key: 'slow', label: 'SLOW MOVING PRODUCTS' },
+    { key: 'non', label: 'NON MOVING PRODUCTS' },
+]
+
+const FILTERS = [
+    // { key: '_all_', label: 'ALL' },
+    { key: 'InStock', label: 'In stock' },
+    { key: 'OutOfStock', label: 'Out of stock' },
+    { key: 'Active', label: 'Active' },
+    { key: 'Inactive', label: 'Not Active' },
+]
 
 export default function page() {
-    // const [categoryFilter, setCategoryFilter] = useState("all")
+    const [categoryFilter, setCategoryFilter] = useState()
+    const [typeFilter, setTypeFilter] = useState('')
+    const [activeTab, setActiveTab] = useState('')
 
     // debounce hook
     function useDebouncedValue(value, delay = 500) {
@@ -61,8 +79,15 @@ export default function page() {
 
     const { subCategoriesQuery } = useSubCategories()
     const subCategories = subCategoriesQuery.data?.data || []
-
-    const products = productsPaginationQuery({ page: page, limit: limit, searchQuery: debouncedSearch })
+    console.log(subCategories)
+    const products = productsPaginationQuery({
+        page: page,
+        limit: limit,
+        searchQuery: debouncedSearch,
+        category: categoryFilter,
+        type: activeTab,
+        filterBy: typeFilter,
+    })
 
     // console.log(ab?.data)
 
@@ -100,29 +125,11 @@ export default function page() {
 
     return (
         <InnerDashboardLayout>
-            <div className="w-full flex flex-col gap-4">
-                <h1 className="text-primary font-bold sm:text-2xl lg:text-4xl">
-                    Products
-                </h1>
-
-                {/* Toolbar */}
+            <div className="w-full flex flex-col gap-4 pb-4">
                 <div className="flex flex-wrap justify-between items-center gap-4">
-                    {/* Stats + Category Picker */}
-                    <div className="flex items-center gap-2">
-                        <Button variant="outline">
-                            Total: {allProducts.length}
-                        </Button>
-
-                        {/* Search Bar */}
-                        <Input
-                            placeholder="Search products..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="max-w-sm lg:w-xl flex-1 bg-white"
-                        />
-                    </div>
-
-
+                    <h1 className="text-primary font-bold sm:text-2xl lg:text-4xl">
+                        Products
+                    </h1>
                     {/* Add New */}
                     <Button onClick={handleAddClick}>
                         <CirclePlus className="mr-2 h-4 w-4" />
@@ -130,25 +137,101 @@ export default function page() {
                     </Button>
                 </div>
 
-                {/* Table */}
-                {(products.isLoading || products.isFetching || productsQuery.isLoading || subCategoriesQuery.isLoading)
-                    ? <TableSkeleton showHeader={false} />
-                    : <>
-                        <ProductsListView
-                            error={productsQuery.error}
-                            products={allProducts}
-                            // onDelete={deleteAsync}
-                            // isDeleting={isDeleting}
-                            // deleteError={deleteError}
-                            canDelete={canDelete}
-                            canEdit={canEdit}
-                            onEdit={handleEditClick}
-                            setStockEditing={setStockEditing}
-                            setSelectedProduct={setSelectedStockProduct}
-                        />
-                    </>
-                }
+                {/* Toolbar */}
+                <div className="flex flex-wrap justify-between items-center gap-2">
+                    {/* Total */}
+                    <Button variant="outline">
+                        Total: {allProducts.length}
+                    </Button>
 
+                    {/* Search Bar */}
+                    <Input
+                        placeholder="Search products..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full flex-1 bg-white"
+                    />
+
+                    <Select value={categoryFilter} onValueChange={(val) => { setCategoryFilter(val === '__all__' ? undefined : val) }}>
+                        <SelectTrigger className="w-[120px]">
+                            <SelectValue placeholder="Category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="__all__">All Categories</SelectItem>
+                            {subCategories?.map((n) => (
+                                <SelectItem key={n._id} value={String(n._id)}>
+                                    {n.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    {/* filter by */}
+                    <Select value={typeFilter} onValueChange={(val) => { setTypeFilter(val === '_aa_' ? undefined : val) }}>
+                        <SelectTrigger className="w-[120px]">
+                            <SelectValue placeholder="Filter By" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="_aa_">All</SelectItem>
+                            {FILTERS?.map((n, idx) => (
+                                <SelectItem key={idx} value={n.key}>
+                                    {n.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div>
+                    <LayoutGroup>
+                        <div className="flex gap-2 mb-0 overflow-x-auto bg-white scrollbar-hide relative">
+                            {TABS.map(({ key, label }) => {
+                                const isActive = activeTab === key
+                                return (
+                                    <button
+                                        key={key}
+                                        onClick={() => {
+                                            setActiveTab(key)
+                                            // setStatusFilter(null)
+                                        }}
+                                        className={`
+            relative px-4 py-6 text-sm font-medium transition-all duration-300 flex gap-1 w-full min-w-fit items-center justify-center
+            ${isActive ? 'font-bold text-black' : 'text-gray-600'}
+          `}
+                                    >
+                                        <span>{label}</span>
+                                        {/* <span>({counts[key]})</span> */}
+
+                                        {isActive && (
+                                            <motion.div
+                                                layoutId="tab-indicator"
+                                                className="absolute bottom-0 left-0 right-0 h-1 bg-black rounded-full"
+                                            />
+                                        )}
+                                    </button>
+                                )
+                            })}
+                        </div>
+                    </LayoutGroup>
+                    {/* Table */}
+                    {(products.isLoading || products.isFetching || productsQuery.isLoading || subCategoriesQuery.isLoading)
+                        ? <TableSkeleton showHeader={false} />
+                        : <>
+                            <ProductsListView
+                                error={productsQuery.error}
+                                products={allProducts}
+                                // onDelete={deleteAsync}
+                                // isDeleting={isDeleting}
+                                // deleteError={deleteError}
+                                canDelete={canDelete}
+                                canEdit={canEdit}
+                                onEdit={handleEditClick}
+                                setStockEditing={setStockEditing}
+                                setSelectedProduct={setSelectedStockProduct}
+                            />
+                        </>
+                    }
+                </div>
 
                 <div className="flex w-full justify-end gap-2 items-center">
                     {/* Limit Dropdown */}
