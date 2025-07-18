@@ -96,6 +96,30 @@ export const useGroups = () => {
         }
     })
 
+    const addProductInGroup = useMutation({
+        mutationFn: (data) => api.post(`/groups/addProduct`, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries(['groups']);
+            // toast.success('Product added successfully');
+        },
+        onError: (err) => {
+            console.log(err)
+            toast.error(err.message || 'Failed to add Product in group');
+        }
+    })
+
+    const removeProductFromGroup = useMutation({
+        mutationFn: (data) => api.post(`/groups/removeProduct`, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries(['groups']);
+            // toast.success('Product added successfully');
+        },
+        onError: (err) => {
+            console.log(err)
+            toast.error(err.message || 'Failed to add Product in group');
+        }
+    })
+
     // Delete Group mutation
     // const deleteGroup = useMutation({
     //     mutationFn: (id) => api.delete(`/groups/${id}`),
@@ -110,7 +134,7 @@ export const useGroups = () => {
     // });
 
     return {
-        groupsQuery, createGroup, updateGroup, updateProductsInGroup, updateGroupStatus,
+        groupsQuery, createGroup, updateGroup, updateProductsInGroup, updateGroupStatus, addProductInGroup, removeProductFromGroup,
         // groupsQuery, deleteGroup, updateGroup, createGroup, getGroupQuery,
         permissions: {
             canView,

@@ -36,7 +36,7 @@ export default function ProductsListView({
     const router = useRouter();
     const [deletingId, setDeletingId] = useState(null);
 
-    const { updateProductsInGroup } = useGroups();
+    const { addProductInGroup, removeProductFromGroup } = useGroups();
 
     const handleView = (product) => {
         // setSelectedService(product);
@@ -96,40 +96,54 @@ export default function ProductsListView({
                                 {/* 1. Quickers */}
                                 <TableCell className=" text-sm">
                                     <div className='flex gap-2 items-center'>
-
+                                        {/* featured products */}
                                         <Star
                                             className={`cursor-pointer scale-100 duration-200 transition-all ease-in-out hover:scale-125 ${product.groups?.some(g => g._id === '6878e1f1ffe77ca83720210e') ? 'text-red-500' : 'text-black'
                                                 }`}
                                             size={18}
                                             onClick={async () => {
+                                                const toastId = toast.loading("Updating...");
                                                 try {
                                                     const data = {
-                                                        products: [product._id],
+                                                        productId: product._id,
                                                         groupId: '6878e1f1ffe77ca83720210e',
                                                     };
-                                                    await updateProductsInGroup.mutateAsync(data);
+                                                    if (product?.groups?.some(g => g._id === "6878e1f1ffe77ca83720210e")) {
+                                                        removeProductFromGroup.mutateAsync(data)
+                                                    } else {
+                                                        await addProductInGroup.mutateAsync(data);
+                                                    }
+                                                    toast.dismiss(toastId);
                                                     // toast.success("Added to Featured group");
                                                 } catch (err) {
                                                     console.error(err);
+                                                    toast.dismiss(toastId);
                                                     toast.error("Failed to update group");
                                                 }
                                             }}
                                         />
 
+                                        {/* Trending Products */}
                                         <TrendingUp
                                             className={`cursor-pointer scale-100 duration-200 transition-all ease-in-out hover:scale-125 ${product.groups?.some(g => g._id === '6878e1fd027b19bf5c7d7d5c') ? 'text-green-500' : 'text-black'
                                                 }`}
                                             size={18}
                                             onClick={async () => {
+                                                const toastId = toast.loading("Updating...");
                                                 try {
                                                     const data = {
-                                                        products: [product._id],
+                                                        productId: product._id,
                                                         groupId: '6878e1fd027b19bf5c7d7d5c',
                                                     };
-                                                    await updateProductsInGroup.mutateAsync(data);
-                                                    // toast.success("Added to Trending group");
+                                                    if (product?.groups?.some(g => g._id === "6878e1fd027b19bf5c7d7d5c")) {
+                                                        removeProductFromGroup.mutateAsync(data)
+                                                    } else {
+                                                        await addProductInGroup.mutateAsync(data);
+                                                    }
+                                                    toast.dismiss(toastId);
                                                 } catch (err) {
                                                     console.error(err);
+                                                    toast.dismiss(toastId);
                                                     toast.error("Failed to update group");
                                                 }
                                             }}
