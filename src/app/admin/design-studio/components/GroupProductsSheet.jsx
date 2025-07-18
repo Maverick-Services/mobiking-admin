@@ -29,6 +29,8 @@ function GroupProductsSheet({ open, onOpenChange, group, onProductsAdd, updating
     const { productsQuery } = useProducts()
     const allProducts = productsQuery?.data || []
 
+    console.log(allProducts)
+
     // console.log(allProducts)
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -37,7 +39,6 @@ function GroupProductsSheet({ open, onOpenChange, group, onProductsAdd, updating
 
     const filteredProducts = allProducts
         .filter(p => p.fullName?.toLowerCase().includes(searchTerm.toLowerCase()))
-        .slice(0, 10); // only show top 10
 
     // Initialize local state whenever the sheet opens or the group changes
     useEffect(() => {
