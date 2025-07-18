@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect, useCallback } from 'react'
 import InnerDashboardLayout from '@/components/dashboard/InnerDashboardLayout'
 import { useOrders } from '@/hooks/useOrders'
 import { DateRangePicker } from '@/components/custom/date-range-picker'
@@ -16,6 +16,7 @@ import { LayoutGroup, motion } from 'framer-motion'
 import PosButton from '@/components/custom/PosButton'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import debounce from 'lodash.debounce'
 
 const TABS = [
     { key: 'all', label: 'ALL ORDERS' },
@@ -62,6 +63,17 @@ const STATUS_BG = {
 
 export default function Page() {
     const [showAmountCards, setShowAmountCards] = useState(false)
+    const [searchQuery, setSearchQuery] = useState('')
+    const [queryParameter, setQueryParameter] = useState('customer')
+
+    const handleDebouncedSearch = useCallback(
+        debounce((value) => {
+            setSearchQuery(value)
+        }, 300), // 500ms delay
+        []
+    )
+
+    console.log(searchQuery)
 
     // Date range
     const today = new Date()
@@ -84,7 +96,7 @@ export default function Page() {
     const endDate = format(range.to, 'yyyy-MM-dd')
 
     // Data fetching
-    const { data: customOrdersData, isFetching, error } = getOrdersByDate({ startDate, endDate })
+    const { data: customOrdersData, isFetching, error } = getOrdersByDate({ startDate, endDate, queryParameter, searchQuery })
     const displayOrders = customOrdersData ?? [];
 
     const [statusFilter, setStatusFilter] = useState(null)
@@ -214,15 +226,8 @@ export default function Page() {
 
             {/* Search & filter */}
             <div className='flex items-center gap-3 mb-3 '>
-                {/* Search bar */}
-                <Input
-                    type={'text'}
-                    placeholder="Search"
-                    className={'border-gray-300'}
-                />
-
                 {/* filter by */}
-                <Select>
+                <Select value={queryParameter} onValueChange={(val) => setQueryParameter(val)}>
                     <SelectTrigger className="min-w-[150px] border-gray-300">
                         <SelectValue placeholder="Filter by" />
                     </SelectTrigger>
@@ -231,6 +236,18 @@ export default function Page() {
                         <SelectItem value="order">Order</SelectItem>
                     </SelectContent>
                 </Select>
+
+                {/* Search bar */}
+                <Input
+                    type={'text'}
+                    placeholder="Search"
+                    className={'border-gray-300'}
+                    value={searchQuery}
+                    onChange={(e) => {
+                        const val = e.target.value
+                        handleDebouncedSearch(val)
+                    }}
+                />
             </div>
 
             {/* Tab bar */}

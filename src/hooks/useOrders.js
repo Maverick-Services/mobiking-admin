@@ -24,11 +24,11 @@ export const useOrders = () => {
         onError: err => toast.error(err.message || 'Failed to fetch orders'),
     })
 
-    const getOrdersByDate = ({ startDate, endDate }) => useQuery({
-        queryKey: ['orders', 'custom', startDate, endDate],
+    const getOrdersByDate = ({ startDate, endDate, queryParameter, searchQuery }) => useQuery({
+        queryKey: ['orders', 'custom', startDate, endDate, queryParameter, searchQuery],
         queryFn: () =>
             api
-                .get('/orders/custom', { params: { startDate, endDate } })
+                .get('/orders/custom', { params: { startDate, endDate, queryParameter, searchQuery } })
                 .then(res => {
                     return Array.isArray(res.data)
                         ? res.data
