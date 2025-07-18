@@ -17,6 +17,7 @@ import Loader from '@/components/Loader';
 import DeleteConfirmationDialog from './DeleteConfirmationDialog ';
 import toast from 'react-hot-toast';
 import { useGroups } from '@/hooks/useGroups';
+import { useProducts } from '@/hooks/useProducts';
 
 export default function ProductsListView({
     error,
@@ -37,6 +38,7 @@ export default function ProductsListView({
     const [deletingId, setDeletingId] = useState(null);
 
     const { addProductInGroup, removeProductFromGroup } = useGroups();
+    const { updateProductStatus } = useProducts();
 
     const handleView = (product) => {
         // setSelectedService(product);
@@ -60,7 +62,7 @@ export default function ProductsListView({
         );
     }
 
-    console.log(products)
+    // console.log(products)
 
     return (
         <section className="w-full">
@@ -148,8 +150,6 @@ export default function ProductsListView({
                                                 }
                                             }}
                                         />
-
-
                                     </div>
                                 </TableCell>
 
@@ -231,11 +231,10 @@ export default function ProductsListView({
                                                 const toastId = toast.loading('Updating status…');
                                                 // console.log(product.categoryId)
                                                 try {
-                                                    await onUpdate({
+                                                    await updateProductStatus.mutateAsync({
                                                         id: product._id,
                                                         data: {
                                                             active: checked,
-                                                            categoryId: product.category._id
                                                         }
                                                     });
                                                 } catch (e) {

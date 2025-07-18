@@ -2,21 +2,8 @@ import React from 'react'
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { z } from 'zod';
@@ -37,6 +24,8 @@ const formSchema = z.object({
     regularPrice: z.number().optional(),
     basePrice: z.number().min(0, "Base Price is required"),
     gst: z.number().min(0, "GST must be a positive number"),
+    sku: z.string().optional(),
+    hsn: z.string().optional(),
     slug: z.string().min(1, "Slug is required"),
     active: z.boolean(),
     description: z.string().min(1, "Description is required"),
@@ -62,6 +51,8 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
             gst: 0,
             regularPrice: 0,
             basePrice: 0,
+            sku: "",
+            hsn: "",
             slug: "",
             active: true,
             description: "",
@@ -82,6 +73,8 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                 gst: selectedProduct.gst,
                 regularPrice: selectedProduct.regularPrice,
                 basePrice: selectedProduct.basePrice,
+                sku: selectedProduct.sku,
+                hsn: selectedProduct.hsn,
                 slug: selectedProduct.slug,
                 active: selectedProduct.active,
                 description: selectedProduct.description,
@@ -98,6 +91,8 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                 gst: 0,
                 basePrice: 0,
                 regularPrice: 0,
+                sku: "",
+                hsn: "",
                 slug: "",
                 active: true,
                 description: "",
@@ -149,8 +144,10 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
         if (selectedProduct) {
             await onUpdate({ id: selectedProduct._id, data: values })
             // console.log(values)
+            onOpenChange(false)
         } else {
             await onCreate(values)
+            onOpenChange(false)
         }
     }
 
@@ -212,54 +209,74 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                 )}
                             />
 
-                            {/* Description */}
-                            <FormField
-                                control={form.control}
-                                name="description"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Description<span className="text-red-500"> *</span></FormLabel>
-                                        <FormControl>
-                                            <Textarea
-                                                {...field}
-                                                rows={3}
-                                                placeholder="Write something about the product..."
-                                                className="w-full p-2 border rounded-md resize-none"
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                            <div className='grid grid-cols-1 sm:grid-cols-3 gap-2'>
+                                {/* category */}
+                                <FormField
+                                    control={form.control}
+                                    name="categoryId"
+                                    render={({ field }) => (
+                                        <FormItem className={''}>
+                                            <FormLabel>Category<span className="text-red-500"> *</span></FormLabel>
+                                            <FormControl>
+                                                <Select
+                                                    onValueChange={field.onChange}
+                                                    defaultValue={field.value}
+                                                >
+                                                    <SelectTrigger className={'w-full flex-1'}>
+                                                        <SelectValue placeholder="Select a category" />
+                                                    </SelectTrigger>
+                                                    <SelectContent className={'w-full'}>
+                                                        {categories?.map((category) => (
+                                                            <SelectItem key={category._id} value={category._id}>
+                                                                {category.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                            {/* category */}
-                            <FormField
-                                control={form.control}
-                                name="categoryId"
-                                render={({ field }) => (
-                                    <FormItem className={''}>
-                                        <FormLabel>Category<span className="text-red-500"> *</span></FormLabel>
-                                        <FormControl>
-                                            <Select
-                                                onValueChange={field.onChange}
-                                                defaultValue={field.value}
-                                            >
-                                                <SelectTrigger className={'w-full'}>
-                                                    <SelectValue placeholder="Select a category" />
-                                                </SelectTrigger>
-                                                <SelectContent className={'w-full'}>
-                                                    {categories?.map((category) => (
-                                                        <SelectItem key={category._id} value={category._id}>
-                                                            {category.name}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                {/* SKU */}
+                                <FormField
+                                    control={form.control}
+                                    name='sku'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>SKU</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type='text'
+                                                    placeholder="Enter SKU"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {/* HSN */}
+                                <FormField
+                                    control={form.control}
+                                    name='hsn'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>HSN Code</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type='text'
+                                                    placeholder="Enter HSN"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
 
                             <div className='flex gap-2'>
                                 {/* Base price */}
@@ -268,7 +285,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                     name="regularPrice"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Regular Price</FormLabel>
+                                            <FormLabel>MRP</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="number"
@@ -343,6 +360,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                     )}
                                 />
                             </div>
+
                             {/* Active */}
                             <FormField
                                 control={form.control}
@@ -384,7 +402,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                                 const files = e.target.files;
                                                 if (!files || files.length === 0) return;
 
-                                               const toastId = toast.loading('Uploading images...');
+                                                const toastId = toast.loading('Uploading images...');
 
                                                 const urls = [];
                                                 for (let file of files) {
@@ -457,6 +475,25 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                 )}
                             />
 
+                            {/* Description */}
+                            <FormField
+                                control={form.control}
+                                name="description"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Description<span className="text-red-500"> *</span></FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                                {...field}
+                                                rows={3}
+                                                placeholder="Write something about the product..."
+                                                className="w-full p-2 border rounded-md resize-none"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
                             {/* Description Points */}
                             <div className='bg-gray-100 rounded p-4'>

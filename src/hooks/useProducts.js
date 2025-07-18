@@ -45,10 +45,7 @@ export const useProducts = () => {
 
         return useQuery({
             queryKey: ['productsPagination', filteredParams],
-            queryFn: () =>
-                api.get(`/products/all/paginated`, {
-                    params: filteredParams,
-                }).then((res) => res.data.data),
+            queryFn: () => api.get(`/products/all/paginated`, { params: filteredParams, }).then((res) => res.data.data),
             keepPreviousData: true,
             staleTime: 1000 * 60 * 5,
             onError: (err) => {
@@ -74,7 +71,6 @@ export const useProducts = () => {
             toast.error(err?.response?.data?.message || 'Failed to fetch service');
         }
     });
-
 
     // Create Product mutation
     const createProduct = useMutation({
@@ -115,6 +111,17 @@ export const useProducts = () => {
         }
     });
 
+    const updateProductStatus = useMutation({
+        mutationFn: ({ data, id }) => api.put(`/products/status/${id}`, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries(['productsPagination']);
+            // toast.success('Stock Added successfully');
+        },
+        onError: (err) => {
+            toast.error(err?.response?.data?.message || 'Failed to update status.');
+        }
+    })
+
     // Delete Product mutation
     // const deleteProduct = useMutation({
     //     mutationFn: (id) => api.delete(`/products/${id}`),
@@ -130,8 +137,8 @@ export const useProducts = () => {
 
     return {
         productsQuery, createProduct, getProductQuery, updateProduct, addProductStock,
-        // productsQuery, deleteProduct, updateProduct, createProduct, getProductQuery,
-        productsPaginationQuery,
+        // deleteProduct,
+        productsPaginationQuery, updateProductStatus,
         permissions: {
             canView,
             canAdd,
