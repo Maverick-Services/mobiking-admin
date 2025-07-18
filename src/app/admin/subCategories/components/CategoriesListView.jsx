@@ -17,6 +17,8 @@ import Loader from "@/components/Loader";
 import Image from "next/image";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog ";
 import TableSkeleton from "@/components/custom/TableSkeleton";
+import { useSubCategories } from "@/hooks/useSubCategories";
+import toast from "react-hot-toast";
 
 export default function CategoriesListView({
     isLoading,
@@ -27,7 +29,8 @@ export default function CategoriesListView({
     deleteError,
 }) {
 
-    console.log(categories)
+    // console.log(categories)
+    const { updateSubCategory } = useSubCategories();
     const [deletingCategoryId, setDeletingCategoryId] = useState(null);
     const router = useRouter();
 
@@ -83,7 +86,21 @@ export default function CategoriesListView({
                             <TableCell className="text-center">{item.parentCategory?.name}</TableCell>
 
                             <TableCell className="text-center">
-                                <Switch checked={item.active} />
+                                <Switch
+                                    checked={item.active}
+                                    onCheckedChange={async checked => {
+                                        const toastId = toast.loading("Updating...");
+                                        try {
+                                            await updateSubCategory.mutateAsync({
+                                                id: item._id,
+                                                data: { active: checked }
+                                            })
+                                            toast.dismiss(toastId);
+                                        } catch (error) {
+                                            toast.dismiss(toastId);
+                                        }
+                                    }}
+                                />
                             </TableCell>
 
                             <TableCell className="text-center">

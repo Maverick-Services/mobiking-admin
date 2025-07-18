@@ -19,6 +19,9 @@ import AcceptDialog from './AcceptDialog'
 import { OrderViewDialog } from './OrderViewDialog'
 import { motion, AnimatePresence } from 'framer-motion'
 import GSTBillDownload from '@/components/GSTBill'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import UpdateStatus from '../[id]/components/UpdateStatus'
+import StatusUpdate from './StatusUpdate'
 
 
 // Map each order status to a Badge variant
@@ -84,10 +87,10 @@ export default function OrdersListView({ error, orders = [] }) {
                             const variant = STATUS_VARIANTS[o.status] || 'default'
 
                             const returnedOrders = (o?.userId?.orders?.filter(item => item.status === 'Returned')).length;
-                            const returnPercent = ((returnedOrders / customerOrderNumber) *100).toFixed(1)
-                            
+                            const returnPercent = ((returnedOrders / customerOrderNumber) * 100).toFixed(1)
+
                             const cancelledOrders = (o?.userId?.orders?.filter(item => item.status === 'Cancelled')).length;
-                            const cancelPercent = ((cancelledOrders / customerOrderNumber) *100).toFixed(1)
+                            const cancelPercent = ((cancelledOrders / customerOrderNumber) * 100).toFixed(1)
 
                             console.log(cancelPercent)
 
@@ -103,21 +106,22 @@ export default function OrdersListView({ error, orders = [] }) {
                                 >
                                     <TableCell>{i + 1}</TableCell>
 
-                                            <OrderViewDialog order={o}>
-                                    <TableCell className={'cursor-pointer'}>
+                                    <TableCell
+                                        className={'cursor-pointer'}
+                                        onClick={() => router.push(`/admin/orders/${o._id}`)}
+                                    >
                                         {o._id.slice(0, 6).toUpperCase()}
-                                        </TableCell>
-</OrderViewDialog>
+                                    </TableCell>
 
                                     <TableCell className="capitalize flex-col">
                                         {o.name || '—'}
                                         <div className='flex gap-1 mt-1'>
-                                        <span className="bg-purple-100 text-purple-700 px-1 font-medium rounded text-[10px]">
-                                          RTO: {returnPercent} %
-                                        </span>
-                                        <span className="bg-amber-100 text-amber-700 px-1 font-medium rounded text-[10px]">
-                                          Cancel: {cancelPercent} %
-                                        </span>
+                                            <span className="bg-purple-100 text-purple-700 px-1 font-medium rounded text-[10px]">
+                                                RTO: {returnPercent} %
+                                            </span>
+                                            <span className="bg-amber-100 text-amber-700 px-1 font-medium rounded text-[10px]">
+                                                Cancel: {cancelPercent} %
+                                            </span>
                                         </div>
                                     </TableCell>
 
@@ -135,11 +139,26 @@ export default function OrdersListView({ error, orders = [] }) {
                                     </TableCell>
                                     <TableCell>₹{o.orderAmount.toFixed(2)}</TableCell>
                                     <TableCell>{o.method}</TableCell>
+
                                     <TableCell>
-                                        <Badge variant={variant}>
+                                        {/* <Badge variant={variant}>
                                             {o.status}
-                                        </Badge>
+                                        </Badge> */}
+                                        {/* <Select>
+                                            <SelectTrigger className={'text-xs p-2 max-h-6'}>
+                                                <SelectValue placeholder="Status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="new">New</SelectItem>
+                                                <SelectItem value="shipped">Shipped</SelectItem>
+                                            </SelectContent>
+                                        </Select> */}
+                                        <StatusUpdate
+                                            orderId={o?._id}
+                                            status={o?.status}
+                                        />
                                     </TableCell>
+
                                     <TableCell>
                                         <div>{format(new Date(o.createdAt), 'dd MMM yyyy')}</div>
                                         <div className="text-gray-500">
@@ -149,15 +168,15 @@ export default function OrdersListView({ error, orders = [] }) {
 
                                     {/* action buttons */}
                                     <TableCell className="text-center space-x-2 flex items-center justify-center">
-                                        {o.abondonedOrder &&
-                                            <OrderViewDialog order={o}>
-                                                <Button variant="outline">
-                                                    <Eye />
-                                                </Button>
-                                            </OrderViewDialog>
-                                        }
+                                        {/* {o.abondonedOrder && */}
+                                        <OrderViewDialog order={o}>
+                                            <Button variant="outline">
+                                                <Eye />
+                                            </Button>
+                                        </OrderViewDialog>
+                                        {/* } */}
 
-                                        {!o.abondonedOrder &&
+                                        {/* {!o.abondonedOrder &&
                                             <Button
                                                 // className={'h-7 w-7'}
                                                 variant="outline"
@@ -165,7 +184,7 @@ export default function OrdersListView({ error, orders = [] }) {
                                             >
                                                 <Eye />
                                             </Button>
-                                        }
+                                        } */}
                                         {!o.abondonedOrder &&
                                             <GSTBillDownload billData={o} />
                                         }
