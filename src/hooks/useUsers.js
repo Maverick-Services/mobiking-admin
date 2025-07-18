@@ -34,6 +34,16 @@ export const useUsers = () => {
         }
     });
 
+    // get all users
+    const allUsersQuery = useQuery({
+        queryKey: ['allUsers'],
+        queryFn: () => api.get(`/users/role/user`).then(res => res.data),
+        enabled: canView,
+        onError: (err) => {
+            toast.error(err.message || 'Failed to fetch users');
+        },
+    });
+
     // Get all employees
     const employeesQuery = ({ role, page, limit, }) => useQuery({
         queryKey: ['employees', role, page, limit],
@@ -120,6 +130,7 @@ export const useUsers = () => {
         updateUser,
         deleteUser,
         employeesQuery,
+        allUsersQuery,
         // changePassword,
         createCustomer,
         permissions: {
