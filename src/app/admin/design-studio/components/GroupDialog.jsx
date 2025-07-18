@@ -6,11 +6,12 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Loader2, X } from 'lucide-react';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { uploadImage } from '@/lib/services/uploadImage';
+import { useSubCategories } from '@/hooks/useSubCategories';
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -20,9 +21,15 @@ const formSchema = z.object({
     isBackgroundColorVisible: z.boolean(),
     banner: z.string().nullable(),
     backgroundColor: z.string().optional(),
+    categories: z.array(z.string()).optional(),
 });
 
 function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, isSubmitting, error, }) {
+
+    const { subCategoriesQuery } = useSubCategories();
+    const subCategoriesData = subCategoriesQuery?.data?.data || [];
+    // console.log(subCategoriesData)
+
     const form = useForm({
         resolver: zodResolver(formSchema),
         mode: 'onSubmit',
@@ -34,6 +41,7 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
             isBannerVisble: false,
             isBackgroundColorVisible: false,
             backgroundColor: "#ffffff",
+            categories: selectedGroup?.categories ?? [],   // ← initialize
         }
     });
     const { watch, setValue, control, reset } = form;
@@ -47,7 +55,8 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                 banner: selectedGroup.banner,
                 isBannerVisble: selectedGroup.isBannerVisble,
                 isBackgroundColorVisible: selectedGroup.isBackgroundColorVisible,
-                backgroundColor: selectedGroup?.backgroundColor || "#ffffff"
+                backgroundColor: selectedGroup?.backgroundColor || "#ffffff",
+                categories: selectedGroup?.categories ?? [],   // ← reset here too
             });
         } else {
             reset({
@@ -61,6 +70,8 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
             });
         }
     }, [selectedGroup, reset]);
+
+    // console.log(selectedGroup)
 
     const bannerRef = useRef(null)
     const onBannerClick = () => bannerRef.current?.click()
@@ -84,6 +95,10 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
         reader.readAsDataURL(file)
     }
 
+
+    // get current selected IDs
+    const selectedIds = watch('categories') || [];
+
     async function onSubmit(values) {
         if (selectedGroup) {
             await onUpdate({ id: selectedGroup._id, data: values })
@@ -92,6 +107,7 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
             await onCreate(values)
             onOpenChange(false)
         }
+        // console.log(values)
     }
 
     return (
@@ -120,21 +136,6 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                                     </FormItem>
                                 )}
                             />
-
-                            {/* seq number */}
-                            {/* <FormField
-                                control={form.control}
-                                name="sequenceNo"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Sequence No<span className="text-red-500"> *</span></FormLabel>
-                                        <FormControl>
-                                            <Input type="number" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            /> */}
 
                             {/* Active */}
                             <FormField
@@ -271,6 +272,45 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                                                 checked={field.value}
                                                 onChange={field.onChange}
                                             />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={control}
+                                name="categories"
+                                render={() => (
+                                    <FormItem>
+                                        <FormLabel>Sub‑Categories</FormLabel>
+                                        <FormDescription>Select all that apply</FormDescription>
+                                        <FormControl>
+                                            <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-2 border rounded">
+                                                {subCategoriesData.map(sub => (
+                                                    <label key={sub._id} className="flex items-center space-x-2">
+                                                        <input
+                                                            type="checkbox"
+                                                            value={sub._id}
+                                                            checked={selectedIds.includes(sub._id)}
+                                                            onChange={e => {
+                                                                const checked = e.target.checked;
+                                                                if (checked) {
+                                                                    setValue('categories', [...selectedIds, sub._id], { shouldDirty: true });
+                                                                } else {
+                                                                    setValue(
+                                                                        'categories',
+                                                                        selectedIds.filter(id => id !== sub._id),
+                                                                        { shouldDirty: true }
+                                                                    );
+                                                                }
+                                                            }}
+                                                            className="w-4 h-4"
+                                                        />
+                                                        <span>{sub.name}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
