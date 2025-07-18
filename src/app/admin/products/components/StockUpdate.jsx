@@ -20,7 +20,7 @@ const formSchema = z.object({
         required_error: 'Quantity is required',
         invalid_type_error: 'Quantity must be a number',
     }),
-    purchasePrice: z.number().optional()
+    purchasePrice: z.coerce.number().optional()
 });
 
 function StockUpdate({ open, onOpenChange, product }) {
@@ -28,8 +28,14 @@ function StockUpdate({ open, onOpenChange, product }) {
 
     const form = useForm({
         resolver: zodResolver(formSchema),
-        mode: 'onSubmit'
-    })
+        mode: 'onSubmit',
+        defaultValues: {
+            variantName: '',
+            vendor: '',
+            quantity: 0,
+            purchasePrice: 0,
+        },
+    });
 
     const SProduct = product || {}
 
@@ -106,12 +112,17 @@ function StockUpdate({ open, onOpenChange, product }) {
                                 />
                                 <FormField
                                     control={form.control}
-                                    name='purchasePrice'
+                                    name="purchasePrice"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Purchase Price</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="2500" type={'number'} {...field} />
+                                                <Input
+                                                    type="number"
+                                                    {...field}
+                                                    value={field.value ?? ''}
+                                                    onChange={e => field.onChange(Number(e.target.value))}
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

@@ -50,7 +50,7 @@ export default function GroupsTable({
 
     if (isLoading) return <TableSkeleton showHeader={false} />;
     if (error) return <div className="text-red-600 p-4">Error: {error.message}</div>;
-    console.log(groupsData)
+    // console.log(groupsData)
     return (
         <section className="w-full">
             <div className="overflow-x-auto rounded-md border border-gray-200">
