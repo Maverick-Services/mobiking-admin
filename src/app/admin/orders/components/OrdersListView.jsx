@@ -141,18 +141,6 @@ export default function OrdersListView({ error, orders = [] }) {
                                     <TableCell>{o.method}</TableCell>
 
                                     <TableCell>
-                                        {/* <Badge variant={variant}>
-                                            {o.status}
-                                        </Badge> */}
-                                        {/* <Select>
-                                            <SelectTrigger className={'text-xs p-2 max-h-6'}>
-                                                <SelectValue placeholder="Status" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="new">New</SelectItem>
-                                                <SelectItem value="shipped">Shipped</SelectItem>
-                                            </SelectContent>
-                                        </Select> */}
                                         <StatusUpdate
                                             orderId={o?._id}
                                             status={o?.status}

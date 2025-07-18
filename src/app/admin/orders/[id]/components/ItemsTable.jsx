@@ -27,6 +27,7 @@ function ItemsTable({ order, isNewOrder }) {
             productId: item.productId._id,
             variantName: item.variantName,
         }
+        console.log(data)
         setLoadingItemId(`${data.productId}-${data.variantName}-inc`)
         try {
             await addItemInOrder.mutateAsync({ ...data })

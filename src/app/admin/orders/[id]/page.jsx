@@ -40,7 +40,7 @@ function page() {
     if (error) return <p>Error: {error.message}</p>
 
     function isNewOrder() {
-        return order?.status === 'New'
+        return order?.status === 'New' || order?.status === 'Accepted'
     }
 
     async function handleGetCourierId() {
@@ -96,7 +96,7 @@ function page() {
                         Download 
                     </Button> */}
 
-                    <GSTBillDownload billData={order}/>
+                    <GSTBillDownload billData={order} />
 
                     {order.status === 'New' &&
                         <Button
@@ -106,7 +106,7 @@ function page() {
                             Reject
                         </Button>
                     }
-                    {order.status === 'New' &&
+                    {(order.status === 'New' || order?.status === 'Accepted') &&
                         <Button
                             onClick={() => setCancelOpen(true)}
                             variant="destructive"

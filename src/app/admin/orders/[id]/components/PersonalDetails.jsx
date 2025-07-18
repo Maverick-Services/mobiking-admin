@@ -32,7 +32,7 @@ function PersonalDetails({ order }) {
     ]
 
     function isEditable() {
-        return order.status === 'New'
+        return order.status === 'New' || order.status === 'Accepted'
     }
 
     return (

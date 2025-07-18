@@ -15,8 +15,8 @@ import { useOrders } from '@/hooks/useOrders'
 
 function AddItemDialog({ open, onOpenChange, orderId }) {
   const { productsQuery } = useProducts()
-  const allProducts = productsQuery?.data?.data || []
-    const { addItemInOrder } = useOrders()
+  const allProducts = productsQuery?.data || []
+  const { addItemInOrder } = useOrders()
 
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedProduct, setSelectedProduct] = useState(null)
@@ -30,23 +30,23 @@ function AddItemDialog({ open, onOpenChange, orderId }) {
     )
   }, [searchTerm, allProducts])
 
-  async function handleAddProduct(){
-    const data ={
-        orderId,
-        productId: selectedProduct._id,
-        variantName: selectedVariant,
-      }
+  async function handleAddProduct() {
+    const data = {
+      orderId,
+      productId: selectedProduct._id,
+      variantName: selectedVariant,
+    }
 
-      try {
-          await addItemInOrder.mutateAsync({ ...data })
-          onOpenChange(false)
-          setSearchTerm("")
-          setSelectedProduct(null)
-          setSelectedVariant('')
-        } catch (error) {
-            console.log(error)
-      }
-      console.log(data)
+    try {
+      await addItemInOrder.mutateAsync({ ...data })
+      onOpenChange(false)
+      setSearchTerm("")
+      setSelectedProduct(null)
+      setSelectedVariant('')
+    } catch (error) {
+      console.log(error)
+    }
+    console.log(data)
 
   }
 
@@ -141,8 +141,8 @@ function AddItemDialog({ open, onOpenChange, orderId }) {
             Close
           </Button>
           <LoaderButton
-          onClick={()=>handleAddProduct()}
-          loading={addItemInOrder.isPending}
+            onClick={() => handleAddProduct()}
+            loading={addItemInOrder.isPending}
           >
             Add Item
           </LoaderButton>
