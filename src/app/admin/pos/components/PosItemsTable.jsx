@@ -9,47 +9,10 @@ import AddPosItemDialog from "./AddPosItem"
 
 function PosItemsTable() {
     const [items, setItems] = useState([])
-    // const items = items || []
-
     const [addingItem, setAddingItem] = useState(false)
-    // const [loadingItemId, setLoadingItemId] = useState(null)
-
-    // async function handleIncrement(item) {
-    //     const data = {
-    //         orderId: order._id,
-    //         productId: item.productId._id,
-    //         variantName: item.variantName,
-    //     }
-    //     setLoadingItemId(`${data.productId}-${data.variantName}-inc`)
-    //     try {
-    //         await addItemInOrder.mutateAsync({ ...data })
-    //     } catch (error) {
-    //         console.log(error)
-    //     } finally {
-    //         setLoadingItemId(null)
-    //     }
-    // }
-
-    // async function handleDecrement(item) {
-    //     const data = {
-    //         orderId: order._id,
-    //         productId: item.productId._id,
-    //         variantName: item.variantName,
-    //     }
-    //     setLoadingItemId(`${data.productId}-${data.variantName}-dec`)
-    //     try {
-    //         await removeItemFromOrder.mutateAsync({ ...data })
-    //     } catch (error) {
-    //         console.log(error)
-    //     } finally {
-    //         setLoadingItemId(null)
-    //     }
-    // }
 
     return (
         <div className="w-full">
-           
-
             <div className="overflow-x-auto">
                 <Table>
                     <TableHeader>
@@ -122,22 +85,6 @@ function PosItemsTable() {
                             }))}
                     </TableBody>
                 </Table>
-
-                {/* Summary */}
-                {/* <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6">
-                    <div className="flex items-center justify-between sm:min-w-[250px] border rounded-md p-3 shadow-sm bg-muted/50">
-                        <span className="text-sm text-gray-600">Subtotal:</span>
-                        <span className="font-medium">₹{order.subtotal}</span>
-                    </div>
-                    <div className="flex items-center justify-between sm:min-w-[250px] border rounded-md p-3 shadow-sm bg-muted/50">
-                        <span className="text-sm text-gray-600">Delivery Charges:</span>
-                        <span className="font-medium">₹{order.deliveryCharge}</span>
-                    </div>
-                    <div className="flex items-center justify-between sm:min-w-[250px] border rounded-md p-3 shadow bg-primary/10">
-                        <span className="text-sm font-semibold text-primary">Total Amount:</span>
-                        <span className="font-bold text-primary">₹{order.orderAmount}</span>
-                    </div>
-                </div> */}
             </div>
             <AddPosItemDialog
                 open={addingItem}

@@ -22,20 +22,14 @@ function AddPosItemDialog({ open, onOpenChange, setItems }) {
         )
     }, [searchTerm, allProducts])
 
-    // console.log(selectedProduct)
-
     async function handleAddProduct() {
-        const price = selectedProduct.sellingPrice[selectedProduct.sellingPrice.length-1].price
+        const price = selectedProduct.sellingPrice[selectedProduct.sellingPrice.length - 1].price
         const data = {
             productId: selectedProduct._id,
             variantName: selectedVariant,
             quantity: 1,
             price: price
         }
-
-       
-        console.log(data)
-
     }
 
     return (
@@ -74,12 +68,12 @@ function AddPosItemDialog({ open, onOpenChange, setItems }) {
                                     <div className="flex-1 min-w-0">
                                         <p className="font-medium truncate  max-w-[450px] text-wrap">{prod.fullName}</p>
                                         <p className="text-xs text-gray-500 truncate space-x-1">
-                                            Variants: {" "}  
+                                            Variants: {" "}
                                             {Object.keys(prod?.variants || {}).map(v => (
-                                            <span key={v} value={v}>
-                                                {v} ({prod.variants[v]})
-                                            </span>
-                                        ))}
+                                                <span key={v} value={v}>
+                                                    {v} ({prod.variants[v]})
+                                                </span>
+                                            ))}
                                         </p>
                                     </div>
                                 </div>
@@ -135,7 +129,6 @@ function AddPosItemDialog({ open, onOpenChange, setItems }) {
                     </Button>
                     <LoaderButton
                         onClick={() => handleAddProduct()}
-                        // loading={addItemInOrder.isPending}
                     >
                         Add Item
                     </LoaderButton>
