@@ -86,10 +86,10 @@ export default function OrdersListView({ error, orders = [] }) {
                             const customerOrderNumber = o?.userId?.orders?.length || 0
                             const variant = STATUS_VARIANTS[o.status] || 'default'
 
-                            const returnedOrders = (o?.userId?.orders?.filter(item => item.status === 'Returned')).length;
+                            const returnedOrders = (o?.userId?.orders?.filter(item => item.status === 'Returned'))?.length;
                             const returnPercent = ((returnedOrders / customerOrderNumber) * 100).toFixed(1)
 
-                            const cancelledOrders = (o?.userId?.orders?.filter(item => item.status === 'Cancelled')).length;
+                            const cancelledOrders = (o?.userId?.orders?.filter(item => item.status === 'Cancelled'))?.length;
                             const cancelPercent = ((cancelledOrders / customerOrderNumber) * 100).toFixed(1)
 
                             console.log(cancelPercent)
