@@ -106,8 +106,8 @@ export default function Page() {
 
     // helper to get last request in the requests-array
     const lastRequestOf = (order) =>
-        Array.isArray(order.requests) && order.requests.length > 0
-            ? order.requests[order.requests.length - 1]
+        Array.isArray(order.requests) && order?.requests?.length > 0
+            ? order.requests[order?.requests?.length - 1]
             : null
 
     const { filteredOrders, counts, statusCounts } = useMemo(() => {
@@ -152,7 +152,7 @@ export default function Page() {
                     case 'warranty': return lastReq?.type === 'Warranty' && lastReq.isRaised
                     default: return !o.abondonedOrder
                 }
-            }).length
+            })?.length
         })
 
         // 3) Compute your status‑card counts
