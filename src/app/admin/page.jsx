@@ -26,6 +26,8 @@ export default function Home() {
 
   if (!canView) return <NotAuthorizedPage />
 
+  console.log(canView)
+
   return (
     <InnerDashboardLayout>
       <div className="w-full flex justify-between items-center gap-4 mb-4">
