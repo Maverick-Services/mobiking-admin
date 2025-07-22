@@ -66,7 +66,7 @@ export default function OrdersListView({ error, orders = [] }) {
 
     return (
         <div>
-            <Table className={'p-4 rounded-none shadow-none overflow-hidden scrollbar-hide'}>
+            <Table className={'p-4 rounded-none shadow-none scrollbar-hide'}>
                 <TableHeader className={''}>
                     <TableRow className="bg-gray-50">
                         <TableHead>#</TableHead>
@@ -81,90 +81,90 @@ export default function OrdersListView({ error, orders = [] }) {
                     </TableRow>
                 </TableHeader>
                 <TableBody className={'scrollbar-hide'}>
-                    <AnimatePresence mode="wait">
-                        {orders.map((o, i) => {
-                            const customerOrderNumber = o?.userId?.orders?.length || 0
-                            const variant = STATUS_VARIANTS[o.status] || 'default'
+                    {/* <AnimatePresence mode="wait"> */}
+                    {orders.map((o, i) => {
+                        const customerOrderNumber = o?.userId?.orders?.length || 0
+                        const variant = STATUS_VARIANTS[o.status] || 'default'
 
-                            const returnedOrders = (o?.userId?.orders?.filter(item => item.status === 'Returned'))?.length;
-                            const returnPercent = ((returnedOrders / customerOrderNumber) * 100).toFixed(1)
+                        const returnedOrders = (o?.userId?.orders?.filter(item => item.status === 'Returned'))?.length;
+                        const returnPercent = ((returnedOrders / customerOrderNumber) * 100).toFixed(1)
 
-                            const cancelledOrders = (o?.userId?.orders?.filter(item => item.status === 'Cancelled'))?.length;
-                            const cancelPercent = ((cancelledOrders / customerOrderNumber) * 100).toFixed(1)
+                        const cancelledOrders = (o?.userId?.orders?.filter(item => item.status === 'Cancelled'))?.length;
+                        const cancelPercent = ((cancelledOrders / customerOrderNumber) * 100).toFixed(1)
 
-                            // console.log(cancelPercent)
+                        // console.log(cancelPercent)
 
-                            return (
-                                <motion.tr
-                                    key={o._id}
-                                    layout
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    transition={{ duration: 0.3 }}
-                                    className="hover:bg-gray-100 scrollbar-hide"
+                        return (
+                            <motion.tr
+                                key={o._id}
+                                layout
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.3 }}
+                                className="hover:bg-gray-100 scrollbar-hide"
+                            >
+                                <TableCell>{i + 1}</TableCell>
+
+                                <TableCell
+                                    className={'cursor-pointer'}
+                                    onClick={() => router.push(`/admin/orders/${o._id}`)}
                                 >
-                                    <TableCell>{i + 1}</TableCell>
+                                    {o._id.slice(0, 6).toUpperCase()}
+                                </TableCell>
 
-                                    <TableCell
-                                        className={'cursor-pointer'}
-                                        onClick={() => router.push(`/admin/orders/${o._id}`)}
-                                    >
-                                        {o._id.slice(0, 6).toUpperCase()}
-                                    </TableCell>
+                                <TableCell className="capitalize flex-col">
+                                    {o.name || '—'}
+                                    <div className='flex gap-1 mt-1'>
+                                        <span className="bg-purple-100 text-purple-700 px-1 font-medium rounded text-[10px]">
+                                            RTO: {returnPercent} %
+                                        </span>
+                                        <span className="bg-amber-100 text-amber-700 px-1 font-medium rounded text-[10px]">
+                                            Cancel: {cancelPercent} %
+                                        </span>
+                                    </div>
+                                </TableCell>
 
-                                    <TableCell className="capitalize flex-col">
-                                        {o.name || '—'}
-                                        <div className='flex gap-1 mt-1'>
-                                            <span className="bg-purple-100 text-purple-700 px-1 font-medium rounded text-[10px]">
-                                                RTO: {returnPercent} %
-                                            </span>
-                                            <span className="bg-amber-100 text-amber-700 px-1 font-medium rounded text-[10px]">
-                                                Cancel: {cancelPercent} %
-                                            </span>
-                                        </div>
-                                    </TableCell>
+                                <TableCell >
+                                    <div className="flex items-center space-x-2">
+                                        <span>{o.phoneNo}</span>
+                                        {o.phoneNo &&
+                                            <FaWhatsapp
+                                                className="cursor-pointer text-green-500 hover:text-green-600"
+                                                size={18}
+                                                onClick={() => openWhatsApp(o.phoneNo)}
+                                            />
+                                        }
+                                    </div>
+                                </TableCell>
+                                <TableCell>₹{o.orderAmount.toFixed(2)}</TableCell>
+                                <TableCell>{o.method}</TableCell>
 
-                                    <TableCell >
-                                        <div className="flex items-center space-x-2">
-                                            <span>{o.phoneNo}</span>
-                                            {o.phoneNo &&
-                                                <FaWhatsapp
-                                                    className="cursor-pointer text-green-500 hover:text-green-600"
-                                                    size={18}
-                                                    onClick={() => openWhatsApp(o.phoneNo)}
-                                                />
-                                            }
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>₹{o.orderAmount.toFixed(2)}</TableCell>
-                                    <TableCell>{o.method}</TableCell>
+                                <TableCell>
+                                    <StatusUpdate
+                                        orderId={o?._id}
+                                        status={o?.status}
+                                    />
+                                </TableCell>
 
-                                    <TableCell>
-                                        <StatusUpdate
-                                            orderId={o?._id}
-                                            status={o?.status}
-                                        />
-                                    </TableCell>
+                                <TableCell>
+                                    <div>{format(new Date(o.createdAt), 'dd MMM yyyy')}</div>
+                                    <div className="text-gray-500">
+                                        {format(new Date(o.createdAt), 'hh:mm a')}
+                                    </div>
+                                </TableCell>
 
-                                    <TableCell>
-                                        <div>{format(new Date(o.createdAt), 'dd MMM yyyy')}</div>
-                                        <div className="text-gray-500">
-                                            {format(new Date(o.createdAt), 'hh:mm a')}
-                                        </div>
-                                    </TableCell>
+                                {/* action buttons */}
+                                <TableCell className="text-center space-x-2 flex items-center justify-center">
+                                    {/* {o.abondonedOrder && */}
+                                    <OrderViewDialog order={o}>
+                                        <Button variant="outline">
+                                            <Eye />
+                                        </Button>
+                                    </OrderViewDialog>
+                                    {/* } */}
 
-                                    {/* action buttons */}
-                                    <TableCell className="text-center space-x-2 flex items-center justify-center">
-                                        {/* {o.abondonedOrder && */}
-                                        <OrderViewDialog order={o}>
-                                            <Button variant="outline">
-                                                <Eye />
-                                            </Button>
-                                        </OrderViewDialog>
-                                        {/* } */}
-
-                                        {/* {!o.abondonedOrder &&
+                                    {/* {!o.abondonedOrder &&
                                             <Button
                                                 // className={'h-7 w-7'}
                                                 variant="outline"
@@ -173,15 +173,15 @@ export default function OrdersListView({ error, orders = [] }) {
                                                 <Eye />
                                             </Button>
                                         } */}
-                                        {!o.abondonedOrder &&
-                                            <GSTBillDownload billData={o} />
-                                        }
+                                    {!o.abondonedOrder &&
+                                        <GSTBillDownload billData={o} />
+                                    }
 
-                                    </TableCell>
-                                </motion.tr>
-                            )
-                        })}
-                    </AnimatePresence>
+                                </TableCell>
+                            </motion.tr>
+                        )
+                    })}
+                    {/* </AnimatePresence> */}
                 </TableBody>
             </Table>
         </div>

@@ -13,11 +13,11 @@ function Pagination({
   ...props
 }) {
   return (
-    (<nav
+    (<div
       role="navigation"
       aria-label="pagination"
       data-slot="pagination"
-      className={cn("mx-auto flex w-full justify-center", className)}
+      className={cn("sticky bottom-0 flex justify-center items-center w-full", className)}
       {...props} />)
   );
 }

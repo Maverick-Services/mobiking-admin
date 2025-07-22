@@ -5,6 +5,8 @@ import { formatINRCurrency } from './../../../../lib/services/formatters';
 function AmountCards({ orders }) {
     if (!orders) return null
 
+    console.log(orders)
+
     const excludedStatuses = ['Cancelled', 'Rejected', 'Returned', 'Hold']
 
     const realOrders = orders.filter(o =>
