@@ -62,7 +62,7 @@ export default function OrdersListView({ error, orders = [] }) {
         window.open(url, '_blank')
     }
 
-    console.log(orders)
+    // console.log(orders)
 
     return (
         <div>
@@ -80,7 +80,7 @@ export default function OrdersListView({ error, orders = [] }) {
                         <TableHead className="text-center">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
-                <TableBody className={' scrollbar-hide'}>
+                <TableBody className={'scrollbar-hide'}>
                     <AnimatePresence mode="wait">
                         {orders.map((o, i) => {
                             const customerOrderNumber = o?.userId?.orders?.length || 0
@@ -92,7 +92,7 @@ export default function OrdersListView({ error, orders = [] }) {
                             const cancelledOrders = (o?.userId?.orders?.filter(item => item.status === 'Cancelled'))?.length;
                             const cancelPercent = ((cancelledOrders / customerOrderNumber) * 100).toFixed(1)
 
-                            console.log(cancelPercent)
+                            // console.log(cancelPercent)
 
                             return (
                                 <motion.tr

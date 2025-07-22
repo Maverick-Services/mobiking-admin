@@ -24,22 +24,32 @@ export const useOrders = () => {
         onError: err => toast.error(err.message || 'Failed to fetch orders'),
     })
 
-    const getOrdersByDate = ({ startDate, endDate, queryParameter, searchQuery }) => useQuery({
-        queryKey: ['orders', 'custom', startDate, endDate, queryParameter, searchQuery],
-        queryFn: () =>
-            api
-                .get('/orders/custom', { params: { startDate, endDate, queryParameter, searchQuery } })
-                .then(res => {
-                    return Array.isArray(res.data)
-                        ? res.data
-                        : res.data.data || []
-                }),
-        staleTime: 1000 * 60 * 5,
-        onError: (err) => {
-            toast.error(err.message || 'Failed to fetch orders');
-            console.log(err)
-        }
-    });
+    const getOrdersByDate = (params) => {
+        // const filteredParams = Object.entries(params)?.filter(([_, value]) => value !== undefined && value !== null && value !== '')
+
+        const filteredParams = Object.fromEntries(
+            Object.entries(params).filter(([_, value]) => value !== undefined && value !== null && value !== '')
+        );
+
+        console.log(filteredParams)
+
+        return useQuery({
+            queryKey: ['orders', filteredParams],
+            queryFn: () =>
+                api
+                    .get('/orders/paginated', { params: filteredParams })
+                    .then(res => {
+                        return Array.isArray(res.data)
+                            ? res.data
+                            : res.data.data || []
+                    }),
+            staleTime: 1000 * 60 * 5,
+            onError: (err) => {
+                toast.error(err?.response?.data?.message || 'Failed to fetch products');
+                console.log(err)
+            }
+        })
+    };
 
     const getCancelRequestOrders = ({ requestType, page, limit, startDate, endDate, }) => useQuery({
         queryKey: ['orders', requestType, startDate, endDate, page, limit],

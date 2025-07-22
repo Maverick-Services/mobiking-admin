@@ -1,8 +1,7 @@
 'use client'
-import React, { useState, useMemo, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import InnerDashboardLayout from '@/components/dashboard/InnerDashboardLayout'
 import { useOrders } from '@/hooks/useOrders'
-import { DateRangePicker } from '@/components/custom/date-range-picker'
 import { Button } from '@/components/ui/button'
 import OrdersListView from './components/OrdersListView'
 import POS from '@/components/POS'
@@ -22,11 +21,7 @@ const TABS = [
     { key: 'all', label: 'ALL ORDERS' },
     { key: 'website', label: 'WEBSITE ORDERS' },
     { key: 'app', label: 'APP ORDERS' },
-    // { key: 'regular', label: 'REGULAR' },
     { key: 'pos', label: 'POS ORDERS' },
-    // { key: 'returns', label: 'RETURNS' },
-    // { key: 'cancelled', label: 'CANCEL REQUESTS' },
-    // { key: 'warranty', label: 'WARRANTY' },
     { key: 'abandoned', label: 'ABANDONED CHECKOUT ORDERS' },
 ]
 
@@ -36,7 +31,6 @@ const STATUS_CARDS = [
     'Shipped',
     'Delivered',
     'Cancelled',
-    // 'Hold'
 ]
 
 const STATUS_BORDER = {
@@ -63,23 +57,28 @@ const STATUS_BG = {
 
 export default function Page() {
     const [showAmountCards, setShowAmountCards] = useState(false)
+
+    // type - web, app, pos, abandoned
+    const [orderType, setOrderType] = useState(null)
+
+    // Status = New, Cancelled, Rejected, Accepted, Shipped
+    const [status, setStatus] = useState(null);
+
+    // for search
     const [searchQuery, setSearchQuery] = useState('')
     const [queryParameter, setQueryParameter] = useState('customer')
 
     const handleDebouncedSearch = useCallback(
         debounce((value) => {
             setSearchQuery(value)
-        }, 300), // 500ms delay
+        }, 300), // 500ms delay 
         []
     )
 
-    console.log(searchQuery)
-
     // Date range
-    const today = new Date()
-    const pastDate = new Date()
-    const from = pastDate.setDate(today.getDate() - 6)
-
+    const today = new Date();
+    const pastDate = new Date();
+    const from = pastDate.setDate(today.getDate() - 60)
     const initialRange = { from: from, to: today }
     const [range, setRange] = useState(initialRange)
 
@@ -96,73 +95,23 @@ export default function Page() {
     const endDate = format(range.to, 'yyyy-MM-dd')
 
     // Data fetching
-    const { data: customOrdersData, isFetching, error } = getOrdersByDate({ startDate, endDate, queryParameter, searchQuery })
-    const displayOrders = customOrdersData ?? [];
+    const { data: customOrdersData, isFetching, error } = getOrdersByDate({
+        params: {
+            page: 1,
+            limit: 10,
+            startDate,
+            endDate,
+            queryParameter,
+            searchQuery,
+            orderType,
+            status
+        }
+    })
+    // console.log(params)
+    const orders = customOrdersData?.orders ?? [];
 
-    const [statusFilter, setStatusFilter] = useState(null)
-    // console.log(statusFilter)
-
-    const [activeTab, setActiveTab] = useState('all')
-
-    // helper to get last request in the requests-array
-    const lastRequestOf = (order) =>
-        Array.isArray(order.requests) && order?.requests?.length > 0
-            ? order.requests[order?.requests?.length - 1]
-            : null
-
-    const { filteredOrders, counts, statusCounts } = useMemo(() => {
-        const counts = {}
-        TABS.forEach(({ key }) => counts[key] = 0)
-
-        // First, filter by activeTab & statusFilter
-        const filteredOrders = displayOrders.filter((o) => {
-
-            // if a status card has been clicked, short‑circuit
-            if (statusFilter) {
-                return o.status === statusFilter && !o.abondonedOrder
-            }
-
-            const lastReq = lastRequestOf(o)
-
-            switch (activeTab) {
-                case 'website': return !o.isAppOrder && o.type === 'Regular' && !o.abondonedOrder
-                case 'app': return o.isAppOrder && o.type === 'Regular' && !o.abondonedOrder
-                case 'regular': return o.type === 'Regular' && !o.abondonedOrder
-                case 'pos': return o.type === 'Pos'
-                case 'abandoned': return o.abondonedOrder
-                case 'returns': return lastReq?.type === 'Return' && lastReq.isRaised
-                case 'cancelled': return lastReq?.type === 'Cancel' && lastReq.isRaised && lastReq.status === 'Pending'
-                case 'warranty': return lastReq?.type === 'Warranty' && lastReq.isRaised
-                default: return !o.abondonedOrder
-            }
-        })
-
-        // Compute tab counts (ignoring statusFilter here)
-        TABS.forEach(({ key }) => {
-            counts[key] = displayOrders.filter((o) => {
-                const lastReq = lastRequestOf(o)
-                switch (key) {
-                    case 'website': return !o.isAppOrder && o.type === 'Regular' && !o.abondonedOrder
-                    case 'app': return o.isAppOrder && o.type === 'Regular' && !o.abondonedOrder
-                    case 'regular': return o.type === 'Regular' && !o.abondonedOrder
-                    case 'pos': return o.type === 'Pos'
-                    case 'abandoned': return o.abondonedOrder
-                    case 'returns': return lastReq?.type === 'Return' && lastReq.isRaised
-                    case 'cancelled': return lastReq?.type === 'Cancel' && lastReq.isRaised && lastReq.status === 'Pending'
-                    case 'warranty': return lastReq?.type === 'Warranty' && lastReq.isRaised
-                    default: return !o.abondonedOrder
-                }
-            })?.length
-        })
-
-        // 3) Compute your status‑card counts
-        const statusCounts = {}
-        STATUS_CARDS.forEach((status) => {
-            statusCounts[status] = displayOrders.filter(o => o.status === status && !o.abondonedOrder).length
-        })
-
-        return { filteredOrders, counts, statusCounts }
-    }, [displayOrders, activeTab, statusFilter])
+    console.log(status)
+    console.log(orders)
 
     return (
         <InnerDashboardLayout>
@@ -188,22 +137,15 @@ export default function Page() {
                 </div>
             </div>
 
-            {/* Amount Cards */}
-            <div
-                className={`transition-all mb-6 duration-500 overflow-hidden ${showAmountCards ? 'max-h-[1000px] opacity-100 scale-100' : 'max-h-0 opacity-0 scale-95'}`}
-            >
-                <AmountCards orders={displayOrders} />
-            </div>
-
-            {/* ─── STATUS CARDS ─── */}
+            {/* STATUS CARDS */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-6">
-                {STATUS_CARDS.map((status) => (
+                {STATUS_CARDS.map((statusFilter) => (
                     <div
-                        key={status}
+                        key={statusFilter}
                         className={`
                             cursor-pointer 
-                            ${statusFilter === status ? `${STATUS_BG[status]} text-white` : 'bg-white'}
-                            ${STATUS_BORDER[status] || 'border-gray-300'} 
+                            ${status === statusFilter ? `${STATUS_BG[statusFilter]} text-white` : 'bg-white'}
+                            ${STATUS_BORDER[statusFilter] || 'border-gray-300'} 
                             border 
                             rounded-lg 
                             p-2 lg:p-4
@@ -212,13 +154,12 @@ export default function Page() {
                             transition-all duration-300
                        `}
                         onClick={() => {
-                            setStatusFilter(prev => prev === status ? null : status)
-                            setActiveTab('all')
+                            setStatus(prev => prev === statusFilter ? null : statusFilter)
                         }}
                     >
-                        <h2 className="text-2xl font-bold">{statusCounts[status]}</h2>
-                        <p className={`text-xs lg:text-sm ${statusFilter === status ? `text-white` : 'text-gray-600'}`}>
-                            {status}
+                        {/* <h2 className="text-2xl font-bold">{statusCounts[status]}</h2> */}
+                        <p className={`text-xs lg:text-sm ${status === statusFilter ? `text-white` : 'text-gray-600'}`}>
+                            {statusFilter}
                         </p>
                     </div>
                 ))}
@@ -250,8 +191,31 @@ export default function Page() {
                 />
             </div>
 
-            {/* Tab bar */}
-            <LayoutGroup>
+            {/* Table */}
+            {isFetching ?
+                <TableSkeleton showHeader={false} />
+                : <OrdersListView
+                    orders={orders}
+                />
+            }
+        </InnerDashboardLayout>
+    )
+}
+
+
+
+
+
+{/* Amount Cards */ }
+{/* <div
+                className={`transition-all mb-6 duration-500 overflow-hidden ${showAmountCards ? 'max-h-[1000px] opacity-100 scale-100' : 'max-h-0 opacity-0 scale-95'}`}
+            >
+                <AmountCards orders={displayOrders} />
+            </div> */}
+
+
+{/* Tab bar */ }
+{/* <LayoutGroup>
                 <div className="flex gap-2 mb-0 overflow-x-auto bg-white scrollbar-hide relative">
                     {TABS.map(({ key, label }) => {
                         const isActive = activeTab === key
@@ -280,16 +244,4 @@ export default function Page() {
                         )
                     })}
                 </div>
-            </LayoutGroup>
-
-            {/* Table */}
-            {isFetching ?
-                <TableSkeleton showHeader={false} />
-                : <OrdersListView
-                    // error={ordersQuery.error}
-                    orders={filteredOrders}
-                />
-            }
-        </InnerDashboardLayout>
-    )
-}
+            </LayoutGroup> */}

@@ -11,8 +11,6 @@ export function usePermissions() {
         staleTime: 30 * 1000, // cache for 30 secs
     });
 
-    console.log(data)
-
     const role = data?.role;
     const perms = data?.permissions || {};
 
