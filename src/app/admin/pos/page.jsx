@@ -224,7 +224,7 @@ function page() {
     const router = useRouter();
     const { allUsersQuery, createCustomer } = useUsers();
     // users data
-    const allUsers = allUsersQuery?.data?.data || []
+    // const allUsers = allUsersQuery?.data?.data || []
     // console.log(allUsers)
     // users data
     // const { usersQuery } = useUsers()
@@ -273,32 +273,6 @@ function page() {
 
     const watchSubTotal = watch('subtotal')
     const watchOrderAmount = watch('orderAmount')
-
-    // phoneNo lookup
-    const [phoneQuery, setPhoneQuery] = useState("")
-    const [suggestions, setSuggestions] = useState([])
-
-    // Suggestions of user
-    function acb() {
-        if (phoneQuery) {
-            setSuggestions(
-                phoneQuery
-                    ? allUsers.filter((u) => u.phoneNo.includes(phoneQuery.trim()))
-                    : []
-            )
-        }
-    }
-
-    useEffect(() => {
-        acb();
-    }, [phoneQuery, allUsers])
-
-    const onPhoneSelect = (u) => {
-        form.setValue("userId", u._id)
-        form.setValue("name", u.name)
-        form.setValue("phoneNo", u.phoneNo)
-        setSuggestions([])
-    }
 
     async function onSubmit(values) {
         try {
@@ -352,14 +326,14 @@ function page() {
                             <PCard>
                                 <div className="flex gap-2 justify-between items-center mb-3">
                                     <h2 className='font-semibold text-xl uppercase text-gray-600'>Customer Details</h2>
-                                    <Button
+                                    {/* <Button
                                         variant="outline"
                                         type="button"
                                         size={'icon'}
                                         onClick={() => setAddUserDialog(true)}
                                     >
                                         <Plus />
-                                    </Button>
+                                    </Button> */}
                                 </div>
                                 <Separator className="mb-4" />
 
@@ -375,26 +349,9 @@ function page() {
                                                         placeholder="Enter phone number"
                                                         type={'tel'}
                                                         {...field}
-                                                        onChange={(e) => {
-                                                            field.onChange(e);
-                                                            setPhoneQuery(e.target.value)
-                                                        }}
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
-                                                {suggestions.length > 0 && (
-                                                    <ul className="absolute z-10 bg-white border w-full mt-1 max-h-40 overflow-auto rounded-md shadow-lg">
-                                                        {suggestions.map((u, idx) => (
-                                                            <li
-                                                                key={idx}
-                                                                className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                                                                onClick={() => onPhoneSelect(u)}
-                                                            >
-                                                                {u.phoneNo} — {u.name}
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                )}
                                             </FormItem>
                                         )}
                                     />
@@ -534,7 +491,7 @@ function page() {
                                                         min={0}
                                                         max={watchSubTotal}
                                                         {...field}
-                                                        onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                                                        onChange={(e) => field.onChange(Number(e.target.value))}
                                                         placeholder="Enter discount"
                                                     />
                                                 </FormControl>

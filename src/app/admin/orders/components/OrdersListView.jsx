@@ -83,16 +83,16 @@ export default function OrdersListView({ error, orders = [] }) {
                 <TableBody className={'scrollbar-hide'}>
                     {/* <AnimatePresence mode="wait"> */}
                     {orders.map((o, i) => {
-                        const customerOrderNumber = o?.userId?.orders?.length || 0
-                        const variant = STATUS_VARIANTS[o.status] || 'default'
+                        const customerOrderNumber = o?.userId?.orders?.length || 0;
+                        const returnedOrders = o?.userId?.orders?.filter(item => item.status === 'Returned')?.length || 0;
+                        const returnPercent = customerOrderNumber > 0
+                            ? ((returnedOrders / customerOrderNumber) * 100).toFixed(1)
+                            : '0.0';
 
-                        const returnedOrders = (o?.userId?.orders?.filter(item => item.status === 'Returned'))?.length;
-                        const returnPercent = ((returnedOrders / customerOrderNumber) * 100).toFixed(1)
-
-                        const cancelledOrders = (o?.userId?.orders?.filter(item => item.status === 'Cancelled'))?.length;
-                        const cancelPercent = ((cancelledOrders / customerOrderNumber) * 100).toFixed(1)
-
-                        // console.log(cancelPercent)
+                        const cancelledOrders = o?.userId?.orders?.filter(item => item.status === 'Cancelled')?.length || 0;
+                        const cancelPercent = customerOrderNumber > 0
+                            ? ((cancelledOrders / customerOrderNumber) * 100).toFixed(1)
+                            : '0.0';
 
                         return (
                             <motion.tr
@@ -117,10 +117,10 @@ export default function OrdersListView({ error, orders = [] }) {
                                     {o.name || '—'}
                                     <div className='flex gap-1 mt-1'>
                                         <span className="bg-purple-100 text-purple-700 px-1 font-medium rounded text-[10px]">
-                                            RTO: {returnPercent} %
+                                            RTO: {returnPercent || 0} %
                                         </span>
                                         <span className="bg-amber-100 text-amber-700 px-1 font-medium rounded text-[10px]">
-                                            Cancel: {cancelPercent} %
+                                            Cancel: {cancelPercent || 0} %
                                         </span>
                                     </div>
                                 </TableCell>
