@@ -15,9 +15,9 @@ function RefreshButton({ queryPrefix = "", className = "" }) {
         setIsRefreshing(true)
         // Invalidate all queries that start with the prefix
         queryClient.invalidateQueries({
-            predicate: (query) => 
-                query.queryKey.some(key => 
-                    typeof key === 'string' && 
+            predicate: (query) =>
+                query.queryKey.some(key =>
+                    typeof key === 'string' &&
                     key.startsWith(queryPrefix)
                 )
         }).finally(() => {
@@ -30,7 +30,7 @@ function RefreshButton({ queryPrefix = "", className = "" }) {
             onClick={handleRefresh}
             variant="outline"
             size="icon"
-            className={cn("p-2 h-8 w-8", className)}
+            className={cn("p-2 h-9 w-9", className)}
             disabled={isRefreshing}
         >
             <IoIosRefresh
