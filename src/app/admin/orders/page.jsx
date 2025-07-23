@@ -26,6 +26,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination"
+import RefreshButton from '@/components/custom/RefreshButton'
 
 const TABS = [
     { key: 'all', label: 'ALL ORDERS' },
@@ -187,6 +188,10 @@ export default function Page() {
                         <ChevronDown className={`transition-transform duration-300 ${showAmountCards ? '' : 'rotate-180'}`} />
                     </Button>
 
+                    <RefreshButton
+                        queryPrefix='orders'
+                    />
+
                     <DateRangeSelector onChange={setRange} defaultRange={initialRange} />
                     <PosButton />
                 </div>
@@ -258,9 +263,20 @@ export default function Page() {
                     // value={searchQuery}
                     onChange={(e) => {
                         const val = e.target.value
-                        handleDebouncedSearch(val)
+                        if (val && val?.length >= 2)
+                            handleDebouncedSearch(val)
+                        else return;
                     }}
                 />
+                <Button
+                    onClick={
+                        () => handleDebouncedSearch("")
+                    }
+                    variant={isFetching ? 'secondary' : 'default'}
+                    disabled={isFetching}
+                >
+                    Reset
+                </Button>
             </div>
 
             {/* Tab bar */}
