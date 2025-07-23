@@ -38,14 +38,17 @@ const TABS = [
 const STATUS_CARDS = [
     'New',
     'Accepted',
+    'Rejected',
     'Shipped',
     'Delivered',
     'Cancelled',
+    'Hold'
 ]
 
 const STATUS_BORDER = {
     New: 'border-indigo-500',
     Accepted: 'border-green-500',
+    Rejected: 'border-red-500',
     Shipped: 'border-yellow-500',
     Delivered: 'border-teal-500',
     Cancelled: 'border-red-500',
@@ -59,6 +62,7 @@ const STATUS_BORDER = {
 const STATUS_BG = {
     New: 'bg-indigo-500',
     Accepted: 'bg-green-500',
+    Rejected: 'bg-red-500',
     Shipped: 'bg-yellow-500',
     Delivered: 'bg-teal-500',
     Cancelled: 'bg-red-500',
@@ -125,6 +129,8 @@ export default function Page() {
     const {
         newCount,
         acceptedCount,
+        rejectedCount,
+        holdCount,
         shippedCount,
         deliveredCount,
         cancelledCount,
@@ -139,6 +145,8 @@ export default function Page() {
     const STATUS_COUNT_MAP = {
         New: newCount,
         Accepted: acceptedCount,
+        Rejected: rejectedCount,
+        Hold: holdCount,
         Shipped: shippedCount,
         Delivered: deliveredCount,
         Cancelled: cancelledCount
@@ -154,7 +162,7 @@ export default function Page() {
 
     const orders = customOrdersData?.orders || [];
     // console.log(customOrdersData)
-    console.log(customOrdersData?.salesData)
+    // console.log(customOrdersData?.salesData)
 
     const totalPages = customOrdersData?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
@@ -195,7 +203,7 @@ export default function Page() {
             </div>
 
             {/* STATUS CARDS */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-6 mt-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6 mt-6">
                 {STATUS_CARDS.map((statusFilter) => (
                     <div
                         key={statusFilter}
