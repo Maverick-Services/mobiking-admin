@@ -85,7 +85,7 @@ export default function Page() {
     const handleDebouncedSearch = useCallback(
         debounce((value) => {
             setSearchQuery(value)
-        }, 300), // 500ms delay 
+        }, 500), // 500ms delay 
         []
     )
 
@@ -229,7 +229,7 @@ export default function Page() {
                     type={'text'}
                     placeholder="Search"
                     className={'border-gray-300'}
-                    value={searchQuery}
+                    // value={searchQuery}
                     onChange={(e) => {
                         const val = e.target.value
                         handleDebouncedSearch(val)

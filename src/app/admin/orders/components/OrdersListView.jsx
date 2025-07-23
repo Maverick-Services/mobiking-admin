@@ -110,7 +110,7 @@ export default function OrdersListView({ error, orders = [] }) {
                                     className={'cursor-pointer'}
                                     onClick={() => router.push(`/admin/orders/${o._id}`)}
                                 >
-                                    {o._id.slice(0, 6).toUpperCase()}
+                                    {o.orderId}
                                 </TableCell>
 
                                 <TableCell className="capitalize flex-col">
