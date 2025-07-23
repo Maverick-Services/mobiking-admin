@@ -23,6 +23,18 @@ import { BsCashCoin } from "react-icons/bs";
 import { PiCreditCardDuotone } from "react-icons/pi";
 import { FaGoogle } from "react-icons/fa";
 import { useRouter } from 'next/navigation'
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination"
+import { getPaginationRange } from "@/lib/services/getPaginationRange"
+import { useSubCategories } from '@/hooks/useSubCategories'
+import api from '@/lib/api'
 
 const posSchema = z.object({
     userId: z.string().optional(),
@@ -31,7 +43,13 @@ const posSchema = z.object({
     gst: z.string().optional(),
     method: z.string().min(1, 'Please select payment method'),
     subtotal: z.number().min(0),
-    discount: z.number().min(0),
+    discount: z.preprocess(
+        val => {
+            if (val === '') return undefined
+            return typeof val === 'string' ? Number(val) : val
+        },
+        z.number().optional()
+    ),
     orderAmount: z.number().min(0),
     items: z.array(
         z.object({
@@ -191,24 +209,10 @@ function ProductCard({ product, onAddItem }) {
 }
 
 function ProductGrid({ allProducts, onAddItem }) {
-    const [searchTerm, setSearchTerm] = useState('');
-
-    const filteredProducts = allProducts.filter(product =>
-        product.fullName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
     return (
         <div className="space-y-4 h-full flex flex-col">
-            <div className="bg-white rounded-lg p-2 sticky top-0 z-10 shadow-sm">
-                <Input
-                    placeholder="Search products..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 flex-1">
-                {filteredProducts.map(product => (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 flex-1">
+                {allProducts.map(product => (
                     <ProductCard
                         key={product._id}
                         product={product}
@@ -220,24 +224,57 @@ function ProductGrid({ allProducts, onAddItem }) {
     );
 }
 
+const FILTERS = [
+    // { key: '_all_', label: 'ALL' },
+    { key: 'InStock', label: 'In stock' },
+    { key: 'OutOfStock', label: 'Out of stock' },
+    { key: 'Active', label: 'Active' },
+    { key: 'Inactive', label: 'Not Active' },
+]
+
 function page() {
     const router = useRouter();
     const { allUsersQuery, createCustomer } = useUsers();
-    // users data
-    // const allUsers = allUsersQuery?.data?.data || []
-    // console.log(allUsers)
-    // users data
-    // const { usersQuery } = useUsers()
-    // const allUsers = usersQuery("user")?.data?.data || []
 
-    // const { createCustomer } = useUsers();
+    const [categoryFilter, setCategoryFilter] = useState()
+    const [typeFilter, setTypeFilter] = useState('')
 
+    // debounce hook
+    function useDebouncedValue(value, delay = 500) {
+        const [debouncedValue, setDebouncedValue] = useState(value);
+
+        useEffect(() => {
+            const handler = setTimeout(() => setDebouncedValue(value), delay);
+            return () => clearTimeout(handler);
+        }, [value, delay]);
+
+        return debouncedValue;
+    }
+    const [searchTerm, setSearchTerm] = useState("")
+    const debouncedSearch = useDebouncedValue(searchTerm, 500);
+    const [page, setPage] = useState(1)
+    const [limit, setLimit] = useState(10)
     // products data
-    const { productsQuery } = useProducts()
-    const allProducts = productsQuery?.data || []
+    const { productsPaginationQuery } = useProducts()
+    const products = productsPaginationQuery({
+        page: page,
+        limit: limit,
+        searchQuery: debouncedSearch,
+        category: categoryFilter,
+        filterBy: typeFilter,
+    })
+
+    const { subCategoriesQuery } = useSubCategories()
+    const subCategories = subCategoriesQuery.data?.data || []
+
+    const allProducts = products.data?.products || []
+    const totalPages = products.data?.pagination?.totalPages || 1
+    const paginationRange = getPaginationRange(page, totalPages)
+
     // console.log(allProducts)
 
     const { createPosOrder } = useOrders()
+    const { getUserByPhoneNumber } = useUsers();
 
     const [addUserDialog, setAddUserDialog] = useState(false)
 
@@ -265,7 +302,7 @@ function page() {
 
     useEffect(() => {
         const subtotal = items.reduce((a, i) => a + (i.price || 0) * (i.quantity || 0), 0)
-        const orderAmount = subtotal - discount
+        const orderAmount = subtotal - discount;
 
         if (form.getValues("subtotal") !== subtotal) form.setValue("subtotal", subtotal)
         if (form.getValues("orderAmount") !== orderAmount) form.setValue("orderAmount", orderAmount)
@@ -275,9 +312,15 @@ function page() {
     const watchOrderAmount = watch('orderAmount')
 
     async function onSubmit(values) {
+        console.log(values)
+        // const abc = getUserByPhoneNumber(values.phoneNo)
         try {
-            let finalUserId = values.userId
+            let finalUserId;
 
+            const res = await api.get(`/users/customer/${values.phoneNo}`);
+            finalUserId = res.data?.data;
+
+            console.log(finalUserId)
             // If user not selected, create a new user
             if (!finalUserId) {
                 const res = await createCustomer.mutateAsync({
@@ -295,7 +338,7 @@ function page() {
             }
 
             await createPosOrder.mutateAsync(payload)
-            router.push('/admin/orders')
+            // router.push('/admin/orders')
         } catch (err) {
             console.error('Error in creating order:', err)
         }
@@ -307,37 +350,122 @@ function page() {
                 <h1 className="text-primary font-bold sm:text-2xl lg:text-3xl mb-0">Create POS Order</h1>
             </div>
 
-            <div className='flex flex-col lg:flex-row gap-4 w-full'>
+            <div className='flex flex-col-reverse lg:flex-col-reverse gap-4 w-full'>
                 {/* Left Column: Product Grid (70% width) */}
-                <div className="w-full lg:w-7/12">
+                <div className="w-full lg:w-full">
                     <PCard className="h-full">
                         <h2 className="font-semibold text-xl uppercase text-gray-600 mb-4">Products</h2>
+
+                        {/* Toolbar */}
+                        <div className="flex flex-wrap justify-between items-center gap-2">
+                            {/* Search Bar */}
+                            <Input
+                                placeholder="Search products..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full flex-1 bg-white"
+                            />
+
+                            <Select value={categoryFilter} onValueChange={(val) => { setCategoryFilter(val === '__all__' ? undefined : val) }}>
+                                <SelectTrigger className="w-[120px]">
+                                    <SelectValue placeholder="Category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="__all__">All Categories</SelectItem>
+                                    {subCategories?.map((n) => (
+                                        <SelectItem key={n._id} value={String(n._id)}>
+                                            {n.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            {/* filter by */}
+                            <Select value={typeFilter} onValueChange={(val) => { setTypeFilter(val === '_aa_' ? undefined : val) }}>
+                                <SelectTrigger className="w-[120px]">
+                                    <SelectValue placeholder="Filter By" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="_aa_">All</SelectItem>
+                                    {FILTERS?.map((n, idx) => (
+                                        <SelectItem key={idx} value={n.key}>
+                                            {n.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
                         <ProductGrid
                             allProducts={allProducts}
                             onAddItem={(item) => append(item)}
                         />
+
+                        <div className="flex w-full justify-end gap-2 items-center">
+                            {/* Limit Dropdown */}
+                            <Select value={String(limit)} onValueChange={(val) => { setPage(1); setLimit(Number(val)) }}>
+                                <SelectTrigger className="w-[120px]">
+                                    <SelectValue placeholder="Items per page" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {[1, 5, 10, 20, 50].map((n) => (
+                                        <SelectItem key={n} value={String(n)}>
+                                            {n} / page
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            {/* Pagination */}
+                            <Pagination className={'inline justify-end mx-1 w-fit'}>
+                                <PaginationContent>
+                                    {page > 1 && (
+                                        <PaginationItem>
+                                            <PaginationPrevious href="#" onClick={() => setPage((p) => p - 1)} />
+                                        </PaginationItem>
+                                    )}
+
+                                    {paginationRange.map((p, i) => (
+                                        <PaginationItem key={i}>
+                                            {p === 'ellipsis-left' || p === 'ellipsis-right' ? (
+                                                <PaginationEllipsis />
+                                            ) : (
+                                                <PaginationLink
+                                                    href="#"
+                                                    isActive={p === page}
+                                                    onClick={(e) => {
+                                                        e.preventDefault()
+                                                        setPage(p)
+                                                    }}
+                                                >
+                                                    {p}
+                                                </PaginationLink>
+                                            )}
+                                        </PaginationItem>
+                                    ))}
+
+                                    {page < totalPages && (
+                                        <PaginationItem>
+                                            <PaginationNext href="#" onClick={() => setPage((p) => p + 1)} />
+                                        </PaginationItem>
+                                    )}
+                                </PaginationContent>
+                            </Pagination>
+                        </div>
                     </PCard>
                 </div>
 
                 {/* Right Column: Order Form (30% width) */}
-                <div className="w-full lg:w-5/12">
+                <div className="w-full lg:w-full">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
                             <PCard>
                                 <div className="flex gap-2 justify-between items-center mb-3">
                                     <h2 className='font-semibold text-xl uppercase text-gray-600'>Customer Details</h2>
-                                    {/* <Button
-                                        variant="outline"
-                                        type="button"
-                                        size={'icon'}
-                                        onClick={() => setAddUserDialog(true)}
-                                    >
-                                        <Plus />
-                                    </Button> */}
                                 </div>
                                 <Separator className="mb-4" />
 
-                                <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+                                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3'>
                                     <FormField
                                         control={form.control}
                                         name="phoneNo"
@@ -377,7 +505,7 @@ function page() {
                                         control={form.control}
                                         name="gst"
                                         render={({ field }) => (
-                                            <FormItem className="col-span-2">
+                                            <FormItem className="">
                                                 <FormLabel>GST Number</FormLabel>
                                                 <FormControl>
                                                     <Input
@@ -393,129 +521,120 @@ function page() {
                                         control={form.control}
                                         name="method"
                                         render={({ field }) => (
-                                            <FormItem className="col-span-2">
+                                            <FormItem className="">
                                                 <FormLabel>Payment Method</FormLabel>
-                                                <FormControl>
-                                                    <div className="grid grid-cols-3 gap-2">
-                                                        {/* Cash Option */}
-                                                        <div
-                                                            className={`border rounded-md p-3 flex gap-2 items-center justify-center cursor-pointer transition-all ${field.value === "Cash"
-                                                                ? "border-primary bg-primary/10"
-                                                                : "border-gray-300 hover:border-primary/50"
-                                                                }`}
-                                                            onClick={() => field.onChange("Cash")}
-                                                        >
-                                                            <BsCashCoin className="w-6 h-6 text-gray-600" />
-                                                            <span>Cash</span>
-                                                        </div>
-
-                                                        {/* Card Option */}
-                                                        <div
-                                                            className={`border rounded-md p-3 flex gap-2 items-center justify-center cursor-pointer transition-all ${field.value === "Card"
-                                                                ? "border-primary bg-primary/10"
-                                                                : "border-gray-300 hover:border-primary/50"
-                                                                }`}
-                                                            onClick={() => field.onChange("Card")}
-                                                        >
-                                                            <PiCreditCardDuotone className="w-6 h-6 text-gray-600" />
-                                                            <span>Card</span>
-                                                        </div>
-
-                                                        {/* UPI Option */}
-                                                        <div
-                                                            className={`border rounded-md p-3 flex gap-2 items-center justify-center cursor-pointer transition-all ${field.value === "UPI"
-                                                                ? "border-primary bg-primary/10"
-                                                                : "border-gray-300 hover:border-primary/50"
-                                                                }`}
-                                                            onClick={() => field.onChange("UPI")}
-                                                        >
-                                                            <FaGoogle className="w-6 h-6 text-gray-600" />
-                                                            <span>UPI</span>
-                                                        </div>
-                                                    </div>
-                                                </FormControl>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger className={'w-full'}>
+                                                            <SelectValue placeholder="Select method" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        <SelectItem value="Cash">
+                                                            <div className="flex items-center gap-2">
+                                                                <BsCashCoin className="w-4 h-4 text-gray-600" />
+                                                                <span>Cash</span>
+                                                            </div>
+                                                        </SelectItem>
+                                                        <SelectItem value="online">
+                                                            <div className="flex items-center gap-2">
+                                                                <FaGoogle className="w-4 h-4 text-gray-600" />
+                                                                <span>Online</span>
+                                                            </div>
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                     />
+
                                 </div>
                             </PCard>
 
-                            <PCard>
-                                <div className="flex justify-between items-center mb-4">
-                                    <h2 className='font-semibold text-xl uppercase text-gray-600'>Order Items</h2>
-                                    <div className="text-sm text-gray-500">
-                                        {items.length} item{items.length !== 1 ? 's' : ''}
-                                    </div>
-                                </div>
-
-                                <div className="border rounded-lg overflow-hidden">
-                                    {fields.length === 0 ? (
-                                        <div className="py-10 text-center text-gray-500">
-                                            No items added. Select products from the left panel.
+                            <div className='grid grid-cols-10 gap-3 w-full'>
+                                <div className={'col-span-7 w-full'}>
+                                    <PCard >
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h2 className='font-semibold text-xl uppercase text-gray-600'>Order Items</h2>
+                                            <div className="text-sm text-gray-500">
+                                                {items.length} item{items.length !== 1 ? 's' : ''}
+                                            </div>
                                         </div>
-                                    ) : (
-                                        <ScrollArea className="max-h-64">
-                                            {fields.map((item, i) => (
-                                                <OrderItemRow
-                                                    key={item.id}
-                                                    index={i}
-                                                    allProducts={allProducts}
-                                                    onRemove={() => remove(i)}
-                                                />
-                                            ))}
-                                        </ScrollArea>
-                                    )}
-                                </div>
-                            </PCard>
 
-                            <PCard>
-                                <div className="space-y-3">
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-600">Subtotal:</span>
-                                        <span className="font-medium">₹{watchSubTotal}</span>
-                                    </div>
-
-                                    <FormField
-                                        control={form.control}
-                                        name="discount"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <div className="flex justify-between items-center">
-                                                    <FormLabel>Discount</FormLabel>
-                                                    <span className="text-sm text-gray-500">Enter amount</span>
+                                        <div className="border rounded-lg overflow-hidden">
+                                            {fields.length === 0 ? (
+                                                <div className="py-10 text-center text-gray-500">
+                                                    No items added. Select products from the left panel.
                                                 </div>
-                                                <FormControl>
-                                                    <Input
-                                                        type="number"
-                                                        min={0}
-                                                        max={watchSubTotal}
-                                                        {...field}
-                                                        onChange={(e) => field.onChange(Number(e.target.value))}
-                                                        placeholder="Enter discount"
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <Separator />
-
-                                    <div className="flex justify-between text-lg font-bold">
-                                        <span>Total Amount:</span>
-                                        <span className="text-primary">₹{watchOrderAmount}</span>
-                                    </div>
+                                            ) : (
+                                                <ScrollArea className="max-h-64">
+                                                    {fields.map((item, i) => (
+                                                        <OrderItemRow
+                                                            key={item.id}
+                                                            index={i}
+                                                            allProducts={allProducts}
+                                                            onRemove={() => remove(i)}
+                                                        />
+                                                    ))}
+                                                </ScrollArea>
+                                            )}
+                                        </div>
+                                    </PCard>
                                 </div>
-                            </PCard>
 
-                            <LoaderButton
-                                loading={createPosOrder.isPending || createCustomer.isPending}
-                                type="submit"
-                                className="w-full mb-5"
-                            >
-                                Create Order
-                            </LoaderButton>
+                                {/* discount */}
+                                <div className={'col-span-3 w-full'}>
+                                    <PCard>
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-600">Subtotal:</span>
+                                                <span className="font-medium">₹{watchSubTotal}</span>
+                                            </div>
+
+                                            <FormField
+                                                control={form.control}
+                                                name="discount"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex items-center justify-between gap-2">
+                                                        <FormLabel>Discount</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                type={'number'}
+                                                                {...field}
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value;
+                                                                    field.onChange(value === '' ? '' : Number(value));
+                                                                }}
+                                                                placeholder="Eg. 240"
+                                                                className="max-w-24 text-right border-none border-b rounded-none border-black appearance-none"
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <Separator />
+
+                                            <div className="flex justify-between text-lg font-bold">
+                                                <span>Total Amount:</span>
+                                                <span className="text-primary">₹{watchOrderAmount}</span>
+                                            </div>
+                                        </div>
+                                    </PCard>
+                                </div>
+                            </div>
+
+                            <div className='flex items-center justify-end'>
+                                <LoaderButton
+                                    loading={createPosOrder.isPending || createCustomer.isPending}
+                                    type="submit"
+                                    className="mb-5"
+                                >
+                                    Create Order
+                                </LoaderButton>
+                            </div>
                         </form>
                     </Form>
                 </div>
