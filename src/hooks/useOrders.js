@@ -147,6 +147,7 @@ export const useOrders = () => {
     onSuccess: () => {
       toast.success("Order updated successfully.");
       queryClient.invalidateQueries({ queryKey: ["order"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
     onError: (err) => {
       toast.error(err.message || "Failed to update order");

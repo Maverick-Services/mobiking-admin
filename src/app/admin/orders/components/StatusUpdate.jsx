@@ -3,15 +3,28 @@ import { useOrders } from '@/hooks/useOrders'
 import React from 'react'
 import toast from 'react-hot-toast'
 
-function StatusUpdate({ orderId, status }) {
+function StatusUpdate({ order, orderId, status }) {
     const { updateOrder } = useOrders()
 
     const STATUSES = [
         "New",
         "Accepted",
+        "Cancelled",
+        "Returned",
+        "Rejected",
+        "Hold",
         "Shipped",
         "Delivered",
     ]
+
+    function isDisabled(status) {
+        if (order.status != "New")
+            return true;
+        else if (status != "Accepted")
+            return true;
+
+        return false;
+    }
 
     async function handleUpdateStatus(value) {
         const toastId = toast.loading('Updating Status...')
@@ -24,6 +37,7 @@ function StatusUpdate({ orderId, status }) {
                 data: data
             })
             console.log(res)
+            toast.dismiss(toastId);
             // toast.success('Status updated', { id: toastId })
         } catch (error) {
             toast.error('Error in updating status', { id: toastId })
@@ -39,7 +53,13 @@ function StatusUpdate({ orderId, status }) {
                 </SelectTrigger>
                 <SelectContent>
                     {STATUSES.map((item, idx) => (
-                        <SelectItem key={idx} value={item}>{item}</SelectItem>
+                        <SelectItem
+                            key={idx}
+                            value={item}
+                            disabled={isDisabled(item)}
+                        >
+                            {item}
+                        </SelectItem>
                     ))}
                 </SelectContent>
             </Select>

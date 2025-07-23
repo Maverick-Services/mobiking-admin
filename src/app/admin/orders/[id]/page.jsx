@@ -66,6 +66,7 @@ function page() {
                 <div className="flex gap-2">
                     {!order.abondonedOrder && !order.shipmentId && order.status !== 'Delivered' &&
                         <UpdateStatus
+                            order={order}
                             orderId={order?._id}
                             status={order?.status}
                         />

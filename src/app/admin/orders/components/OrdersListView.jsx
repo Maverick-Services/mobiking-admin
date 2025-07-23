@@ -142,6 +142,7 @@ export default function OrdersListView({ error, orders = [] }) {
 
                                 <TableCell>
                                     <StatusUpdate
+                                        order={o}
                                         orderId={o?._id}
                                         status={o?.status}
                                     />
