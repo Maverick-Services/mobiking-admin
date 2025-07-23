@@ -154,7 +154,7 @@ export default function Page() {
 
     const orders = customOrdersData?.orders || [];
     // console.log(customOrdersData)
-    console.log(totalCount)
+    console.log(customOrdersData?.salesData)
 
     const totalPages = customOrdersData?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
@@ -188,7 +188,10 @@ export default function Page() {
             <div
                 className={`transition-all mb-6 duration-500 overflow-hidden ${showAmountCards ? 'max-h-[1000px] opacity-100 scale-100' : 'max-h-0 opacity-0 scale-95'}`}
             >
-                <AmountCards orders={orders} />
+                <AmountCards
+                    orders={orders}
+                    data={customOrdersData?.salesData}
+                />
             </div>
 
             {/* STATUS CARDS */}
