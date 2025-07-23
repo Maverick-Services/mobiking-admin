@@ -29,7 +29,7 @@ import {
 
 const TABS = [
     { key: 'all', label: 'ALL ORDERS' },
-    { key: 'website', label: 'WEBSITE ORDERS' },
+    { key: 'web', label: 'WEBSITE ORDERS' },
     { key: 'app', label: 'APP ORDERS' },
     { key: 'pos', label: 'POS ORDERS' },
     { key: 'abandoned', label: 'ABANDONED CHECKOUT ORDERS' },
@@ -129,6 +129,11 @@ export default function Page() {
         deliveredCount,
         cancelledCount,
         totalCount,
+        allOrderCount,
+        websiteOrderCount,
+        appOrderCount,
+        posOrderCount,
+        abandonedOrderCount
     } = customOrdersData || {};
 
     const STATUS_COUNT_MAP = {
@@ -139,8 +144,17 @@ export default function Page() {
         Cancelled: cancelledCount
     };
 
+    const TABS_COUNT_MAP = {
+        all: allOrderCount,
+        web: websiteOrderCount,
+        app: appOrderCount,
+        pos: posOrderCount,
+        abandoned: abandonedOrderCount
+    };
+
     const orders = customOrdersData?.orders || [];
-    console.log(customOrdersData)
+    // console.log(customOrdersData)
+    console.log(totalCount)
 
     const totalPages = customOrdersData?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
@@ -195,6 +209,7 @@ export default function Page() {
       `}
                         onClick={() => {
                             setStatus(prev => prev === statusFilter ? null : statusFilter)
+                            setPage(1);
                         }}
                     >
                         {isFetching
@@ -247,6 +262,7 @@ export default function Page() {
                                 key={key}
                                 onClick={() => {
                                     setOrderType(key)
+                                    setPage(1)
                                 }}
                                 className={`
             relative px-4 py-6 text-sm font-medium transition-all duration-300 flex gap-1 w-full min-w-fit items-center justify-center
@@ -254,7 +270,7 @@ export default function Page() {
           `}
                             >
                                 <span>{label}</span>
-                                {/* <span>({counts[key]})</span> */}
+                                <span>({TABS_COUNT_MAP[key]})</span>
 
                                 {isActive && (
                                     <motion.div
