@@ -18,8 +18,8 @@ function SalesOfOneDay() {
     const formattedSales = formatINRCurrency(data?.salesInRange || 0)
 
     return (
-        <PCard className="flex items-center justify-between">
-            <div className="flex flex-col gap-1 h-full items-center mb-0 justify-center">
+        <PCard className="flex max-[1150px]:gap-2 max-[1150px]:flex-col min-[1150px]:items-center justify-between">
+            <div className="flex flex-col gap-1 h-full items-start mb-0 justify-center">
                 {isLoading ?
                     <Loader2 className="animate-spin" />
                     : <p className="text-2xl font-semibold">{formattedSales}</p>
@@ -27,7 +27,7 @@ function SalesOfOneDay() {
                 <p className="text-muted-foreground text-sm">Sales - Day</p>
             </div>
 
-            <div className="text-sm text-muted-foreground flex flex-col items-end gap-2">
+            <div className="text-sm text-muted-foreground flex min-[1300px]:flex-col gap-2 items-center min-[1300px]:items-end">
                 <Popover>
                     <PopoverTrigger asChild>
                         <Button variant="outline" className="flex gap-2 items-center">

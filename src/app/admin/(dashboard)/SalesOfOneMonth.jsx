@@ -23,16 +23,16 @@ function SalesOfOneMonth() {
   const formattedSales = formatINRCurrency(data?.salesInRange || 0)
 
   return (
-    <PCard className="flex items-center justify-between">
+    <PCard className="flex max-[1300px]:gap-2 max-[1300px]:flex-col min-[1300px]:items- justify-between">
       <div className="flex flex-col gap-1 h-full items-start mb-0 justify-center">
-       {isLoading ?
-                    <Loader2 className="animate-spin" />
-                    : <p className="text-2xl font-semibold">{formattedSales}</p>
-                } <p className="text-muted-foreground text-sm">Sales - Month</p>
+        {isLoading ?
+          <Loader2 className="animate-spin" />
+          : <p className="text-2xl font-semibold">{formattedSales}</p>
+        } <p className="text-muted-foreground text-sm">Sales - Month</p>
       </div>
-      <div className="flex flex-col gap-2 items-end text-sm text-muted-foreground">
+      <div className="flex min-[1300px]:flex-col gap-2 items-center min-[1300px]:items-end text-sm text-muted-foreground">
         <MonthSelector onChange={setRange} />
-        <p>{monthLabel}</p>
+        {/* <p>{monthLabel}</p> */}
       </div>
     </PCard>
   )
