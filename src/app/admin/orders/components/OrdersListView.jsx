@@ -138,7 +138,15 @@ export default function OrdersListView({ error, orders = [] }) {
                                     </div>
                                 </TableCell>
                                 <TableCell>₹{o.orderAmount.toFixed(2)}</TableCell>
-                                <TableCell>{o.method}</TableCell>
+                                <TableCell>
+                                    <div className='text-xs flex flex-col gap-1 items-center'>
+                                        <p className='font-semibold'>{o.method}</p>
+                                        {o.paymentStatus == "Paid" ?
+                                            <Badge className={'bg-emerald-600 text-white'} >Paid</Badge>
+                                            : <Badge variant="destructive">Pending</Badge>
+                                        }
+                                    </div>
+                                </TableCell>
 
                                 <TableCell>
                                     <StatusUpdate

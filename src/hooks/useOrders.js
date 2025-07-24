@@ -134,6 +134,18 @@ export const useOrders = () => {
     },
   });
 
+  const getPaymentLinks = useQuery({
+    queryKey: ["paymentLinks"],
+    queryFn: () => api.get("/payment/links").then((res) => res.data),
+    keepPreviousData: true,
+    staleTime: 1000 * 60 * 5,
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.message || "Failed to fetch payment links"
+      );
+    },
+  });
+
   //  Get single order by Id
   const getSingleOrderQuery = (id) =>
     useQuery({
@@ -211,6 +223,7 @@ export const useOrders = () => {
     removeItemFromOrder,
     getCancelRequestOrders,
     sendPaymentLink,
+    getPaymentLinks,
     permissions: { canView, canAdd, canEdit, canDelete },
   };
 };
