@@ -44,6 +44,12 @@ export const ADMIN_SIDEBAR_LINKS = [
     icon: <FaReceipt />,
   },
   {
+    key: "manual-order",
+    label: "Manual Order",
+    href: "/admin/manual-order",
+    icon: <FaFileInvoiceDollar />,
+  },
+  {
     key: "orders",
     label: "Orders",
     href: "/admin/orders",

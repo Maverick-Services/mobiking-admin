@@ -126,6 +126,18 @@ export const useOrders = () => {
     },
   });
 
+  const createManualOrder = useMutation({
+    mutationFn: (data) => api.post("/orders/manual/new", data),
+    onSuccess: () => {
+      toast.success("Order Created!");
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to create order");
+      console.error(err);
+    },
+  });
+
   // send payment link
   const sendPaymentLink = useMutation({
     mutationFn: ({ data }) => api.post(`/payment/generateLink`, data),
@@ -228,6 +240,7 @@ export const useOrders = () => {
     getCancelRequestOrders,
     sendPaymentLink,
     getPaymentLinks,
+    createManualOrder,
     permissions: { canView, canAdd, canEdit, canDelete },
   };
 };

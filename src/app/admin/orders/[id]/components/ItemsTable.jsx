@@ -13,6 +13,7 @@ import MiniLoaderButton from "@/components/custom/MiniLoaderButton"
 import { useOrders } from "@/hooks/useOrders"
 import { Button } from "@/components/ui/button"
 import AddItemDialog from './AddItemDialog';
+import OrderChargesDetailsDialog from "./OrderChargesDetailsDialog"
 
 function ItemsTable({ order, isNewOrder }) {
     const items = order?.items || []
@@ -20,6 +21,7 @@ function ItemsTable({ order, isNewOrder }) {
 
     const [addingItem, setAddingItem] = useState(false)
     const [loadingItemId, setLoadingItemId] = useState(null)
+    const [open, setOpen] = useState(false)
 
     async function handleIncrement(item) {
         const data = {
@@ -135,22 +137,32 @@ function ItemsTable({ order, isNewOrder }) {
                 </Table>
 
                 {/* Summary */}
-                <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6">
-                    <div className="flex items-center justify-between sm:min-w-[200px] border rounded-md p-3 shadow-sm bg-muted/50">
-                        <span className="text-sm text-gray-600">Subtotal:</span>
-                        <span className="font-medium">₹{order.subtotal}</span>
-                    </div>
-                    <div className="flex items-center justify-between sm:min-w-[200px] border rounded-md p-3 shadow-sm bg-muted/50">
-                        <span className="text-sm text-gray-600">Discount:</span>
-                        <span className="font-medium">₹{order.discount}</span>
-                    </div>
-                    <div className="flex items-center justify-between sm:min-w-[200px] border rounded-md p-3 shadow-sm bg-muted/50">
-                        <span className="text-sm text-gray-600">Delivery Charges:</span>
-                        <span className="font-medium">₹{order.deliveryCharge}</span>
-                    </div>
-                    <div className="flex items-center justify-between sm:min-w-[200px] border rounded-md p-3 shadow bg-primary/10">
-                        <span className="text-sm font-semibold text-primary">Total Amount:</span>
-                        <span className="font-bold text-primary">₹{order.orderAmount}</span>
+                <div className="flex flex-col gap-3 mt-8">
+
+                    {isNewOrder() && order?.method === 'COD' &&
+                        <Button
+                            className='self-end'
+                            onClick={() => setOpen(true)} variant={'outline'}>Edit</Button>
+                    }
+
+                    {/* Order Amount Details */}
+                    <div className="flex flex-col sm:flex-row justify-end gap-3">
+                        <div className="flex items-center justify-between sm:min-w-[200px] border rounded-md p-3 shadow-sm bg-muted/50">
+                            <span className="text-sm text-gray-600">Subtotal:</span>
+                            <span className="font-medium">₹{order.subtotal}</span>
+                        </div>
+                        <div className="flex items-center justify-between sm:min-w-[200px] border rounded-md p-3 shadow-sm bg-muted/50">
+                            <span className="text-sm text-gray-600">Discount:</span>
+                            <span className="font-medium">₹{order.discount}</span>
+                        </div>
+                        <div className="flex items-center justify-between sm:min-w-[200px] border rounded-md p-3 shadow-sm bg-muted/50">
+                            <span className="text-sm text-gray-600">Delivery Charges:</span>
+                            <span className="font-medium">₹{order.deliveryCharge}</span>
+                        </div>
+                        <div className="flex items-center justify-between sm:min-w-[200px] border rounded-md p-3 shadow bg-primary/10">
+                            <span className="text-sm font-semibold text-primary">Total Amount:</span>
+                            <span className="font-bold text-primary">₹{order.orderAmount}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -158,6 +170,12 @@ function ItemsTable({ order, isNewOrder }) {
                 open={addingItem}
                 onOpenChange={setAddingItem}
                 orderId={order?._id}
+            />
+
+            <OrderChargesDetailsDialog
+                open={open}
+                onOpenChange={setOpen}
+                user={order}
             />
         </PCard>
     )
