@@ -122,6 +122,18 @@ export const useOrders = () => {
     },
   });
 
+  // send payment link
+  const sendPaymentLink = useMutation({
+    mutationFn: ({ data }) => api.post(`/payment/generateLink`, data),
+    onSuccess: () => {
+      toast.success("Link sent successfully.");
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to send payment link");
+      console.log(err);
+    },
+  });
+
   //  Get single order by Id
   const getSingleOrderQuery = (id) =>
     useQuery({
@@ -198,6 +210,7 @@ export const useOrders = () => {
     addItemInOrder,
     removeItemFromOrder,
     getCancelRequestOrders,
+    sendPaymentLink,
     permissions: { canView, canAdd, canEdit, canDelete },
   };
 };

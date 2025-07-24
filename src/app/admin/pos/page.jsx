@@ -3,226 +3,28 @@ import React, { useEffect, useState } from 'react'
 import InnerDashboardLayout from '@/components/dashboard/InnerDashboardLayout'
 import PCard from '@/components/custom/PCard'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { z } from 'zod'
 import { useFieldArray, useForm, useFormContext, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { useUsers } from '@/hooks/useUsers'
 import { useProducts } from '@/hooks/useProducts'
 import { useOrders } from '@/hooks/useOrders'
 import UserDialog from '../customers/components/UserDialog'
 import { Separator } from '@/components/ui/separator'
-import { Plus } from 'lucide-react'
 import LoaderButton from '@/components/custom/LoaderButton'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { BsCashCoin } from "react-icons/bs";
-import { PiCreditCardDuotone } from "react-icons/pi";
 import { FaGoogle } from "react-icons/fa";
 import { useRouter } from 'next/navigation'
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination"
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from "@/components/ui/pagination"
 import { getPaginationRange } from "@/lib/services/getPaginationRange"
 import { useSubCategories } from '@/hooks/useSubCategories'
 import api from '@/lib/api'
-
-const posSchema = z.object({
-    userId: z.string().optional(),
-    name: z.string().min(1, 'User Name is required'),
-    phoneNo: z.string().min(1, 'Phone Number is required'),
-    gst: z.string().optional(),
-    method: z.string().min(1, 'Please select payment method'),
-    subtotal: z.number().min(0),
-    discount: z.preprocess(
-        val => {
-            if (val === '') return undefined
-            return typeof val === 'string' ? Number(val) : val
-        },
-        z.number().optional()
-    ),
-    orderAmount: z.number().min(0),
-    items: z.array(
-        z.object({
-            productId: z.string().min(1, 'Product ID is required'),
-            variantName: z.string().optional(),
-            quantity: z.number().min(1, 'Quantity must be at least 1'),
-            price: z.number().min(0),
-        })
-    ).min(1, 'At least one item is required'),
-});
-
-function OrderItemRow({ index, allProducts, onRemove }) {
-    const { control, getValues, setValue } = useFormContext()
-    const productId = useWatch({ control, name: `items.${index}.productId` })
-    const quantity = useWatch({ control, name: `items.${index}.quantity` })
-
-    const selected = allProducts.find((p) => p._id === productId)
-    const variants = selected ? Object.entries(selected.variants || {}) : []
-    const price = selected?.sellingPrice?.slice(-1)[0]?.price || 0
-
-    const total = (quantity || 0) * price
-
-    // reset variant when product changes
-    useEffect(() => {
-        const cur = getValues(`items.${index}.variantName`)
-        const hasKey = variants.some(([key]) => key === cur)
-        if (cur && !hasKey) setValue(`items.${index}.variantName`, '')
-    }, [productId, variants, getValues, setValue, index])
-
-    // sync price
-    useEffect(() => {
-        if (getValues(`items.${index}.price`) !== price) {
-            setValue(`items.${index}.price`, price)
-        }
-    }, [quantity, productId, price, getValues, setValue, index])
-
-    return (
-        <div className="flex gap-2 items-center w-full p-2 border-b">
-            <div className="w-12 h-12 flex-shrink-0">
-                {selected?.images?.[0] ? (
-                    <img
-                        src={selected.images[0]}
-                        alt={selected.fullName}
-                        className="w-full h-full object-cover rounded-md"
-                    />
-                ) : (
-                    <div className="bg-gray-200 border-2 border-dashed rounded-md w-full h-full" />
-                )}
-            </div>
-
-            <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium truncate max-w-[300px] text-wrap">{selected?.fullName || 'Product not selected'}</p>
-                {selected?.variants && (
-                    <p className="text-xs text-gray-500 truncate">
-                        {getValues(`items.${index}.variantName`) || 'No variant selected'}
-                    </p>
-                )}
-            </div>
-
-            <FormField
-                control={control}
-                name={`items.${index}.quantity`}
-                render={({ field }) => (
-                    <FormItem className="w-20">
-                        <FormControl>
-                            <Input
-                                type="number"
-                                min={1}
-                                {...field}
-                                onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
-                                className="text-center"
-                            />
-                        </FormControl>
-                    </FormItem>
-                )}
-            />
-
-            <div className="w-20 text-right font-medium">₹{price}</div>
-            <div className="w-20 text-right font-bold">₹{total}</div>
-
-            <Button
-                variant="ghost"
-                size="icon"
-                type="button"
-                onClick={onRemove}
-                className="text-red-500 hover:text-red-700"
-            >
-                &times;
-            </Button>
-        </div>
-    )
-}
-
-function ProductCard({ product, onAddItem }) {
-    const [selectedVariant, setSelectedVariant] = useState('');
-    const variants = Object.entries(product.variants || {});
-    const price = product?.sellingPrice?.slice(-1)[0]?.price || 0;
-
-    const handleAddToCart = () => {
-        onAddItem({
-            productId: product._id,
-            variantName: variants.length > 0 ? selectedVariant : undefined,
-            quantity: 1,
-            price: price
-        });
-
-        // Reset variant selection after adding
-        if (variants.length > 0) setSelectedVariant('');
-    };
-
-    return (
-        <Card className="h-full flex py-0 shadow-none rounded">
-            <div className="p-3 pb-0">
-                <div className="aspect-square w-full bg-gray-100 rounded-md overflow-hidden">
-                    {product.images?.[0] ? (
-                        <img
-                            src={product.images[0]}
-                            alt={product.fullName}
-                            className="w-full h-full object-cover"
-                        />
-                    ) : (
-                        <div className="bg-gray-200 border-2 border-dashed rounded-md w-full h-full" />
-                    )}
-                </div>
-            </div>
-            <div className="p-3 flex-1">
-                <h3 className="font-medium text-xs">{product.fullName}</h3>
-                <p className="text-primary font-bold mt-1">₹{price}</p>
-
-                {variants.length > 0 && (
-                    <div className="my-2">
-                        <Select value={selectedVariant} onValueChange={setSelectedVariant}>
-                            <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select variant" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {variants.filter(([key, qty]) => qty > 0)?.map(([key, qty]) => (
-                                    <SelectItem key={key} value={key}>
-                                        {key} <Badge variant="outline" className="ml-2">{qty} in stock</Badge>
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                )}
-                <Button
-                    size="sm"
-                    className="w-full"
-                    onClick={handleAddToCart}
-                    disabled={variants.length > 0 && !selectedVariant}
-                >
-                    Add to Cart
-                </Button>
-            </div>
-        </Card>
-    );
-}
-
-function ProductGrid({ allProducts, onAddItem }) {
-    return (
-        <div className="space-y-4 h-full flex flex-col">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 flex-1">
-                {allProducts.map(product => (
-                    <ProductCard
-                        key={product._id}
-                        product={product}
-                        onAddItem={onAddItem}
-                    />
-                ))}
-            </div>
-        </div>
-    );
-}
+import ProductGrid from './components/ProductGrid'
+import OrderItemRow from './components/OrderItemRow'
+import { posSchema } from '@/lib/validations/posSchema'
+import SuccessMessage from './components/SuccessMessage'
 
 const FILTERS = [
     // { key: '_all_', label: 'ALL' },
@@ -234,8 +36,8 @@ const FILTERS = [
 
 function page() {
     const router = useRouter();
-    const { allUsersQuery, createCustomer } = useUsers();
-
+    const { createCustomer } = useUsers();
+    const [createdOrder, setCreatedOrder] = useState(null)
     const [categoryFilter, setCategoryFilter] = useState()
     const [typeFilter, setTypeFilter] = useState('')
 
@@ -295,7 +97,7 @@ function page() {
         }
     })
 
-    const { watch, setValue } = form;
+    const { watch, setValue, reset } = form;
     const { fields, append, remove } = useFieldArray({ control: form.control, name: "items" })
     const items = useWatch({ control: form.control, name: "items" })
     const discount = watch('discount')
@@ -337,7 +139,9 @@ function page() {
                 userId: finalUserId,
             }
 
-            await createPosOrder.mutateAsync(payload)
+            const res2 = await createPosOrder.mutateAsync(payload)
+            const created = res2?.data?.data;
+            setCreatedOrder(created)
             // router.push('/admin/orders')
         } catch (err) {
             console.error('Error in creating order:', err)
@@ -397,6 +201,7 @@ function page() {
                         </div>
 
                         <ProductGrid
+                            loading={products.isFetching}
                             allProducts={allProducts}
                             onAddItem={(item) => append(item)}
                         />
@@ -459,13 +264,14 @@ function page() {
                 <div className="w-full lg:w-full">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+                            {/* user personal details */}
                             <PCard>
                                 <div className="flex gap-2 justify-between items-center mb-3">
                                     <h2 className='font-semibold text-xl uppercase text-gray-600'>Customer Details</h2>
                                 </div>
                                 <Separator className="mb-4" />
-
                                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3'>
+                                    {/* phone no */}
                                     <FormField
                                         control={form.control}
                                         name="phoneNo"
@@ -484,6 +290,7 @@ function page() {
                                         )}
                                     />
 
+                                    {/* Customer name */}
                                     <FormField
                                         control={form.control}
                                         name="name"
@@ -501,6 +308,7 @@ function page() {
                                         )}
                                     />
 
+                                    {/* GST Number */}
                                     <FormField
                                         control={form.control}
                                         name="gst"
@@ -517,6 +325,7 @@ function page() {
                                         )}
                                     />
 
+                                    {/* payment method */}
                                     <FormField
                                         control={form.control}
                                         name="method"
@@ -536,10 +345,10 @@ function page() {
                                                                 <span>Cash</span>
                                                             </div>
                                                         </SelectItem>
-                                                        <SelectItem value="online">
+                                                        <SelectItem value="UPI">
                                                             <div className="flex items-center gap-2">
                                                                 <FaGoogle className="w-4 h-4 text-gray-600" />
-                                                                <span>Online</span>
+                                                                <span>UPI</span>
                                                             </div>
                                                         </SelectItem>
                                                     </SelectContent>
@@ -553,6 +362,7 @@ function page() {
                             </PCard>
 
                             <div className='grid grid-cols-10 gap-3 w-full'>
+                                {/* items table */}
                                 <div className={'col-span-7 w-full'}>
                                     <PCard >
                                         <div className="flex justify-between items-center mb-4">
@@ -583,15 +393,17 @@ function page() {
                                     </PCard>
                                 </div>
 
-                                {/* discount */}
+                                {/* totals */}
                                 <div className={'col-span-3 w-full'}>
                                     <PCard>
                                         <div className="space-y-3">
+                                            {/* Sub total */}
                                             <div className="flex justify-between">
                                                 <span className="text-gray-600">Subtotal:</span>
                                                 <span className="font-medium">₹{watchSubTotal}</span>
                                             </div>
 
+                                            {/* discount */}
                                             <FormField
                                                 control={form.control}
                                                 name="discount"
@@ -617,6 +429,7 @@ function page() {
 
                                             <Separator />
 
+                                            {/* Total amount */}
                                             <div className="flex justify-between text-lg font-bold">
                                                 <span>Total Amount:</span>
                                                 <span className="text-primary">₹{watchOrderAmount}</span>
@@ -638,6 +451,13 @@ function page() {
                         </form>
                     </Form>
                 </div>
+                {createdOrder &&
+                    <SuccessMessage
+                        reset={reset}
+                        order={createdOrder}
+                        resetOrder={setCreatedOrder}
+                    />
+                }
             </div>
 
             <UserDialog
@@ -649,11 +469,3 @@ function page() {
 }
 
 export default page
-
-
-
-
-//   const { allUsersQuery, createCustomer, updateUser } = useUsers();
-//     // users data
-//     const allUsers = allUsersQuery?.data?.data || []
-//     console.log(allUsers)
