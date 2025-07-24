@@ -1,5 +1,6 @@
 'use client'
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { CSVLink } from 'react-csv'
 import InnerDashboardLayout from '@/components/dashboard/InnerDashboardLayout'
 import { useOrders } from '@/hooks/useOrders'
 import { Button } from '@/components/ui/button'
@@ -27,6 +28,9 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination"
 import RefreshButton from '@/components/custom/RefreshButton'
+import toast from 'react-hot-toast'
+import axios from 'axios'
+import { useAuthStore } from '@/store/useAuthStore'
 
 const TABS = [
     { key: 'all', label: 'ALL ORDERS' },
@@ -72,6 +76,101 @@ const STATUS_BG = {
     Hold: 'bg-purple-500',
 }
 
+// For flattening the order data to make it exportable as csv
+const flattenOrder = (orders) => {
+    const rows = [];
+
+    orders.forEach((order) => {
+        order.items?.forEach((item, index) => {
+            if (index > 0) {
+                rows.push({
+                    _id: order._id,
+                    orderId: order.orderId,
+                    createdAt: "",
+                    type: "",
+                    method: "",
+                    status: "",
+                    shippingStatus: "",
+                    paymentStatus: "",
+                    paymentDate: "",
+                    name: "",
+                    phoneNo: "",
+                    userId: "",
+
+                    //items
+                    itemNo: index + 1,
+                    productId: item?.productId?._id || "",
+                    name_item: item?.productId?.name || "",
+                    fullName: item?.productId?.fullName || "",
+                    variant: item?.productId?.variantName || "",
+                    quantity: item?.quantity ?? "",
+                    price: item?.price ?? "",
+
+                    //other details
+
+                    subtotal: "",
+                    deliveryCharge: "",
+                    discount: "",
+                    orderAmount: "",
+                    gst: "",
+                    isAppOrder: "",
+                    abondonedOrder: "",
+                    pickupScheduled: "",
+                    length: "",
+                    breadth: "",
+                    height: "",
+                    weight: "",
+                    updatedAt: "",
+                });
+            } else {
+                rows.push(
+                    {
+                        _id: order._id,
+                        orderId: order.orderId,
+                        createdAt: order.createdAt,
+                        type: order.type,
+                        method: order.method,
+                        status: order.status,
+                        shippingStatus: order.shippingStatus,
+                        paymentStatus: order.paymentStatus,
+                        paymentDate: order.paymentDate || "",
+                        name: order.name,
+                        phoneNo: order.phoneNo,
+                        userId: order.userId?._id || "",
+
+                        //items
+                        itemNo: index + 1,
+                        productId: item?.productId?._id || "",
+                        name_item: item?.productId?.name || "",
+                        fullName: item?.productId?.fullName || "",
+                        variant: item?.productId?.variantName || "",
+                        quantity: item?.quantity ?? "",
+                        price: item?.price ?? "",
+
+                        //other details
+
+                        subtotal: order.subtotal,
+                        deliveryCharge: order.deliveryCharge,
+                        discount: order.discount,
+                        orderAmount: order.orderAmount,
+                        gst: order.gst,
+                        isAppOrder: order.isAppOrder,
+                        abondonedOrder: order.abondonedOrder,
+                        pickupScheduled: order.pickupScheduled,
+                        length: order.length,
+                        breadth: order.breadth,
+                        height: order.height,
+                        weight: order.weight,
+                        updatedAt: order.updatedAt,
+                    }
+                )
+            }
+        });
+    });
+
+    return rows;
+};
+
 export default function Page() {
     const [showAmountCards, setShowAmountCards] = useState(false)
     const [page, setPage] = useState(1)
@@ -86,6 +185,11 @@ export default function Page() {
     // for search
     const [searchQuery, setSearchQuery] = useState('')
     const [queryParameter, setQueryParameter] = useState('customer')
+
+    // For Exporting Data
+    const { accessToken } = useAuthStore();
+    const csvLinkRef = useRef();
+    const [csvData, setCsvData] = useState([]);
 
     const handleDebouncedSearch = useCallback(
         debounce((value) => {
@@ -162,11 +266,44 @@ export default function Page() {
     };
 
     const orders = customOrdersData?.orders || [];
-    // console.log(customOrdersData)
-    // console.log(customOrdersData?.salesData)
-
     const totalPages = customOrdersData?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
+
+    //Export data Function
+    const handleExportData = async () => {
+        try {
+            const res = await axios.get(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/orders/custom?startDate=${startDate}&endDate=${endDate}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`, // replace `token` with your actual token variable
+                    },
+                }
+            );
+
+            // fetch your order data
+            if (!res?.data?.success)
+                throw new Error("Could not export data");
+
+            const flattened = flattenOrder(res.data.data);
+            setCsvData(flattened);
+
+        } catch (err) {
+            console.error("Failed to export:", err);
+            toast.error(err?.message || err?.response?.data?.message);
+        }
+    }
+
+    useEffect(() => {
+        // console.log(csvData)
+        if (csvData && csvData?.length) {
+            // Wait a bit for state update then trigger download
+            // setTimeout(() => {
+            csvLinkRef.current?.link.click();
+            setCsvData([]);
+            // }, 200);
+        }
+    }, [csvData])
 
     if (error) {
         console.log(error)
@@ -187,6 +324,26 @@ export default function Page() {
                     <Button variant="outline" onClick={() => setShowAmountCards(prev => !prev)}>
                         <ChevronDown className={`transition-transform duration-300 ${showAmountCards ? '' : 'rotate-180'}`} />
                     </Button>
+
+                    {/* Export Data */}
+                    {
+                        (
+                            <Button variant="outline"
+                                disabled={isFetching}
+                                onClick={handleExportData}
+                            >
+                                Export as CSV
+                            </Button>
+                        )
+                    }
+
+                    <CSVLink
+                        data={csvData}
+                        filename={`order-items-${startDate}-${endDate}.csv`}
+                        className="hidden"
+                        ref={csvLinkRef}
+                        target="_blank"
+                    />
 
                     <RefreshButton
                         queryPrefix='orders'

@@ -75,6 +75,7 @@ export const useOrders = () => {
         .then((res) => res.data),
     onSuccess: () => {
       toast.success("Order accepted!");
+      queryClient.invalidateQueries({ queryKey: ["order"] });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
     onError: (err) => toast.error(err.message || "Failed to accept order"),
@@ -85,6 +86,7 @@ export const useOrders = () => {
       api.post("/orders/reject", { orderId, reason }).then((res) => res.data),
     onSuccess: () => {
       toast.success("Order rejected!");
+      queryClient.invalidateQueries({ queryKey: ["order"] });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
     onError: (err) => toast.error(err.message || "Failed to reject order"),
@@ -95,6 +97,7 @@ export const useOrders = () => {
       api.post("/orders/hold", { orderId, reason }).then((res) => res.data),
     onSuccess: () => {
       toast.success("Order on hold!");
+      queryClient.invalidateQueries({ queryKey: ["order"] });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
     onError: (err) => toast.error(err.message || "Failed to hold order"),
@@ -105,6 +108,7 @@ export const useOrders = () => {
       api.post("/orders/cancel", { orderId, reason }),
     onSuccess: () => {
       toast.success("Order cancelled!");
+      queryClient.invalidateQueries({ queryKey: ["order"] });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
     onError: (err) => toast.error(err.message || "Failed to cancel order"),
