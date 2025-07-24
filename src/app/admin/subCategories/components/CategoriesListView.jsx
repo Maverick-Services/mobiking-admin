@@ -30,7 +30,7 @@ export default function CategoriesListView({
 }) {
 
     // console.log(categories)
-    const { updateSubCategory } = useSubCategories();
+    const { updateSubCategory, updateSubCategoryStatus } = useSubCategories();
     const [deletingCategoryId, setDeletingCategoryId] = useState(null);
     const router = useRouter();
 
@@ -91,7 +91,7 @@ export default function CategoriesListView({
                                     onCheckedChange={async checked => {
                                         const toastId = toast.loading("Updating...");
                                         try {
-                                            await updateSubCategory.mutateAsync({
+                                            await updateSubCategoryStatus.mutateAsync({
                                                 id: item._id,
                                                 data: { active: checked }
                                             })

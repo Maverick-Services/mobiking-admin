@@ -71,6 +71,19 @@ export const useSubCategories = () => {
         }
     });
 
+    const updateSubCategoryStatus = useMutation({
+        mutationFn: ({ id, data }) => api.put(`/categories/subCategories/status/${id}`, data),
+        enabled: canEdit,
+        onSuccess: () => {
+            queryClient.invalidateQueries(['subCategories']);
+            toast.success('Sub Category Status updated successfully');
+        },
+        onError: (err) => {
+            console.log(err)
+            toast.error(err.message || 'Failed to update status');
+        }
+    });
+
     // Delete Category mutation
     const deleteSubCategory = useMutation({
         mutationFn: (id) => api.delete(`/categories/subCategories/${id}`),
@@ -85,7 +98,7 @@ export const useSubCategories = () => {
     });
 
     return {
-        subCategoriesQuery, deleteSubCategory, updateSubCategory, createSubCategory, getSubServiceQuery,
+        subCategoriesQuery, deleteSubCategory, updateSubCategory, updateSubCategoryStatus, createSubCategory, getSubServiceQuery,
         permissions: {
             canView,
             canAdd,
