@@ -25,6 +25,7 @@ import ProductGrid from './components/ProductGrid'
 import OrderItemRow from './components/OrderItemRow'
 import { posSchema } from '@/lib/validations/posSchema'
 import SuccessMessage from './components/SuccessMessage'
+import axios from 'axios'
 
 const FILTERS = [
     // { key: '_all_', label: 'ALL' },
@@ -73,11 +74,8 @@ function page() {
     const totalPages = products.data?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
 
-    // console.log(allProducts)
-
     const { createPosOrder } = useOrders()
-    const { getUserByPhoneNumber } = useUsers();
-
+    const [addedProducts, setAddedProducts] = useState([])
     const [addUserDialog, setAddUserDialog] = useState(false)
 
     // form hook
@@ -114,17 +112,11 @@ function page() {
     const watchOrderAmount = watch('orderAmount')
 
     async function onSubmit(values) {
-        console.log(values)
-        // const abc = getUserByPhoneNumber(values.phoneNo)
         try {
             let finalUserId;
-
             const res = await api.get(`/users/customer/${values.phoneNo}`);
-            finalUserId = res.data?.data;
 
-            console.log(finalUserId)
-            // If user not selected, create a new user
-            if (!finalUserId) {
+            if (res?.data?.statusCode === 200) {
                 const res = await createCustomer.mutateAsync({
                     name: values.name,
                     phoneNo: values.phoneNo,
@@ -132,6 +124,8 @@ function page() {
                 })
                 finalUserId = res?.data?.data?._id
                 form.setValue('userId', finalUserId)
+            } else {
+                finalUserId = res.data?.data;
             }
 
             const payload = {
@@ -146,6 +140,10 @@ function page() {
         } catch (err) {
             console.error('Error in creating order:', err)
         }
+    }
+
+    function onError(errors) {
+        console.log("❌ Validation errors:", errors);
     }
 
     return (
@@ -203,6 +201,7 @@ function page() {
                         <ProductGrid
                             loading={products.isFetching}
                             allProducts={allProducts}
+                            setAddedProducts={setAddedProducts}
                             onAddItem={(item) => append(item)}
                         />
 
@@ -263,7 +262,7 @@ function page() {
                 {/* Right Column: Order Form (30% width) */}
                 <div className="w-full lg:w-full">
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+                        <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-2">
                             {/* user personal details */}
                             <PCard>
                                 <div className="flex gap-2 justify-between items-center mb-3">
@@ -357,14 +356,13 @@ function page() {
                                             </FormItem>
                                         )}
                                     />
-
                                 </div>
                             </PCard>
 
-                            <div className='grid grid-cols-10 gap-3 w-full'>
+                            <div className='grid grid-cols-10 gap-3 w-full '>
                                 {/* items table */}
-                                <div className={'col-span-7 w-full'}>
-                                    <PCard >
+                                <div className={'col-span-10 lg:col-span-7 w-full'}>
+                                    <div className={'bg-white rounded-sm overflow-x-scroll p-4'}>
                                         <div className="flex justify-between items-center mb-4">
                                             <h2 className='font-semibold text-xl uppercase text-gray-600'>Order Items</h2>
                                             <div className="text-sm text-gray-500">
@@ -372,29 +370,29 @@ function page() {
                                             </div>
                                         </div>
 
-                                        <div className="border rounded-lg overflow-hidden">
+                                        <div className="border rounded-lg overflow-x-auto overflow-scroll">
                                             {fields.length === 0 ? (
                                                 <div className="py-10 text-center text-gray-500">
                                                     No items added. Select products from the left panel.
                                                 </div>
                                             ) : (
-                                                <ScrollArea className="max-h-64">
+                                                <div className="max-h-64 ">
                                                     {fields.map((item, i) => (
                                                         <OrderItemRow
                                                             key={item.id}
                                                             index={i}
-                                                            allProducts={allProducts}
+                                                            allProducts={addedProducts}
                                                             onRemove={() => remove(i)}
                                                         />
                                                     ))}
-                                                </ScrollArea>
+                                                </div>
                                             )}
                                         </div>
-                                    </PCard>
+                                    </div>
                                 </div>
 
                                 {/* totals */}
-                                <div className={'col-span-3 w-full'}>
+                                <div className={'col-span-10 lg:col-span-3 w-full'}>
                                     <PCard>
                                         <div className="space-y-3">
                                             {/* Sub total */}

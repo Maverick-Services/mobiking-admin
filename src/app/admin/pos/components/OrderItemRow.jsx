@@ -30,8 +30,8 @@ function OrderItemRow({ index, allProducts, onRemove }) {
     }, [quantity, productId, price, getValues, setValue, index])
 
     return (
-        <div className="flex gap-2 items-center w-full p-2 border-b">
-            <div className="w-12 h-12 flex-shrink-0">
+        <div className="flex flex-col sm:flex-row gap-2 sm:items-center w-full p-2 border-b">
+            <div className="w-12 h-12 flex-shrink-0 self-start sm:self-auto">
                 {selected?.images?.[0] ? (
                     <img
                         src={selected.images[0]}
@@ -44,7 +44,9 @@ function OrderItemRow({ index, allProducts, onRemove }) {
             </div>
 
             <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium truncate max-w-[300px] text-wrap">{selected?.fullName || 'Product not selected'}</p>
+                <p className="text-xs font-medium truncate max-w-[300px] text-wrap">
+                    {selected?.fullName || 'Product not selected'}
+                </p>
                 {selected?.variants && (
                     <p className="text-xs text-gray-500 truncate">
                         {getValues(`items.${index}.variantName`) || 'No variant selected'}
@@ -56,7 +58,7 @@ function OrderItemRow({ index, allProducts, onRemove }) {
                 control={control}
                 name={`items.${index}.quantity`}
                 render={({ field }) => (
-                    <FormItem className="w-20">
+                    <FormItem className="w-full sm:w-20">
                         <FormControl>
                             <Input
                                 type="number"
@@ -70,19 +72,20 @@ function OrderItemRow({ index, allProducts, onRemove }) {
                 )}
             />
 
-            <div className="w-20 text-right font-medium">₹{price}</div>
-            <div className="w-20 text-right font-bold">₹{total}</div>
+            <div className="w-full sm:w-20 text-right font-medium">₹{price}</div>
+            <div className="w-full sm:w-20 text-right font-bold">₹{total}</div>
 
             <Button
                 variant="ghost"
                 size="icon"
                 type="button"
                 onClick={onRemove}
-                className="text-red-500 hover:text-red-700"
+                className="text-red-500 hover:text-red-700 self-end sm:self-auto"
             >
                 &times;
             </Button>
         </div>
+
     )
 }
 

@@ -4,9 +4,11 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 
-function ProductCard({ product, onAddItem }) {
-    const [selectedVariant, setSelectedVariant] = useState('');
+function ProductCard({ product, onAddItem, setAddedProducts }) {
     const variants = Object.entries(product.variants || {});
+    if (variants?.length <= 0) return null;
+
+    const [selectedVariant, setSelectedVariant] = useState(variants[0]?.[0] || '');
     const price = product?.sellingPrice?.slice(-1)[0]?.price || 0;
 
     const handleAddToCart = () => {
@@ -16,7 +18,7 @@ function ProductCard({ product, onAddItem }) {
             quantity: 1,
             price: price
         });
-
+        setAddedProducts(prev => [...prev, product])
         // Reset variant selection after adding
         if (variants.length > 0) setSelectedVariant('');
     };
@@ -40,22 +42,21 @@ function ProductCard({ product, onAddItem }) {
                 <h3 className="font-medium text-xs">{product.fullName}</h3>
                 <p className="text-primary font-bold mt-1">₹{price}</p>
 
-                {variants.length > 0 && (
-                    <div className="my-2">
-                        <Select value={selectedVariant} onValueChange={setSelectedVariant}>
-                            <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select variant" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {variants.filter(([key, qty]) => qty > 0)?.map(([key, qty]) => (
-                                    <SelectItem key={key} value={key}>
-                                        {key} <Badge variant="outline" className="ml-2">{qty} in stock</Badge>
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                )}
+                <div className="my-2">
+                    <Select value={selectedVariant} onValueChange={setSelectedVariant}>
+                        <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select variant" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {variants.filter(([key, qty]) => qty > 0)?.map(([key, qty]) => (
+                                <SelectItem key={key} value={key}>
+                                    {key} <Badge variant="outline" className="ml-2">{qty} in stock</Badge>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
                 <Button
                     size="sm"
                     className="w-full"

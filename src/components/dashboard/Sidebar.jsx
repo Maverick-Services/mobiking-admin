@@ -70,9 +70,9 @@ export default function Sidebar({ isOpen, setIsSidebarOpen }) {
     return (
         <div
             className={`
-        max-[640px]:max-w-58 max-[640px]:absolute
+        max-[1024px]:max-w-58 max-[1024px]:absolute
         ${!isOpen ? "-left-full" : "left-0"}
-        max-[640px]:top-0 lg:w-[16rem] h-screen max-h-screen bg-gray-900
+        max-[1024px]:top-0 lg:w-[16rem] h-screen max-h-screen bg-gray-900
         overflow-auto text-gray-100 border-r border-gray-700
         shadow-xl flex flex-col items-center gap-2 px-3 py-2
         transition-all duration-500 ease-in-out z-[100]

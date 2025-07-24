@@ -8,9 +8,9 @@ function LayoutDashboard({ children }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
-        <main className='flex flex-col sm:flex-row h-screen'>
+        <main className='flex flex-col lg:flex-row h-screen'>
 
-            <div className="flex p-5 justify-between items-center bg-gray-900 shadow-md gap-3 sm:hidden">
+            <div className="flex p-5 justify-between items-center bg-gray-900 shadow-md gap-3 lg:hidden">
                 <Image
                     height={100}
                     width={300}

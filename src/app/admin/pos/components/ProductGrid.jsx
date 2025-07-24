@@ -2,7 +2,7 @@ import React from 'react'
 import ProductCard from './ProductCard';
 import Loader from '@/components/Loader';
 
-function ProductGrid({ loading, allProducts, onAddItem }) {
+function ProductGrid({ loading, allProducts, onAddItem, setAddedProducts }) {
     // console.log(loading)
     if (loading) return <Loader />
     return (
@@ -13,6 +13,7 @@ function ProductGrid({ loading, allProducts, onAddItem }) {
                         key={product._id}
                         product={product}
                         onAddItem={onAddItem}
+                        setAddedProducts={setAddedProducts}
                     />
                 ))}
             </div>
