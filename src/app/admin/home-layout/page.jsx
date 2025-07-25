@@ -32,10 +32,7 @@ function page() {
         setBanners(homeData?.banners)
     }, [homeData])
 
-    const [bannerLoading, setBannerLoading] = useState(false)
-
-
-    console.log(homeData)
+    const [bannerLoading, setBannerLoading] = useState(false);
 
     return (
         <InnerDashboardLayout>
@@ -43,23 +40,7 @@ function page() {
                 <h1 className='font-bold sm:text-2xl lg:text-4xl w-full'>Design Studio</h1>
             </div>
 
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4'>
-                <PCard>
-                    <GroupTable
-                        initialData={initialData}
-                        allGroups={allGroups}
-                        onSave={(newSequence) => {
-                            console.log('New sequence of IDs:', newSequence)
-                            const data = {
-                                ...homeData,
-                                groups: newSequence
-                            }
-                            updateHome.mutateAsync(data)
-                            // console.log(data)
-                        }}
-                    />
-                </PCard>
-
+            <div className='flex flex-col gap-4 mb-4'>
                 <PCard>
                     {/* Categories section */}
                     <CategoryTable
@@ -72,6 +53,20 @@ function page() {
                             }
                             updateHome.mutateAsync(data)
                             console.log('Categories saved:', newSeq)
+                        }}
+                    />
+                </PCard>
+                <PCard>
+                    <GroupTable
+                        initialData={initialData}
+                        allGroups={allGroups}
+                        onSave={(newSequence) => {
+                            console.log('New sequence of IDs:', newSequence)
+                            const data = {
+                                ...homeData,
+                                groups: newSequence
+                            }
+                            updateHome.mutateAsync(data)
                         }}
                     />
                 </PCard>
