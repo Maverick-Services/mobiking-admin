@@ -61,7 +61,7 @@ function page() {
                 </PCard>
             </div>
 
-            <PCard className={''}>
+            <PCard className='max-w-[600px]'>
                 <WebsiteBanners />
             </PCard>
         </InnerDashboardLayout>
