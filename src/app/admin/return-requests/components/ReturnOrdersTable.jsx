@@ -15,6 +15,7 @@ import { Download, Eye, HeadphoneOff, MessageSquare, Pencil } from 'lucide-react
 import { format } from 'date-fns'
 import { FaWhatsapp } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
+import { OrderViewDialog } from './OrderViewDialog'
 
 // Map each order status to a Badge variant
 const STATUS_VARIANTS = {
@@ -134,16 +135,11 @@ export default function ReturnOrdersTable({ error, orders = [] }) {
 
                                     {/* action buttons */}
                                     <TableCell className="text-center space-x-2 flex items-center justify-center">
-
-                                        <Button
-                                            // className={'h-7 w-7'}
-                                            variant="outline"
-                                        // onClick={() => router.push(`/admin/orders/${o._id}`)}
-                                        >
-                                            <Eye />
-                                        </Button>
-
-
+                                        <OrderViewDialog order={o}>
+                                            <Button variant="outline">
+                                                <Eye />
+                                            </Button>
+                                        </OrderViewDialog>
                                     </TableCell>
                                 </motion.tr>
                             )

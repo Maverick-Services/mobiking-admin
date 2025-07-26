@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card'
 
 function ProductCard({ product, onAddItem, setAddedProducts }) {
     const variants = Object.entries(product.variants || {});
-    if (variants?.length <= 0) return null;
+    // if (variants?.length <= 0) return null;
 
     const [selectedVariant, setSelectedVariant] = useState(variants[0]?.[0] || '');
     const price = product?.sellingPrice?.slice(-1)[0]?.price || 0;

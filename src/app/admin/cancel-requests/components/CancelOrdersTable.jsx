@@ -15,6 +15,8 @@ import { Download, Eye, HeadphoneOff, MessageSquare, Pencil } from 'lucide-react
 import { format } from 'date-fns'
 import { FaWhatsapp } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
+import CancelDialog from './CancelDialog'
+import { OrderViewDialog } from './OrderViewDialog'
 
 // Map each order status to a Badge variant
 const STATUS_VARIANTS = {
@@ -30,6 +32,8 @@ const STATUS_VARIANTS = {
 
 export default function CancelOrdersTable({ error, orders = [] }) {
     const router = useRouter()
+    const [cancelDialog, setCancelDialog] = useState(false)
+    const [selectedOrder, setSelectedOrder] = useState(undefined)
 
     if (error) {
         return (
@@ -93,7 +97,7 @@ export default function CancelOrdersTable({ error, orders = [] }) {
                                 >
                                     <TableCell>{i + 1}</TableCell>
 
-                                    <TableCell className={'cursor-pointer'}>
+                                    <TableCell className={''}>
                                         {o._id.slice(0, 6).toUpperCase()}
                                     </TableCell>
 
@@ -135,13 +139,21 @@ export default function CancelOrdersTable({ error, orders = [] }) {
                                     {/* action buttons */}
                                     <TableCell className="text-center space-x-2 flex items-center justify-center">
 
-                                        <Button
+                                        {/* <Button
                                             // className={'h-7 w-7'}
                                             variant="outline"
-                                        // onClick={() => router.push(`/admin/orders/${o._id}`)}
+                                            onClick={() => {
+                                                setSelectedOrder(o)
+                                                setCancelDialog(true)
+                                            }}
                                         >
                                             <Eye />
-                                        </Button>
+                                        </Button> */}
+                                        <OrderViewDialog order={o}>
+                                            <Button variant="outline">
+                                                <Eye />
+                                            </Button>
+                                        </OrderViewDialog>
 
 
                                     </TableCell>
@@ -151,6 +163,11 @@ export default function CancelOrdersTable({ error, orders = [] }) {
                     </AnimatePresence>
                 </TableBody>
             </Table>
+            <CancelDialog
+                open={cancelDialog}
+                onOpenChange={setCancelDialog}
+                order={selectedOrder}
+            />
         </div>
     )
 }

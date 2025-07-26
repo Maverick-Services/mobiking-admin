@@ -114,6 +114,39 @@ export const useOrders = () => {
     onError: (err) => toast.error(err.message || "Failed to cancel order"),
   });
 
+  const rejectCancelRequest = useMutation({
+    mutationFn: ({ orderId, reason }) =>
+      api.post("/users/request/cancel/reject", { orderId, reason }),
+    onSuccess: () => {
+      toast.success("Cancel request rejected!");
+      queryClient.invalidateQueries({ queryKey: ["order"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+    onError: (err) => toast.error(err.message || "Failed to reject cancel request"),
+  });
+
+  const returnOrder = useMutation({
+    mutationFn: ({ orderId }) =>
+      api.post("/orders/return", { orderId }),
+    onSuccess: () => {
+      toast.success("Order return placed!");
+      queryClient.invalidateQueries({ queryKey: ["order"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+    onError: (err) => toast.error(err.message || "Failed to return order"),
+  });
+
+  const rejectReturnRequest = useMutation({
+    mutationFn: ({ orderId, reason }) =>
+      api.post("/users/request/return/reject", { orderId, reason }),
+    onSuccess: () => {
+      toast.success("Return request rejected!");
+      queryClient.invalidateQueries({ queryKey: ["order"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+    onError: (err) => toast.error(err.message || "Failed to reject return request"),
+  });
+
   const createPosOrder = useMutation({
     mutationFn: (data) => api.post("/orders/pos/new", data),
     onSuccess: () => {
@@ -230,7 +263,10 @@ export const useOrders = () => {
     getOrdersByDate,
     acceptOrder,
     cancelOrder,
+    rejectCancelRequest,
     holdOrder,
+    returnOrder,
+    rejectReturnRequest,
     createPosOrder,
     rejectOrder,
     getSingleOrderQuery,
