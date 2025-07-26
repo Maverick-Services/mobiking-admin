@@ -136,6 +136,7 @@ function page() {
                                     key={key}
                                     onClick={() => {
                                         setActiveTab(key)
+                                        setPage(1);
                                         // setStatusFilter(null)
                                     }}
                                     className={`
