@@ -9,6 +9,7 @@ function UpdateStatus({ order, orderId, status }) {
     const STATUSES = [
         "New",
         "Accepted",
+        "Hold"
         // "Shipped",
         // "Delivered",
     ]
