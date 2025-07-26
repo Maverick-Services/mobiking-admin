@@ -142,6 +142,17 @@ export function OrderViewDialog({ order, children }) {
                         </div>
                     </section>
 
+                    {/* Hold Order Display Reason */}
+                    {
+                        order?.status == "Hold" &&
+                        <section className="mt-6 text-sm p-4 rounded-md border border-blue-600 bg-blue-100 text-blue-600">
+                            <p>
+                                <strong>Order on Hold: </strong>
+                                <span>{order?.reason}</span>
+                            </p>
+                        </section>
+                    }
+
                     {/* Requests History */}
                     {order.requests && order.requests.length > 0 && (
                         <section className="mt-6 text-sm">
@@ -188,9 +199,8 @@ export function OrderViewDialog({ order, children }) {
                             </div>
                         }
 
-                        {order.abondonedOrder &&
+                        {order.status == "New" &&
                             <Button variant="outline" onClick={() => { setHoldDialog(true) }}>Hold</Button>
-
                         }
 
 

@@ -17,7 +17,8 @@ const TABS = [
     { key: 'all', label: 'ALL CUSTOMERS' },
     { key: 'frequent', label: 'FREQUENT CUSTOMERS' },
     { key: 'oneOrder', label: 'ONE ORDER CUSTOMERS' },
-    { key: 'noOrder', label: 'NO ORDER CUSTOMERS' },
+    { key: 'noOrder', label: 'NO ORDER CUSTOMERS' }
+    // ,
     // { key: 'abandoned', label: 'ABANDONED CHECKOUT ORDERS' },
     // { key: 'regular', label: 'REGULAR' },
     // { key: 'returns', label: 'RETURNS' },
