@@ -42,7 +42,7 @@ function SuccessMessage({ order, resetOrder, reset }) {
                     reset();
                 }}>Create New Order</Button>
 
-                {order?.method === 'UPI' && !linkSent &&
+                {order?.order?.method === 'UPI' && !linkSent &&
                     <LoaderButton
                         onClick={handleSendLink}
                         loading={sendPaymentLink.isPending}

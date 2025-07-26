@@ -42,7 +42,7 @@ function SuccessMessage({ order, resetOrder, reset }) {
                     reset();
                 }}>Create New Order</Button>
 
-                {order?.method === 'Online' && !linkSent &&
+                {order?.order?.method === 'Online' && !linkSent &&
                     <LoaderButton
                         onClick={handleSendLink}
                         loading={sendPaymentLink.isPending}
