@@ -152,6 +152,7 @@ export const useOrders = () => {
     onSuccess: () => {
       toast.success("Order Created!");
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["productsPagination"] });
     },
     onError: (err) => {
       toast.error(err.message || "Failed to create order");
@@ -164,6 +165,7 @@ export const useOrders = () => {
     onSuccess: () => {
       toast.success("Order Created!");
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["productsPagination"] });
     },
     onError: (err) => {
       toast.error(err.message || "Failed to create order");

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import InnerDashboardLayout from '@/components/dashboard/InnerDashboardLayout'
 import PCard from '@/components/custom/PCard'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { useFieldArray, useForm, useFormContext, useWatch } from 'react-hook-form'
+import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '@/components/ui/input'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
@@ -13,10 +13,8 @@ import { useOrders } from '@/hooks/useOrders'
 import UserDialog from '../customers/components/UserDialog'
 import { Separator } from '@/components/ui/separator'
 import LoaderButton from '@/components/custom/LoaderButton'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { BsCashCoin } from "react-icons/bs";
 import { FaGoogle } from "react-icons/fa";
-import { useRouter } from 'next/navigation'
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from "@/components/ui/pagination"
 import { getPaginationRange } from "@/lib/services/getPaginationRange"
 import { useSubCategories } from '@/hooks/useSubCategories'
@@ -25,7 +23,6 @@ import ProductGrid from './components/ProductGrid'
 import OrderItemRow from './components/OrderItemRow'
 import { posSchema } from '@/lib/validations/posSchema'
 import SuccessMessage from './components/SuccessMessage'
-import axios from 'axios'
 
 const FILTERS = [
     // { key: '_all_', label: 'ALL' },
@@ -36,11 +33,10 @@ const FILTERS = [
 ]
 
 function page() {
-    const router = useRouter();
     const { createCustomer } = useUsers();
     const [createdOrder, setCreatedOrder] = useState(null)
     const [categoryFilter, setCategoryFilter] = useState()
-    const [typeFilter, setTypeFilter] = useState('')
+    const [typeFilter, setTypeFilter] = useState('InStock')
 
     // debounce hook
     function useDebouncedValue(value, delay = 500) {
@@ -135,6 +131,7 @@ function page() {
 
             const res2 = await createPosOrder.mutateAsync(payload)
             const created = res2?.data?.data;
+            reset();
             setCreatedOrder(created)
             // router.push('/admin/orders')
         } catch (err) {
@@ -143,7 +140,7 @@ function page() {
     }
 
     function onError(errors) {
-        console.log("❌ Validation errors:", errors);
+        console.log("Validation errors:", errors);
     }
 
     return (

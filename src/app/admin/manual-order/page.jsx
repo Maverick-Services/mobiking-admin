@@ -53,7 +53,7 @@ function page() {
     const { createCustomer } = useUsers();
     const [createdOrder, setCreatedOrder] = useState(null)
     const [categoryFilter, setCategoryFilter] = useState()
-    const [typeFilter, setTypeFilter] = useState('')
+    const [typeFilter, setTypeFilter] = useState('InStock')
 
     // debounce hook
     function useDebouncedValue(value, delay = 500) {
@@ -150,7 +150,8 @@ function page() {
 
             const res2 = await createManualOrder.mutateAsync(payload)
             const created = res2?.data?.data;
-            setCreatedOrder(created)
+            reset();
+            setCreatedOrder(created);
             // router.push('/admin/orders')
         } catch (err) {
             console.error('Error in creating order:', err)
