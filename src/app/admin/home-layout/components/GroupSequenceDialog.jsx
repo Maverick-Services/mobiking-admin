@@ -1,14 +1,7 @@
 // app/design-studio/components/GroupSequenceDialog.jsx
 'use client'
 import React, { useEffect, useState } from 'react'
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog'
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter, } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Command, CommandInput, CommandList, CommandItem, CommandEmpty } from '@/components/ui/command'
 import { Reorder, AnimatePresence, motion } from 'framer-motion'
@@ -18,6 +11,7 @@ export default function GroupSequenceDialog({ allGroups = [], initialGroups = []
   const [ordered, setOrdered] = useState([])
   const [adding, setAdding] = useState(false)
   const [filter, setFilter] = useState('')
+
 
   useEffect(() => {
     if (open) {
