@@ -7,26 +7,20 @@ import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogTrigger,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, } from "@/components/ui/dialog";
 import { IMAGES } from "@/lib/constants/assets";
 import { ADMIN_SIDEBAR_LINKS } from "@/lib/constants/sidebarLinks";
 import { useAuthStore } from "@/store/useAuthStore";
 import { usePermissions } from "@/hooks/usePermissions";
 import SidebarSkeleton from "../custom/SidebarSkeleton";
+import LoaderButton from "../custom/LoaderButton";
 
 export default function Sidebar({ isOpen, setIsSidebarOpen }) {
     const { data, isLoading, error } = usePermissions();
     const pathname = usePathname();
     const router = useRouter();
-    const { user, clearAuth } = useAuthStore();
+    const { user } = useAuthStore();
+    const clearAuth = useAuthStore((state) => state.clearAuth);
 
     const role = data?.role;
     const perms = data?.permissions || {};
@@ -46,25 +40,27 @@ export default function Sidebar({ isOpen, setIsSidebarOpen }) {
     }
 
     async function handleLogout() {
-        try {
-            const res = await fetch(
-                process.env.NEXT_PUBLIC_BACKEND_URL + "/users/logout",
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(''),
-                });
+        clearAuth();
+        router.push('/')
+        // try {
+        //     const res = await fetch(
+        //         process.env.NEXT_PUBLIC_BACKEND_URL + "/users/logout",
+        //         {
+        //             method: "POST",
+        //             headers: { "Content-Type": "application/json" },
+        //             body: JSON.stringify(''),
+        //         });
 
-            const data = await res.json();
-            if (res.ok && data.success) {
-                clearAuth();
-                router.replace("/");
-            } else {
-                console.error("Logout failed:", data);
-            }
-        } catch (err) {
-            console.error("Logout error:", err);
-        }
+        //     const data = await res.json();
+        //     if (res.ok && data.success) {
+        //         clearAuth();
+        //         router.replace("/");
+        //     } else {
+        //         console.error("Logout failed:", data);
+        //     }
+        // } catch (err) {
+        //     console.error("Logout error:", err);
+        // }
     }
 
     return (
@@ -92,7 +88,7 @@ export default function Sidebar({ isOpen, setIsSidebarOpen }) {
             {/* Navigation Links */}
             {isLoading ? <div><SidebarSkeleton /></div>
                 : <div className="w-full flex flex-col gap-3 transition-all duration-300 ease-in-out">
-                    {ADMIN_SIDEBAR_LINKS.map(({ href, label, icon }) => {
+                    {allowedLinks.map(({ href, label, icon }) => {
                         const rootPath = `/${href.split("/")[1]}`;
                         const isActive =
                             href === rootPath ? pathname === rootPath : pathname.startsWith(href);
@@ -164,12 +160,9 @@ export default function Sidebar({ isOpen, setIsSidebarOpen }) {
                             </DialogDescription>
                         </DialogHeader>
                         <DialogFooter>
-                            <Button variant="outline" onClick={() => {/* closes automatically */ }}>
-                                Cancel
-                            </Button>
-                            <Button variant="destructive" onClick={handleLogout}>
+                            <LoaderButton variant="destructive" onClick={handleLogout}>
                                 Yes, log out
-                            </Button>
+                            </LoaderButton>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
