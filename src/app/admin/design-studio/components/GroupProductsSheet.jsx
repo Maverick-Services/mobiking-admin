@@ -29,8 +29,6 @@ function GroupProductsSheet({ open, onOpenChange, group, onProductsAdd, updating
     const { productsQuery } = useProducts()
     const allProducts = productsQuery?.data || []
 
-    console.log(allProducts)
-
     // console.log(allProducts)
 
     const [searchTerm, setSearchTerm] = useState('');

@@ -122,7 +122,7 @@ export default function GroupsTable({
                                                 <Pencil size={16} />
                                             </Button>
                                         )}
-                                        {canDelete && (
+                                        {/* {canDelete && (
                                             <Button
                                                 size="icon"
                                                 variant="destructive"
@@ -130,7 +130,7 @@ export default function GroupsTable({
                                             >
                                                 <Trash size={16} />
                                             </Button>
-                                        )}
+                                        )} */}
                                     </div>
                                 </TableCell>
                             </TableRow>
@@ -139,15 +139,15 @@ export default function GroupsTable({
                 </Table>
             </div>
 
-            <DeleteConfirmationDialog
+            {/* <DeleteConfirmationDialog
                 isOpen={!!deletingId}
                 onOpenChange={open => open || setDeletingId(null)}
                 onConfirm={handleDeleteConfirm}
                 isLoading={isDeleting}
                 error={deleteError}
-                title="Delete Product"
-                description="Are you sure you want to delete this Product?"
-            />
+                title="Delete Group"
+                description="Are you sure you want to delete this Groups?"
+            /> */}
         </section>
     );
 }
