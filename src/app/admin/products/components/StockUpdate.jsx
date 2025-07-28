@@ -43,7 +43,7 @@ function StockUpdate({ open, onOpenChange, product }) {
 
     const stockHistory = product?.stock || []
 
-    console.log(product)
+    // console.log(product)
 
     async function onSubmit(values) {
         const data = {

@@ -79,7 +79,7 @@ export default function page() {
 
     const { subCategoriesQuery } = useSubCategories()
     const subCategories = subCategoriesQuery.data?.data || []
-    console.log(subCategories)
+    // console.log(subCategories)
     const products = productsPaginationQuery({
         page: page,
         limit: limit,

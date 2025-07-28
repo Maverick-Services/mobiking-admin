@@ -109,12 +109,12 @@ export const ADMIN_SIDEBAR_LINKS = [
     href: "/admin/home-layout",
     icon: <FaHome />,
   },
-  // {
-  //     key: 'media',
-  //     label: 'Media',
-  //     href: '/admin/media',
-  //     icon: <FaPaintBrush />,
-  // },
+  {
+  key: "couponCodes",
+  label: "Coupon Codes",
+  href: "/admin/couponCodes",
+  icon: <FaTags />,
+},
   {
     key: "customers",
     label: "Customers",
@@ -145,6 +145,17 @@ export const ADMIN_SIDEBAR_LINKS = [
     href: "/admin/policies",
     icon: <FaFileContract />,
   },
+];
+
+
+
+  // {
+  //     key: 'media',
+  //     label: 'Media',
+  //     href: '/admin/media',
+  //     icon: <FaPaintBrush />,
+  // },
+  
   // {
   //     key: 'about-us',
   //     label: 'About Us',
@@ -157,7 +168,6 @@ export const ADMIN_SIDEBAR_LINKS = [
   //     href: '/admin/contact-us',
   //     icon: <FaPhoneAlt />,
   // },
-];
 
 // {
 //     key: 'payments',

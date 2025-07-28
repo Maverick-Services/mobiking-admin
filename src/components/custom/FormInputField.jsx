@@ -9,6 +9,7 @@ export default function FormInputField({
     placeholder,
     type = 'text',
     className = '',
+    disabled = false
 }) {
     return (
         <FormField
@@ -18,7 +19,7 @@ export default function FormInputField({
                 <FormItem className={className}>
                     {label && <FormLabel>{label}</FormLabel>}
                     <FormControl>
-                        <Input {...field} type={type} placeholder={placeholder} />
+                        <Input {...field} type={type} disabled={disabled} placeholder={placeholder} />
                     </FormControl>
                     <FormMessage />
                 </FormItem>
