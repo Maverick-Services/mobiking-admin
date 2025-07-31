@@ -37,11 +37,6 @@ function SuccessMessage({ order, resetOrder, reset }) {
                 }
             </div>
             <div className='w-fit sm:w-1/2 flex flex-col items-end justify-end h-full gap-3'>
-                <Button onClick={() => {
-                    resetOrder(null)
-                    reset();
-                }}>Create New Order</Button>
-
                 {order?.order?.method === 'Online' && !linkSent &&
                     <LoaderButton
                         onClick={handleSendLink}

@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 
 function ProductCard({ product, onAddItem, setAddedProducts }) {
-    const variants = Object.entries(product.variants || {});
+    const variants = Object.entries(product.variants || {}).filter(([_, qty]) => qty > 0);
     // if (variants?.length <= 0) return null;
 
     const [selectedVariant, setSelectedVariant] = useState(variants[0]?.[0] || '');

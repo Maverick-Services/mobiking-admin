@@ -91,7 +91,7 @@ export default function Sidebar({ isOpen, setIsSidebarOpen }) {
                     {allowedLinks.map(({ href, label, icon }) => {
                         const rootPath = `/${href.split("/")[1]}`;
                         const isActive =
-                            href === rootPath ? pathname === rootPath : pathname.startsWith(href);
+                            href === rootPath ? pathname === rootPath : pathname === href;
 
                         return (
                             <Link

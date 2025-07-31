@@ -23,6 +23,8 @@ import ProductGrid from './components/ProductGrid'
 import OrderItemRow from './components/OrderItemRow'
 import { posSchema } from '@/lib/validations/posSchema'
 import SuccessMessage from './components/SuccessMessage'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 const FILTERS = [
     // { key: '_all_', label: 'ALL' },
@@ -83,7 +85,7 @@ function page() {
             name: "",
             phoneNo: "",
             gst: "",
-            method: "",
+            method: "UPI",
             subtotal: 0,
             discount: 0,
             orderAmount: 0,
@@ -147,6 +149,9 @@ function page() {
         <InnerDashboardLayout>
             <div className='flex items-center justify-between w-full mb-3'>
                 <h1 className="text-primary font-bold sm:text-2xl lg:text-3xl mb-0">Create POS Order</h1>
+                <div>
+                    <Button><Link href={'/admin/posOrders'}>View History</Link> </Button>
+                </div>
             </div>
 
             <div className='flex flex-col-reverse lg:flex-col-reverse gap-4 w-full'>
@@ -328,7 +333,7 @@ function page() {
                                         render={({ field }) => (
                                             <FormItem className="">
                                                 <FormLabel>Payment Method</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <Select onValueChange={field.onChange} defaultValue={'UPI'}>
                                                     <FormControl>
                                                         <SelectTrigger className={'w-full'}>
                                                             <SelectValue placeholder="Select method" />
@@ -438,6 +443,7 @@ function page() {
                                 <LoaderButton
                                     loading={createPosOrder.isPending || createCustomer.isPending}
                                     type="submit"
+                                    disabled={items?.length < 1 || createPosOrder.isPending || createCustomer.isPending}
                                     className="mb-5"
                                 >
                                     Create Order

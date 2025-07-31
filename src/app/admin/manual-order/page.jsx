@@ -100,7 +100,7 @@ function page() {
             name: "",
             phoneNo: "",
             gst: "",
-            method: "",
+            method: "Online",
             subtotal: 0,
             discount: 0,
             deliveryCharge: 0,

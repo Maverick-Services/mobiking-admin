@@ -5,7 +5,7 @@ export const posSchema = z.object({
   name: z.string().min(1, "User Name is required"),
   phoneNo: z.string().min(1, "Phone Number is required"),
   gst: z.string().optional(),
-  method: z.string().min(1, "Please select payment method"),
+  method: z.string().min(1, "Please select payment method").default('UPI'),
   subtotal: z.number().min(0),
   discount: z.preprocess((val) => {
     if (val === "") return undefined;
