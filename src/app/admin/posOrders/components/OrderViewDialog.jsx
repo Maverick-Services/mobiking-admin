@@ -40,7 +40,7 @@ const STATUS_VARIANTS = {
     Hold: 'secondary',
 }
 
-export function OrderViewDialog({ order, children }) {
+export function OrderViewDialog({ order, children, canEditPos }) {
     const safe = (value) => (value !== null && value !== undefined && value !== '' ? value : '-')
     const [acceptDialog, setAcceptDialog] = useState(false)
     const [rejectDialog, setRejectDialog] = useState(false)
@@ -176,7 +176,8 @@ export function OrderViewDialog({ order, children }) {
                         {/* {order.requests && order.requests.length > 0
                             && lastRequestOf(order).type === 'Cancel' && lastRequestOf(order).isRaised && lastRequestOf(order).status === 'Pending'
                             &&  */}
-                        {order?.status !== 'Cancelled' &&
+                        {canEditPos &&
+                            order?.status !== 'Cancelled' &&
                             // <div className=" flex flex-col gap-1">
                             //     <p className='text-sm text-gray-500'>Cancel Order</p>
                             //     <div className=" flex gap-1">
@@ -185,6 +186,7 @@ export function OrderViewDialog({ order, children }) {
                             // </div>
                             // </div>
                         }
+
                         {/* } */}
 
                         {/* {order.status == "New" &&

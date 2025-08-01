@@ -3,27 +3,40 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { toast } from "react-hot-toast";
 import { Actions, checkPermission, Resources } from "@/lib/permissions";
-import { useAuthStore } from "@/store/useAuthStore";
 import axios from "axios";
+import { usePermissions } from "./usePermissions";
 
 export const useOrders = () => {
-  const { user } = useAuthStore();
   const queryClient = useQueryClient();
+  const { checkView, checkAdd, checkEdit, checkDelete } = usePermissions()
 
-  // Permissions
-  const canView = checkPermission(user, Resources.ORDERS, Actions.VIEW);
-  const canAdd = checkPermission(user, Resources.ORDERS, Actions.ADD);
-  const canEdit = checkPermission(user, Resources.ORDERS, Actions.EDIT);
-  const canDelete = checkPermission(user, Resources.ORDERS, Actions.DELETE);
+  // Orders Permissions
+  const canView = checkView(Resources.ORDERS);
+  const canAdd = checkAdd(Resources.ORDERS);
+  const canEdit = checkEdit(Resources.ORDERS);
+  const canDelete = checkDelete(Resources.ORDERS);
 
+  // POS Permissions
+  const canViewPos = checkView(Resources.POS);
+  const canAddPos = checkAdd(Resources.POS);
+  const canEditPos = checkEdit(Resources.POS);
+  const canDeletePos = checkDelete(Resources.POS);
+
+  // POS Orders Tab Permissions
+  const canViewPosTab = checkView(Resources.POS_ORDERS);
+  const canAddPosTab = checkAdd(Resources.POS_ORDERS);
+  const canEditPosTab = checkEdit(Resources.POS_ORDERS);
+  const canDeletePosTab = checkDelete(Resources.POS_ORDERS);
+
+  // all orders
   const ordersQuery = useQuery({
     queryKey: ["orders", "all"],
-    enabled: canView,
     queryFn: () => api.get("/orders").then((res) => res.data),
     staleTime: 1000 * 60 * 5,
     onError: (err) => toast.error(err.message || "Failed to fetch orders"),
   });
 
+  // get orders by date
   const getOrdersByDate = ({ params }) => {
     const filtered = Object.fromEntries(
       Object.entries(params).filter(
@@ -280,5 +293,7 @@ export const useOrders = () => {
     getPaymentLinks,
     createManualOrder,
     permissions: { canView, canAdd, canEdit, canDelete },
+    permissionsPos: { canViewPos, canAddPos, canEditPos, canDeletePos },
+    permissionsPosTab: { canViewPosTab, canAddPosTab, canEditPosTab, canDeletePosTab },
   };
 };

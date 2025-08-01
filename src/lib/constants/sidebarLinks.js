@@ -44,7 +44,7 @@ export const ADMIN_SIDEBAR_LINKS = [
     icon: <FaReceipt />,
   },
   {
-    key: "pos-orders",
+    key: "posOrders",
     label: "POS Orders",
     href: "/admin/posOrders",
     icon: <FaReceipt />,

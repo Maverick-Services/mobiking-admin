@@ -169,7 +169,7 @@ export default function Page() {
         setRange(initialRange)
     }, [])
 
-    const { getOrdersByDate } = useOrders();
+    const { getOrdersByDate, permissionsPos: { canAddPosTab, canDeletePosTab, canEditPosTab, canViewPosTab } } = useOrders();
 
     const formattedStart = format(range.from, 'dd MMM yyyy')
     const formattedEnd = format(range.to, 'dd MMM yyyy')
@@ -221,19 +221,17 @@ export default function Page() {
     }
 
     useEffect(() => {
-        // console.log(csvData)
         if (csvData && csvData?.length) {
-            // Wait a bit for state update then trigger download
-            // setTimeout(() => {
             csvLinkRef.current?.link.click();
             setCsvData([]);
-            // }, 200);
         }
     }, [csvData])
 
     if (error) {
         console.log(error)
     }
+
+    if (!canViewPosTab) return <NotAuthorizedPage />
 
     return (
         <InnerDashboardLayout>
@@ -316,6 +314,7 @@ export default function Page() {
                 <TableSkeleton showHeader={false} />
                 : <OrdersListView
                     orders={orders}
+                    canEditPos={canEditPosTab}
                 />
             }
 

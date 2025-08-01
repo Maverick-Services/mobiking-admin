@@ -26,6 +26,7 @@ import SuccessMessage from './components/SuccessMessage'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Textarea } from '@/components/ui/textarea'
+import NotAuthorizedPage from '@/components/notAuthorized'
 
 const FILTERS = [
     // { key: '_all_', label: 'ALL' },
@@ -74,9 +75,14 @@ function page() {
     const totalPages = products.data?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
 
-    const { createPosOrder } = useOrders()
+    const { createPosOrder, permissionsPos: { canAddPos, canDeletePos, canEditPos, canViewPos } } = useOrders()
     const [addedProducts, setAddedProducts] = useState([])
     const [addUserDialog, setAddUserDialog] = useState(false)
+
+    console.log(canAddPos)
+    console.log(canDeletePos)
+    console.log(canEditPos)
+    console.log(canViewPos)
 
     // form hook
     const form = useForm({
@@ -147,6 +153,8 @@ function page() {
     function onError(errors) {
         console.log("Validation errors:", errors);
     }
+
+    if (!canViewPos) return <NotAuthorizedPage />
 
     return (
         <InnerDashboardLayout>
@@ -468,14 +476,16 @@ function page() {
                             </div>
 
                             <div className='flex items-center justify-end'>
-                                <LoaderButton
-                                    loading={createPosOrder.isPending || createCustomer.isPending}
-                                    type="submit"
-                                    disabled={items?.length < 1 || createPosOrder.isPending || createCustomer.isPending}
-                                    className="mb-5"
-                                >
-                                    Create Order
-                                </LoaderButton>
+                                {canAddPos &&
+                                    <LoaderButton
+                                        loading={createPosOrder.isPending || createCustomer.isPending}
+                                        type="submit"
+                                        disabled={items?.length < 1 || createPosOrder.isPending || createCustomer.isPending}
+                                        className="mb-5"
+                                    >
+                                        Create Order
+                                    </LoaderButton>
+                                }
                             </div>
                         </form>
                     </Form>

@@ -1,27 +1,25 @@
-// lib/permissions.js
-
 // resources
 export const Resources = {
     DASHBOARD: 'dashboard',
+    POS: 'pos',
+    POS_ORDERS: 'posOrders',
+    MANUAL_ORDER: 'manual-order',
     ORDERS: 'orders',
-    RETURN_REQUESTS: "return-requests",
-    CANCEL_REQUESTS: "cancel-requests",
+    RETURN_REQUESTS: 'return-requests',
+    CANCEL_REQUESTS: 'cancel-requests',
+    PAYMENT_LINKS: 'payment-links',
     QUERIES: 'queries',
     CATEGORIES: 'categories',
     SUB_CATEGORIES: 'subCategories',
     PRODUCTS: 'products',
-    PRODUCT_GROUPS: 'product-groups',
+    DESIGN_STUDIO: 'design-studio',
     HOME_LAYOUT: 'home-layout',
+    COUPON_CODES: 'couponCodes',
     CUSTOMERS: 'customers',
     EMPLOYEES: 'employees',
     NOTIFICATIONS: 'notifications',
-    MEDIA: 'media',
-    // USERS: 'users',
-    // SETTINGS: 'settings',
-    POLICIES: 'policies',
     REPORTS: 'reports',
-    // ABOUT_US: 'about-us',
-    // CONTACT_US: 'contact-us',
+    POLICIES: 'policies',
 };
 
 // possible actions

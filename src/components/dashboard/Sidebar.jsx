@@ -31,6 +31,8 @@ export default function Sidebar({ isOpen, setIsSidebarOpen }) {
         return false;
     }
 
+    console.log(perms)
+
     const allowedLinks = ADMIN_SIDEBAR_LINKS.filter(link => can(link.key, 'view'));
 
     // console.log(user)

@@ -19,12 +19,10 @@ import AcceptDialog from './AcceptDialog'
 import { OrderViewDialog } from './OrderViewDialog'
 import { motion, AnimatePresence } from 'framer-motion'
 import GSTBillDownload from '@/components/GSTBill'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import UpdateStatus from '../[id]/components/UpdateStatus'
 import StatusUpdate from './StatusUpdate'
 import Link from 'next/link'
 
-export default function OrdersListView({ error, orders = [] }) {
+export default function OrdersListView({ error, orders = [], canEditPos }) {
     const router = useRouter()
 
     if (error) {
@@ -153,7 +151,7 @@ export default function OrdersListView({ error, orders = [] }) {
                                 {/* action buttons */}
                                 <TableCell className="text-center space-x-2 flex items-center justify-center">
                                     {/* {o.abondonedOrder && */}
-                                    <OrderViewDialog order={o}>
+                                    <OrderViewDialog order={o} canEditPos={canEditPos}>
                                         <Button variant="outline">
                                             <Eye />
                                         </Button>
