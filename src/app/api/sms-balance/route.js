@@ -5,10 +5,13 @@ import axios from 'axios'
 
 export async function GET() {
     try {
+        const apiKey = process.env.MYSMS_API_KEY
+        const clientId = process.env.MYSMS_CLIENT_ID
+
         const response = await axios.get('https://api.mylogin.co.in/api/v2/Balance', {
             params: {
-                ApiKey: 'DmGRastE1TT0vCDJyjMJYMEi+peSX/vPuybBpFaCcZ8=',
-                ClientId: 'a87c4262-3525-46c3-9abd-bc98d2427fbf',
+                ApiKey: apiKey,
+                ClientId: clientId,
             },
         })
 
