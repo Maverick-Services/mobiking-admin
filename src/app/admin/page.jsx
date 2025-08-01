@@ -17,6 +17,7 @@ import PosButton from "@/components/custom/PosButton";
 import { usePermissions } from "@/hooks/usePermissions";
 import NotAuthorizedPage from "@/components/notAuthorized";
 import { Resources } from "@/lib/permissions";
+import SMSCredit from "./(dashboard)/SMSCredit";
 
 export default function Home() {
   const { checkView } = usePermissions()
@@ -36,7 +37,7 @@ export default function Home() {
           {/* <POS>
             <Button>POS</Button>
           </POS> */}
-          <PosButton />
+          {/* <PosButton /> */}
         </div>
       </div>
 
@@ -46,7 +47,8 @@ export default function Home() {
         <TotalSales />
         <SalesOfOneDay />
         <SalesOfOneMonth />
-        <Time />
+        {/* <Time /> */}
+        <SMSCredit />
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-3">
