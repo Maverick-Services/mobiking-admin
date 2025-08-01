@@ -6,7 +6,6 @@ import toast from "react-hot-toast";
 export const useHome = () => {
     const queryClient = useQueryClient();
 
-
     const homeQuery = useQuery({
         queryKey: ['home'],
         queryFn: () => api.get('/home').then(res => res.data),

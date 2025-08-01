@@ -6,7 +6,7 @@ import GroupSequenceDialog from './GroupSequenceDialog'
 import Image from 'next/image'
 
 export default function GroupTable({ initialData = [], allGroups = [], onSave }) {
-
+    // console.log(initialData)
     return (
         <div>
             <div className="flex justify-between items-center w-full mb-5">
@@ -62,7 +62,7 @@ export default function GroupTable({ initialData = [], allGroups = [], onSave })
                                 </span>
                             </TableCell>
                             <TableCell>
-                                <div className={`h-10 w-20 p-0 border border-black rounded-sm bg-[${group.backgroundColor}]`}>
+                                <div className={`h-10 w-20 p-0 rounded-sm bg-[${group.backgroundColor}]`}>
                                     <input type="color" value={group?.backgroundColor} disabled className='w-full h-full' />
                                 </div>
                             </TableCell>

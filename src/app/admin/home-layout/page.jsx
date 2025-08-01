@@ -8,6 +8,7 @@ import CategoryTable from './components/CategoryTable'
 import { useSubCategories } from '@/hooks/useSubCategories'
 import PCard from '@/components/custom/PCard'
 import WebsiteBanners from './components/WebsiteBanners'
+import Loader from '@/components/Loader'
 
 function page() {
     const { homeQuery, updateHome } = useHome()
@@ -21,6 +22,17 @@ function page() {
     const initialData = homeData.groups || []
 
     const initialCategoriesData = (homeData.categories || [])
+
+    if (homeQuery.isLoading || groupsQuery.isLoading) {
+        return (
+            <InnerDashboardLayout>
+                <div className='w-full flex items-center justify-between text-primary mb-5'>
+                    <h1 className='font-bold sm:text-2xl lg:text-4xl w-full'>Design Studio</h1>
+                </div>
+                <Loader />
+            </InnerDashboardLayout>
+        )
+    }
 
     return (
         <InnerDashboardLayout>
