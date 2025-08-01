@@ -29,7 +29,7 @@ const STATUS_VARIANTS = {
     Hold: 'secondary',        // gray or custom secondary
 }
 
-export default function ReturnOrdersTable({ error, orders = [] }) {
+export default function ReturnOrdersTable({ error, orders = [], canEditReturn }) {
     const router = useRouter()
 
     if (error) {
@@ -135,7 +135,7 @@ export default function ReturnOrdersTable({ error, orders = [] }) {
 
                                     {/* action buttons */}
                                     <TableCell className="text-center space-x-2 flex items-center justify-center">
-                                        <OrderViewDialog order={o}>
+                                        <OrderViewDialog order={o} canEditReturn={canEditReturn}>
                                             <Button variant="outline">
                                                 <Eye />
                                             </Button>

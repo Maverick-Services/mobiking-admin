@@ -16,6 +16,12 @@ export const useOrders = () => {
   const canEdit = checkEdit(Resources.ORDERS);
   const canDelete = checkDelete(Resources.ORDERS);
 
+  // Return Permissions
+  const canViewReturn = checkView(Resources.RETURN_REQUESTS);
+  const canAddReturn = checkAdd(Resources.RETURN_REQUESTS);
+  const canEditReturn = checkEdit(Resources.RETURN_REQUESTS);
+  const canDeleteReturn = checkDelete(Resources.RETURN_REQUESTS);
+
   // Manual Orders Permissions
   const canViewManual = checkView(Resources.MANUAL_ORDER);
   const canAddManual = checkAdd(Resources.MANUAL_ORDER);
@@ -299,6 +305,7 @@ export const useOrders = () => {
     getPaymentLinks,
     createManualOrder,
     permissions: { canView, canAdd, canEdit, canDelete },
+    permissionsReturn: { canViewReturn, canAddReturn, canEditReturn, canDeleteReturn },
     permissionsManual: { canViewManual, canAddManual, canEditManual, canDeleteManual },
     permissionsPos: { canViewPos, canAddPos, canEditPos, canDeletePos },
     permissionsPosTab: { canViewPosTab, canAddPosTab, canEditPosTab, canDeletePosTab },
