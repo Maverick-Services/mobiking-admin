@@ -17,7 +17,7 @@ import {
 import { getPaginationRange } from "@/lib/services/getPaginationRange"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, } from "@/components/ui/select"
 import ReturnOrdersTable from './components/ReturnOrdersTable';
-
+import NotAuthorizedPage from '@/components/notAuthorized';
 
 function page() {
     // Date range
@@ -40,8 +40,8 @@ function page() {
 
     const [page, setPage] = useState(1)
     const [limit, setLimit] = useState(10)
-
-    const { getCancelRequestOrders } = useOrders();
+        ;
+    const { getCancelRequestOrders, permissionsReturn: { canViewReturn, canAddReturn, canEditReturn, canDeleteReturn } } = useOrders();
     const { data: returnReqOrders, isFetching, error } = getCancelRequestOrders({ requestType: 'Return', startDate, endDate, page, limit });
 
     const totalPages = returnReqOrders?.pagination?.totalPages || 1
@@ -49,6 +49,8 @@ function page() {
 
     const ordersData = returnReqOrders?.orders;
     // console.log(returnReqOrders)
+
+    if (!canViewReturn) return <NotAuthorizedPage />
 
     return (
         <InnerDashboardLayout>
@@ -71,6 +73,7 @@ function page() {
                 : <ReturnOrdersTable
                     error={error}
                     orders={ordersData}
+                    canEditReturn={canEditReturn}
                 />
             }
 
