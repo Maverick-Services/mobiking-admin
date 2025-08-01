@@ -12,6 +12,7 @@ export const posSchema = z.object({
     return typeof val === "string" ? Number(val) : val;
   }, z.number().optional()),
   orderAmount: z.number().min(0),
+  comments: z.string().optional(),
   items: z
     .array(
       z.object({
@@ -58,6 +59,7 @@ export const manualOrderSchema = z.object({
   ),
 
   orderAmount: z.number().min(0, "Order amount must be 0 or more"),
+  comments: z.string().optional(),
 
   items: z
     .array(

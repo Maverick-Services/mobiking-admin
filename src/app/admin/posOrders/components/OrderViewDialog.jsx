@@ -165,28 +165,31 @@ export function OrderViewDialog({ order, children }) {
                     <DialogFooter className="mt-6 flex gap-1">
 
                         {/* accept order */}
-                        {order.status === 'New' && order.requests.length <= 0 && !order.abondonedOrder &&
+                        {/* {order.status === 'New' && order.requests.length <= 0 && !order.abondonedOrder &&
                             <div className=" flex gap-1">
                                 <Button variant="outline" onClick={() => { setAcceptDialog(true) }}>Accept</Button>
                                 <Button variant="outline" onClick={() => { setRejectOrderDialog(true) }}>Reject</Button>
                             </div>
-                        }
+                        } */}
 
                         {/* cancel order */}
-                        {order.requests && order.requests.length > 0
+                        {/* {order.requests && order.requests.length > 0
                             && lastRequestOf(order).type === 'Cancel' && lastRequestOf(order).isRaised && lastRequestOf(order).status === 'Pending'
-                            && <div className=" flex flex-col gap-1">
-                                <p className='text-sm text-gray-500'>Cancel Request</p>
-                                <div className=" flex gap-1">
-                                    <Button variant="outline" onClick={() => { setRejectDialog(true) }}>Accept</Button>
-                                    <Button variant="outline">Reject</Button>
-                                </div>
-                            </div>
+                            &&  */}
+                        {order?.status !== 'Cancelled' &&
+                            // <div className=" flex flex-col gap-1">
+                            //     <p className='text-sm text-gray-500'>Cancel Order</p>
+                            //     <div className=" flex gap-1">
+                            <Button variant="outline" onClick={() => { setRejectDialog(true) }}>Cancel Order</Button>
+                            // <Button variant="outline">Reject</Button>
+                            // </div>
+                            // </div>
                         }
+                        {/* } */}
 
-                        {order.status == "New" &&
+                        {/* {order.status == "New" &&
                             <Button variant="outline" onClick={() => { setHoldDialog(true) }}>Hold</Button>
-                        }
+                        } */}
 
 
                     </DialogFooter>

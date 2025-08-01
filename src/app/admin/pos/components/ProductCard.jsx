@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/card'
 function ProductCard({ product, onAddItem, setAddedProducts }) {
     const variants = Object.entries(product.variants || {}).filter(([_, qty]) => qty > 0);
 
-    if (variants?.length <= 0) return null;
+    // if (variants?.length <= 0) return null;
 
     const [selectedVariant, setSelectedVariant] = useState(variants[0]?.[0] || '');
     const price = product?.sellingPrice?.slice(-1)[0]?.price || 0;
@@ -39,33 +39,49 @@ function ProductCard({ product, onAddItem, setAddedProducts }) {
                     )}
                 </div>
             </div>
-            <div className="p-3 flex-1">
-                <h3 className="font-medium text-xs">{product.fullName}</h3>
-                <p className="text-primary font-bold mt-1">₹{price}</p>
 
-                <div className="my-2">
-                    <Select value={selectedVariant} onValueChange={setSelectedVariant}>
-                        <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select variant" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {variants.filter(([key, qty]) => qty > 0)?.map(([key, qty]) => (
-                                <SelectItem key={key} value={key}>
-                                    {key} <Badge variant="outline" className="ml-2">{qty} in stock</Badge>
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+            <div className="p-3 flex-1 flex flex-col">
+                {/* Title and price area */}
+                <div className="flex-1">
+                    <h3 className="font-medium text-xs line-clamp-4">{product.fullName}</h3>
+                    <p className="text-primary font-bold mt-1">₹{price}</p>
                 </div>
 
-                <Button
-                    size="sm"
-                    className="w-full"
-                    onClick={handleAddToCart}
-                    disabled={variants.length > 0 && !selectedVariant}
-                >
-                    Add to Cart
-                </Button>
+                {/* Bottom action button */}
+                <div className="mt-auto">
+                    {variants?.length > 0 ? (
+                        <>
+                            {variants?.length > 0 && (
+                                <div className="my-2">
+                                    <Select value={selectedVariant} onValueChange={setSelectedVariant}>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Select variant" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {variants.map(([key, qty]) => (
+                                                <SelectItem key={key} value={key}>
+                                                    {key} <Badge variant="outline" className="ml-2">{qty} in stock</Badge>
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
+                            <Button
+                                size="sm"
+                                className="w-full"
+                                onClick={handleAddToCart}
+                                disabled={!selectedVariant}
+                            >
+                                Add to Cart
+                            </Button>
+                        </>
+                    ) : (
+                        <Button disabled size="sm" className="w-full">
+                            Out of Stock
+                        </Button>
+                    )}
+                </div>
             </div>
         </Card>
     );

@@ -13,9 +13,6 @@ import { useOrders } from '@/hooks/useOrders'
 import UserDialog from '../customers/components/UserDialog'
 import { Separator } from '@/components/ui/separator'
 import LoaderButton from '@/components/custom/LoaderButton'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { BsCashCoin } from "react-icons/bs";
-import { FaGoogle } from "react-icons/fa";
 import { useRouter } from 'next/navigation'
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from "@/components/ui/pagination"
 import { getPaginationRange } from "@/lib/services/getPaginationRange"
@@ -26,6 +23,7 @@ import OrderItemRow from './components/OrderItemRow'
 import { manualOrderSchema } from '@/lib/validations/posSchema'
 import SuccessMessage from './components/SuccessMessage'
 import FormInputField from '@/components/custom/FormInputField'
+import { Textarea } from '@/components/ui/textarea'
 
 const FILTERS = [
     // { key: '_all_', label: 'ALL' },
@@ -61,6 +59,7 @@ function page() {
 
         useEffect(() => {
             const handler = setTimeout(() => setDebouncedValue(value), delay);
+            setPage(1)
             return () => clearTimeout(handler);
         }, [value, delay]);
 
@@ -105,6 +104,7 @@ function page() {
             discount: 0,
             deliveryCharge: 0,
             orderAmount: 0,
+            comments: '',
             items: []
         }
     })
@@ -184,7 +184,10 @@ function page() {
                                 className="w-full flex-1 bg-white"
                             />
 
-                            <Select value={categoryFilter} onValueChange={(val) => { setCategoryFilter(val === '__all__' ? undefined : val) }}>
+                            <Select value={categoryFilter} onValueChange={(val) => {
+                                setCategoryFilter(val === '__all__' ? undefined : val)
+                                setPage(1)
+                            }}>
                                 <SelectTrigger className="w-[120px]">
                                     <SelectValue placeholder="Category" />
                                 </SelectTrigger>
@@ -199,7 +202,10 @@ function page() {
                             </Select>
 
                             {/* filter by */}
-                            <Select value={typeFilter} onValueChange={(val) => { setTypeFilter(val === '_aa_' ? undefined : val) }}>
+                            <Select value={typeFilter} onValueChange={(val) => {
+                                setTypeFilter(val === '_aa_' ? undefined : val)
+                                setPage(1)
+                            }}>
                                 <SelectTrigger className="w-[120px]">
                                     <SelectValue placeholder="Filter By" />
                                 </SelectTrigger>
@@ -429,6 +435,26 @@ function page() {
                                                 <span>Total Amount:</span>
                                                 <span className="text-primary">₹{watchOrderAmount}</span>
                                             </div>
+
+
+                                            <Separator />
+
+                                            <FormField
+                                                control={form.control}
+                                                name='comments'
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Comments</FormLabel>
+                                                        <FormControl>
+                                                            <Textarea
+                                                                placeholder='Add comments on order...'
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
                                         </div>
                                     </PCard>
                                 </div>
@@ -438,6 +464,7 @@ function page() {
                                 <LoaderButton
                                     loading={createManualOrder.isPending || createCustomer.isPending}
                                     type="submit"
+                                    disabled={items?.length < 1 || createPosOrder.isPending || createCustomer.isPending}
                                     className="mb-5"
                                 >
                                     Create Order

@@ -194,6 +194,7 @@ export default function Page() {
     const handleDebouncedSearch = useCallback(
         debounce((value) => {
             setSearchQuery(value)
+            setPage(1)
         }, 500), // 500ms delay 
         []
     )
@@ -349,7 +350,11 @@ export default function Page() {
                         queryPrefix='orders'
                     />
 
-                    <DateRangeSelector onChange={setRange} defaultRange={initialRange} />
+                    <DateRangeSelector onChange={() => {
+                        setRange()
+                        setPage(1)
+                    }
+                    } defaultRange={initialRange} />
                     <PosButton />
                 </div>
             </div>
@@ -402,7 +407,7 @@ export default function Page() {
             {/* Search & filter */}
             <div className='flex items-center gap-3 mb-3 '>
                 {/* filter by */}
-                <Select value={queryParameter} onValueChange={(val) => setQueryParameter(val)}>
+                <Select value={queryParameter} onValueChange={(val) => { setQueryParameter(val); setPage(1) }}>
                     <SelectTrigger className="min-w-[150px] border-gray-300">
                         <SelectValue placeholder="Filter by" />
                     </SelectTrigger>

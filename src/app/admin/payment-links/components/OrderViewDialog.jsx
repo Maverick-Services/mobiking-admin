@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React from 'react'
 import {
     Dialog,
     DialogTrigger,
@@ -7,10 +7,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogDescription,
-    DialogFooter,
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { X, Eye } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import {
     Table,
@@ -21,11 +18,6 @@ import {
     TableCell,
 } from '@/components/ui/table'
 import { format } from 'date-fns'
-import { useOrders } from '@/hooks/useOrders'
-import AcceptDialog from './AcceptDialog'
-import CancelDialog from './CancelDialog'
-import RejectDialog from './RejectOrderDialog'
-import HoldDialog from './HoldOrder'
 
 // Map each order status to a Badge variant
 const STATUS_VARIANTS = {
@@ -42,17 +34,6 @@ const STATUS_VARIANTS = {
 
 export function OrderViewDialog({ order, children }) {
     const safe = (value) => (value !== null && value !== undefined && value !== '' ? value : '-')
-    const [acceptDialog, setAcceptDialog] = useState(false)
-    const [rejectDialog, setRejectDialog] = useState(false)
-    const [rejectOrderDialog, setRejectOrderDialog] = useState(false)
-    const [holdDialog, setHoldDialog] = useState(false)
-
-    // console.log(order)
-
-    const lastRequestOf = (order) =>
-        Array.isArray(order.requests) && order.requests.length > 0
-            ? order.requests[order.requests.length - 1]
-            : null
 
     return (
         <>
@@ -70,8 +51,11 @@ export function OrderViewDialog({ order, children }) {
                             <Badge variant={STATUS_VARIANTS[order.status] || 'default'}>
                                 {safe(order.status)}
                             </Badge>
-                            {' • '}{safe(order.type)}{' • '}{safe(order.method)}{' • '}
-                            {order.isAppOrder ? 'App' : 'Website'}
+                            {' • '}{safe(order.type)}
+                            {' • '}{safe(order.method)}
+                            {' • '}{order.isAppOrder ? 'App' : 'Website'}
+                            {' • '}{safe(order.paymentStatus)}
+
                         </DialogDescription>
                     </DialogHeader>
 
@@ -140,6 +124,10 @@ export function OrderViewDialog({ order, children }) {
                         <div className="flex justify-between font-bold border-t pt-1">
                             <span>Total</span><span>₹{order.orderAmount != null ? order.orderAmount.toFixed(2) : '-'}</span>
                         </div>
+
+                        <div className='flex justify-end mt-5'>
+                            <Badge variant={order?.paymentStatus === 'Paid' ? 'success' : 'yellow'}>Payment Status: {order?.paymentStatus}</Badge>
+                        </div>
                     </section>
 
                     {/* Hold Order Display Reason */}
@@ -175,62 +163,8 @@ export function OrderViewDialog({ order, children }) {
                             </ul>
                         </section>
                     )}
-
-                    {/* Action buttons */}
-                    <DialogFooter className="mt-6 flex gap-1">
-
-                        {/* accept order */}
-                        {order.status === 'New' && order.requests.length <= 0 && !order.abondonedOrder &&
-                            <div className=" flex gap-1">
-                                <Button variant="outline" onClick={() => { setAcceptDialog(true) }}>Accept</Button>
-                                <Button variant="outline" onClick={() => { setRejectOrderDialog(true) }}>Reject</Button>
-                            </div>
-                        }
-
-                        {/* cancel order */}
-                        {order.requests && order.requests.length > 0
-                            && lastRequestOf(order).type === 'Cancel' && lastRequestOf(order).isRaised && lastRequestOf(order).status === 'Pending'
-                            && <div className=" flex flex-col gap-1">
-                                <p className='text-sm text-gray-500'>Cancel Request</p>
-                                <div className=" flex gap-1">
-                                    <Button variant="outline" onClick={() => { setRejectDialog(true) }}>Accept</Button>
-                                    <Button variant="outline">Reject</Button>
-                                </div>
-                            </div>
-                        }
-
-                        {order.status == "New" &&
-                            <Button variant="outline" onClick={() => { setHoldDialog(true) }}>Hold</Button>
-                        }
-
-
-                    </DialogFooter>
                 </DialogContent>
             </Dialog>
-
-            <AcceptDialog
-                open={acceptDialog}
-                onOpenChange={setAcceptDialog}
-                order={order}
-            />
-
-            <RejectDialog
-                open={rejectOrderDialog}
-                onOpenChange={setRejectOrderDialog}
-                order={order}
-            />
-
-            <HoldDialog
-                open={holdDialog}
-                onOpenChange={setHoldDialog}
-                order={order}
-            />
-
-            <CancelDialog
-                open={rejectDialog}
-                onOpenChange={setRejectDialog}
-                order={order}
-            />
         </>
     )
 }

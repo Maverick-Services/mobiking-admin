@@ -64,7 +64,7 @@ function page() {
                     View Order
                 </h1>
                 <div className="flex gap-2">
-                    {!order.abondonedOrder && !order.shipmentId && order.status !== 'Delivered' &&
+                    {!order.abondonedOrder && !order.shipmentId && isNewOrder() &&
                         <UpdateStatus
                             order={order}
                             orderId={order?._id}
@@ -99,7 +99,7 @@ function page() {
 
                     <GSTBillDownload billData={order} />
 
-                    {order.status === 'New' || order.status === 'Hold' &&
+                    {isNewOrder() &&
                         <Button
                             onClick={() => setRejectOpen(true)}
                             variant="destructive"
@@ -107,7 +107,7 @@ function page() {
                             Reject
                         </Button>
                     }
-                    {(order.status === 'New' || order?.status === 'Accepted' || order.status === 'Hold') &&
+                    {isNewOrder() &&
                         <Button
                             onClick={() => setCancelOpen(true)}
                             variant="destructive"

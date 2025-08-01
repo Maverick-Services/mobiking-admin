@@ -37,7 +37,7 @@ function SalesOfOneDay() {
                     <PopoverContent className="w-auto p-0" align="end">
                         <Calendar
                             mode="single"
-                            captionLayout="dropdown"
+                            // captionLayout="dropdown"
                             selected={selectedDate}
                             onSelect={(date) => {
                                 if (!date) return

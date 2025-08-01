@@ -9,11 +9,17 @@ import { Separator } from '@/components/ui/separator'
 import { FaLink, FaRupeeSign } from 'react-icons/fa'
 import RefreshButton from '@/components/custom/RefreshButton'
 import PaymentSkeleton from './components/PaymentSkeleton'
+import { format } from 'date-fns'
+import { OrderViewDialog } from './components/OrderViewDialog'
+import { Eye } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 function Page() {
     const { getPaymentLinks } = useOrders();
     const isLoading = getPaymentLinks.isLoading;
     const linksData = getPaymentLinks?.data?.data || [];
+
+    console.log(linksData)
 
     return (
         <InnerDashboardLayout>
@@ -24,7 +30,7 @@ function Page() {
 
             {isLoading
                 ? <PaymentSkeleton />
-                : <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 bg-gray-100 rounded-md">
+                : <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 bg-gray-100 rounded-md pb-4">
                     {linksData.length === 0 ? (
                         <p className="text-muted-foreground">No payment links found.</p>
                     ) : (
@@ -37,9 +43,17 @@ function Page() {
                                             <p className="text-sm text-gray-500">{link.email}</p>
                                             <p className="text-sm text-gray-500">{link.phoneNo}</p>
                                         </div>
-                                        <Badge variant="outline" className="capitalize">
-                                            {link.status}
-                                        </Badge>
+                                        <div className='flex flex-col gap-2'>
+                                            <Badge variant="outline" className="capitalize">
+                                                {link.status}
+                                            </Badge>
+
+                                            <OrderViewDialog order={link?.orderId}>
+                                                <Button variant="secondary" className={'h-7  border border-gray-400'}>
+                                                    <Eye size={5} className='text-gray-400' />
+                                                </Button>
+                                            </OrderViewDialog>
+                                        </div>
                                     </div>
 
                                     <Separator className="my-3" />
@@ -63,10 +77,10 @@ function Page() {
                                     </div>
 
                                     <p className="text-xs text-gray-400 mt-3">
-                                        Created: {new Date(link.createdAt).toLocaleString()}
+                                        Created: {format(new Date(link.createdAt).toLocaleString(), 'dd MMM, yyyy hh:mm a')}
                                     </p>
                                     <p className="text-xs text-gray-400">
-                                        Updated: {new Date(link.updatedAt).toLocaleString()}
+                                        Updated: {format(new Date(link.updatedAt).toLocaleString(), 'dd MMM, yyyy hh:mm a')}
                                     </p>
                                 </CardContent>
                             </Card>

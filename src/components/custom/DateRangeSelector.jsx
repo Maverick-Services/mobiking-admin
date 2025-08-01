@@ -63,7 +63,7 @@ export default function DateRangeSelector({ onChange, defaultRange }) {
         <div>
           <Calendar
             mode="range"
-            captionLayout="dropdown"
+            // captionLayout="dropdown"
             selected={range}
             onSelect={handleRangeSelect}
             initialFocus

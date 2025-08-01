@@ -25,6 +25,7 @@ import { posSchema } from '@/lib/validations/posSchema'
 import SuccessMessage from './components/SuccessMessage'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { Textarea } from '@/components/ui/textarea'
 
 const FILTERS = [
     // { key: '_all_', label: 'ALL' },
@@ -46,6 +47,7 @@ function page() {
 
         useEffect(() => {
             const handler = setTimeout(() => setDebouncedValue(value), delay);
+            setPage(1)
             return () => clearTimeout(handler);
         }, [value, delay]);
 
@@ -89,6 +91,7 @@ function page() {
             subtotal: 0,
             discount: 0,
             orderAmount: 0,
+            comments: '',
             items: []
         }
     })
@@ -155,7 +158,7 @@ function page() {
             </div>
 
             <div className='flex flex-col-reverse lg:flex-col-reverse gap-4 w-full'>
-                {/* Left Column: Product Grid (70% width) */}
+                {/* Product Grid */}
                 <div className="w-full lg:w-full">
                     <PCard className="h-full">
                         <h2 className="font-semibold text-xl uppercase text-gray-600 mb-4">Products</h2>
@@ -170,7 +173,10 @@ function page() {
                                 className="w-full flex-1 bg-white"
                             />
 
-                            <Select value={categoryFilter} onValueChange={(val) => { setCategoryFilter(val === '__all__' ? undefined : val) }}>
+                            <Select value={categoryFilter} onValueChange={(val) => {
+                                setCategoryFilter(val === '__all__' ? undefined : val)
+                                setPage(1)
+                            }}>
                                 <SelectTrigger className="w-[120px]">
                                     <SelectValue placeholder="Category" />
                                 </SelectTrigger>
@@ -185,7 +191,10 @@ function page() {
                             </Select>
 
                             {/* filter by */}
-                            <Select value={typeFilter} onValueChange={(val) => { setTypeFilter(val === '_aa_' ? undefined : val) }}>
+                            <Select value={typeFilter} onValueChange={(val) => {
+                                setTypeFilter(val === '_aa_' ? undefined : val)
+                                setPage(1)
+                            }}>
                                 <SelectTrigger className="w-[120px]">
                                     <SelectValue placeholder="Filter By" />
                                 </SelectTrigger>
@@ -261,7 +270,7 @@ function page() {
                     </PCard>
                 </div>
 
-                {/* Right Column: Order Form (30% width) */}
+                {/* Order Form  */}
                 <div className="w-full lg:w-full">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-2">
@@ -434,6 +443,25 @@ function page() {
                                                 <span>Total Amount:</span>
                                                 <span className="text-primary">₹{watchOrderAmount}</span>
                                             </div>
+
+                                            <Separator />
+
+                                            <FormField
+                                                control={form.control}
+                                                name='comments'
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Comments</FormLabel>
+                                                        <FormControl>
+                                                            <Textarea
+                                                                placeholder='Add comments on order...'
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
                                         </div>
                                     </PCard>
                                 </div>
