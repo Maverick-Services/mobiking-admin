@@ -31,6 +31,7 @@ import RefreshButton from '@/components/custom/RefreshButton'
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import { useAuthStore } from '@/store/useAuthStore'
+import NotAuthorizedPage from '@/components/notAuthorized'
 
 const TABS = [
     { key: 'all', label: 'ALL ORDERS' },
@@ -210,7 +211,7 @@ export default function Page() {
         setRange(initialRange)
     }, [])
 
-    const { getOrdersByDate } = useOrders();
+    const { getOrdersByDate, permissions: { canView, canAdd, canEdit, canDelete }, } = useOrders();
 
     const formattedStart = format(range.from, 'dd MMM yyyy')
     const formattedEnd = format(range.to, 'dd MMM yyyy')
@@ -310,6 +311,9 @@ export default function Page() {
         console.log(error)
     }
 
+    if (!canView) return <NotAuthorizedPage />
+
+
     return (
         <InnerDashboardLayout>
             {/* Header */}
@@ -355,7 +359,7 @@ export default function Page() {
                         setPage(1)
                     }
                     } defaultRange={initialRange} />
-                    <PosButton />
+                    {/* <PosButton /> */}
                 </div>
             </div>
 

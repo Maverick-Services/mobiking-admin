@@ -62,13 +62,13 @@ export const ADMIN_SIDEBAR_LINKS = [
     icon: <FaShoppingCart />,
   },
   {
-    key: "returnRequests",
+    key: "return-requests",
     label: "Return Requests",
     href: "/admin/return-requests",
     icon: <FaExchangeAlt />,
   },
   {
-    key: "cancelRequests",
+    key: "cancel-requests",
     label: "Cancel Requests",
     href: "/admin/cancel-requests",
     icon: <FaCaretSquareDown />,

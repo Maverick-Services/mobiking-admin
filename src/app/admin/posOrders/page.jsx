@@ -31,6 +31,7 @@ import RefreshButton from '@/components/custom/RefreshButton'
 import toast from 'react-hot-toast'
 import axios from 'axios'
 import { useAuthStore } from '@/store/useAuthStore'
+import NotAuthorizedPage from '@/components/notAuthorized'
 
 const TABS = [
     { key: 'pos', label: 'POS ORDERS' },
@@ -154,6 +155,7 @@ export default function Page() {
     const handleDebouncedSearch = useCallback(
         debounce((value) => {
             setSearchQuery(value)
+            setPage(1)
         }, 500), // 500ms delay 
         []
     )
@@ -169,7 +171,7 @@ export default function Page() {
         setRange(initialRange)
     }, [])
 
-    const { getOrdersByDate, permissionsPos: { canAddPosTab, canDeletePosTab, canEditPosTab, canViewPosTab } } = useOrders();
+    const { getOrdersByDate, permissionsPosTab: { canAddPosTab, canDeletePosTab, canEditPosTab, canViewPosTab } } = useOrders();
 
     const formattedStart = format(range.from, 'dd MMM yyyy')
     const formattedEnd = format(range.to, 'dd MMM yyyy')

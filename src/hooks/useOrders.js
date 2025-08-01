@@ -16,6 +16,12 @@ export const useOrders = () => {
   const canEdit = checkEdit(Resources.ORDERS);
   const canDelete = checkDelete(Resources.ORDERS);
 
+  // Manual Orders Permissions
+  const canViewManual = checkView(Resources.MANUAL_ORDER);
+  const canAddManual = checkAdd(Resources.MANUAL_ORDER);
+  const canEditManual = checkEdit(Resources.MANUAL_ORDER);
+  const canDeleteManual = checkDelete(Resources.MANUAL_ORDER);
+
   // POS Permissions
   const canViewPos = checkView(Resources.POS);
   const canAddPos = checkAdd(Resources.POS);
@@ -293,6 +299,7 @@ export const useOrders = () => {
     getPaymentLinks,
     createManualOrder,
     permissions: { canView, canAdd, canEdit, canDelete },
+    permissionsManual: { canViewManual, canAddManual, canEditManual, canDeleteManual },
     permissionsPos: { canViewPos, canAddPos, canEditPos, canDeletePos },
     permissionsPosTab: { canViewPosTab, canAddPosTab, canEditPosTab, canDeletePosTab },
   };

@@ -78,14 +78,14 @@ export function OrderViewDialog({ order, children }) {
                     {/* Customer & Shipping Info */}
                     <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-4 text-sm">
                         <div>
-                            <h4 className="font-medium">Customer</h4>
+                            <Badge variant={'secondary'} className={'mb-1'}>Customer Details</Badge>
                             <p><strong>Name:</strong> {safe(order.name)}</p>
                             <p><strong>Email:</strong> {safe(order.email)}</p>
                             <p><strong>Phone:</strong> {safe(order.phoneNo)}</p>
                             <p><strong>Address:</strong> {safe(order.address)}</p>
                         </div>
                         <div>
-                            <h4 className="font-medium">Shipping</h4>
+                            <Badge variant={'secondary'} className={'mb-1'}>Shipping</Badge>
                             <p><strong>Created:</strong>{' '}{order.createdAt ? format(new Date(order.createdAt), 'dd MMM yyyy, hh:mm a') : '-'}</p>
                             <p><strong>Ship Status:</strong> {safe(order.shippingStatus)}</p>
                             <p><strong>AWB:</strong> {safe(order.awbCode)}</p>
@@ -113,8 +113,8 @@ export function OrderViewDialog({ order, children }) {
                             {(order.items || []).map((it, i) => (
                                 <TableRow key={i}>
                                     <TableCell>{i + 1}</TableCell>
-                                    <TableCell><p className='max-w-40 text-wrap'>{safe(it.productId?.name)}</p></TableCell>
-                                    <TableCell>{safe(it.variantName)}</TableCell>
+                                    <TableCell><p className='max-w-50 text-wrap'>{safe(it.productId?.name)}</p></TableCell>
+                                    <TableCell><p className='max-w-40 text-wrap'>{safe(it.variantName)}</p></TableCell>
                                     <TableCell>{safe(it.quantity)}</TableCell>
                                     <TableCell>{it.price != null ? `₹${it.price}` : '-'}</TableCell>
                                     <TableCell>{it.price != null && it.quantity != null ? `₹${(it.price * it.quantity).toFixed(2)}` : '-'}</TableCell>

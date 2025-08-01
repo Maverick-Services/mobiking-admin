@@ -24,6 +24,7 @@ import { manualOrderSchema } from '@/lib/validations/posSchema'
 import SuccessMessage from './components/SuccessMessage'
 import FormInputField from '@/components/custom/FormInputField'
 import { Textarea } from '@/components/ui/textarea'
+import NotAuthorizedPage from '@/components/notAuthorized'
 
 const FILTERS = [
     // { key: '_all_', label: 'ALL' },
@@ -86,7 +87,7 @@ function page() {
     const totalPages = products.data?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
 
-    const { createManualOrder } = useOrders()
+    const { createManualOrder, permissionsManual: { canViewManual, canAddManual, canEditManual, canDeleteManual } } = useOrders()
     const [addedProducts, setAddedProducts] = useState([])
     const [addUserDialog, setAddUserDialog] = useState(false)
 
@@ -161,6 +162,8 @@ function page() {
     function onError(errors) {
         console.log("❌ Validation errors:", errors);
     }
+
+    if (!canViewManual) return <NotAuthorizedPage />
 
     return (
         <InnerDashboardLayout>
@@ -461,14 +464,16 @@ function page() {
                             </div>
 
                             <div className='flex items-center justify-end'>
-                                <LoaderButton
-                                    loading={createManualOrder.isPending || createCustomer.isPending}
-                                    type="submit"
-                                    disabled={items?.length < 1 || createPosOrder.isPending || createCustomer.isPending}
-                                    className="mb-5"
-                                >
-                                    Create Order
-                                </LoaderButton>
+                                {canAddManual &&
+                                    <LoaderButton
+                                        loading={createManualOrder.isPending || createCustomer.isPending}
+                                        type="submit"
+                                        disabled={items?.length < 1 || createManualOrder.isPending || createCustomer.isPending}
+                                        className="mb-5"
+                                    >
+                                        Create Order
+                                    </LoaderButton>
+                                }
                             </div>
                         </form>
                     </Form>
