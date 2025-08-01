@@ -11,7 +11,7 @@ import WebsiteBanners from './components/WebsiteBanners'
 import Loader from '@/components/Loader'
 
 function page() {
-    const { homeQuery, updateHome } = useHome()
+    const { homeQuery, updateHome, permissions: { canView, canAdd, canEdit, canDelete } } = useHome()
     const { groupsQuery } = useGroups()
     const { subCategoriesQuery } = useSubCategories()
 
@@ -34,6 +34,10 @@ function page() {
         )
     }
 
+    if (!canView) {
+        return <NotAuthorizedPage />
+    }
+
     return (
         <InnerDashboardLayout>
             <div className='w-full flex items-center justify-between text-primary mb-5'>
@@ -54,6 +58,7 @@ function page() {
                             updateHome.mutateAsync(data)
                             console.log('Categories saved:', newSeq)
                         }}
+                        canEdit={canEdit}
                     />
                 </PCard>
                 {/* Groups section */}
@@ -69,12 +74,13 @@ function page() {
                             }
                             updateHome.mutateAsync(data)
                         }}
+                        canEdit={canEdit}
                     />
                 </PCard>
             </div>
 
             <PCard className='max-w-[600px]'>
-                <WebsiteBanners />
+                <WebsiteBanners canEdit={canEdit} />
             </PCard>
         </InnerDashboardLayout>
     )

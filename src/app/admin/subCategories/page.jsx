@@ -6,12 +6,12 @@ import CategoriesListView from './components/CategoriesListView';
 import { useSubCategories } from '@/hooks/useSubCategories';
 import { useCategories } from '@/hooks/useCategories';
 import { useRouter } from 'next/navigation';
-import { Separator } from '@/components/ui/separator';
+import NotAuthorizedPage from '@/components/notAuthorized';
 
 export default function Page() {
     const router = useRouter()
     // fetch categories query
-    const { subCategoriesQuery, deleteSubCategory } = useSubCategories();
+    const { subCategoriesQuery, deleteSubCategory, permissions: { canView, canAdd, canEdit, canDelete } } = useSubCategories();
     const { categoriesQuery } = useCategories()
     console.log(subCategoriesQuery.data)
     // destructure deleteSubCategory mutation
@@ -27,6 +27,9 @@ export default function Page() {
         router.push('/admin/subCategories/add')
     };
 
+    if (!canView) return <NotAuthorizedPage />
+
+
     return (
         <InnerDashboardLayout>
             <div className="w-full items-center justify-between">
@@ -38,9 +41,11 @@ export default function Page() {
                     <Button variant="outline">
                         Total: {subCategoriesQuery.data?.data?.length || 0}
                     </Button>
-                    <Button onClick={handleAddClick}>
-                        <CirclePlus className="mr-2 h-4 w-4" /> Add New
-                    </Button>
+                    {canAdd &&
+                        <Button onClick={handleAddClick}>
+                            <CirclePlus className="mr-2 h-4 w-4" /> Add New
+                        </Button>
+                    }
                 </div>
 
                 <CategoriesListView
@@ -50,6 +55,8 @@ export default function Page() {
                     onDelete={deleteSubCategoryAsync}
                     isDeleting={isDeleting}
                     deleteError={deleteError}
+                    canEdit={canEdit}
+                    canDelete={canDelete}
                 />
             </div>
         </InnerDashboardLayout>

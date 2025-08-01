@@ -74,7 +74,7 @@ export const ADMIN_SIDEBAR_LINKS = [
     icon: <FaCaretSquareDown />,
   },
   {
-    key: "paymentLinks",
+    key: "payment-links",
     label: "Payment Links",
     href: "/admin/payment-links",
     icon: <FaMoneyCheckAlt />,

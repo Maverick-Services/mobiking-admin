@@ -5,17 +5,19 @@ import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from '@
 import GroupSequenceDialog from './GroupSequenceDialog'
 import Image from 'next/image'
 
-export default function GroupTable({ initialData = [], allGroups = [], onSave }) {
+export default function GroupTable({ initialData = [], allGroups = [], onSave, canEdit }) {
     // console.log(initialData)
     return (
         <div>
             <div className="flex justify-between items-center w-full mb-5">
                 <h2 className="font-bold text-xl text-purple-800">Product Groups</h2>
-                <GroupSequenceDialog
-                    allGroups={allGroups}
-                    initialGroups={initialData.map((g) => g._id)}
-                    onSave={onSave}
-                />
+                {canEdit &&
+                    <GroupSequenceDialog
+                        allGroups={allGroups}
+                        initialGroups={initialData.map((g) => g._id)}
+                        onSave={onSave}
+                    />
+                }
             </div>
 
             <Table>

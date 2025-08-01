@@ -118,23 +118,23 @@ export default function CouponsTable({
                                             <Eye size={18} className="text-gray-600" />
                                         </Button> */}
 
-                                        {/* {canEdit && */}
-                                        <Button
-                                            size="icon"
-                                            variant="outline"
-                                            onClick={() => onEdit(coupon)}
-                                        >
-                                            <Pencil size={16} />
-                                        </Button>
-                                        {/* // } */}
-                                        {/* {canDelete && */}
-                                        <Button
-                                            variant="destructive"
-                                            onClick={() => handleDeleteClick(coupon._id)}
-                                        >
-                                            <Trash size={16} />
-                                        </Button>
-                                        {/* } */}
+                                        {canEdit &&
+                                            <Button
+                                                size="icon"
+                                                variant="outline"
+                                                onClick={() => onEdit(coupon)}
+                                            >
+                                                <Pencil size={16} />
+                                            </Button>
+                                        }
+                                        {canDelete &&
+                                            <Button
+                                                variant="destructive"
+                                                onClick={() => handleDeleteClick(coupon._id)}
+                                            >
+                                                <Trash size={16} />
+                                            </Button>
+                                        }
                                     </div>
                                 </TableCell>
                             </TableRow>

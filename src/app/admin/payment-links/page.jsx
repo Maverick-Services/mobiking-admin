@@ -13,13 +13,14 @@ import { format } from 'date-fns'
 import { OrderViewDialog } from './components/OrderViewDialog'
 import { Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import NotAuthorizedPage from '@/components/notAuthorized'
 
 function Page() {
-    const { getPaymentLinks } = useOrders();
+    const { getPaymentLinks, permissionsPayment: { canViewPayment, canAddPaymentPayment, canEditPayment, canDeletePayment } } = useOrders();
     const isLoading = getPaymentLinks.isLoading;
     const linksData = getPaymentLinks?.data?.data || [];
 
-    console.log(linksData)
+    if (!canViewPayment) return <NotAuthorizedPage />
 
     return (
         <InnerDashboardLayout>

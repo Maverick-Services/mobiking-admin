@@ -8,17 +8,10 @@ import TableSkeleton from '@/components/custom/TableSkeleton'
 import { format, startOfMonth, startOfToday, subDays } from 'date-fns'
 import DateRangeSelector from '@/components/custom/DateRangeSelector'
 import { Input } from '@/components/ui/input'
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination"
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from "@/components/ui/pagination"
 import { getPaginationRange } from "@/lib/services/getPaginationRange"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, } from "@/components/ui/select"
+import NotAuthorizedPage from '@/components/notAuthorized'
 
 function Page() {
     // Date range
@@ -55,7 +48,7 @@ function Page() {
     const startDate = format(range.from, 'yyyy-MM-dd')
     const endDate = format(range.to, 'yyyy-MM-dd')
 
-    const { queriesQuery, getQueriesByDate } = useQueries();
+    const { queriesQuery, getQueriesByDate, permissions: { canView, canAdd, canEdit, canDelete } } = useQueries();
 
     const { data: customQueriesData, isFetching, error } = getQueriesByDate({ page, limit, startDate, endDate, searchQuery: debouncedSearch })
     const displayQueries = customQueriesData ?? [];
@@ -70,7 +63,7 @@ function Page() {
         setFilteredData(displayQueries?.queries)
     }, [displayQueries])
 
-    console.log(displayQueries)
+    if (!canView) return <NotAuthorizedPage />
 
     return (
         <InnerDashboardLayout>
@@ -107,7 +100,7 @@ function Page() {
 
             {queriesQuery.isLoading || isFetching
                 ? <TableSkeleton showHeader={false} />
-                : <QueryTable data={filteredData} />
+                : <QueryTable data={filteredData} canEdit={canEdit} />
             }
 
             <div className="flex w-full justify-end gap-2 items-center mt-3">

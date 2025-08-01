@@ -9,7 +9,7 @@ import { Eye, Inbox } from "lucide-react"
 import QuerySheet from "./QuerySheet"
 import { AnimatePresence, motion } from "framer-motion"
 
-function QueryTable({ data = [] }) {
+function QueryTable({ data = [], canEdit }) {
     const [selectedQuery, setSelectedQuery] = useState(null)
     const [sheetOpen, setSheetOpen] = useState(false)
 
@@ -92,6 +92,7 @@ function QueryTable({ data = [] }) {
                     open={sheetOpen}
                     onOpenChange={setSheetOpen}
                     query={selectedQuery}
+                    canEdit={canEdit}
                 />
             )}
         </>

@@ -27,6 +27,8 @@ export default function CategoriesListView({
     onDelete,
     isDeleting,
     deleteError,
+    canEdit,
+    canDelete
 }) {
 
     // console.log(categories)
@@ -88,6 +90,7 @@ export default function CategoriesListView({
                             <TableCell className="text-center">
                                 <Switch
                                     checked={item.active}
+                                    disabled={!canEdit}
                                     onCheckedChange={async checked => {
                                         const toastId = toast.loading("Updating...");
                                         try {
@@ -109,23 +112,27 @@ export default function CategoriesListView({
 
                             <TableCell >
                                 <div className="flex gap-2 items-center justify-center">
-                                    <Button
-                                        size="icon"
-                                        variant="outline"
-                                        onClick={() =>
-                                            router.push(
-                                                `/admin/subCategories/${item.slug}/edit`
-                                            )
-                                        }
-                                    >
-                                        <Pencil size={16} />
-                                    </Button>
-                                    <Button
-                                        variant="destructive"
-                                        onClick={() => handleDeleteClick(item._id)}
-                                    >
-                                        <Trash size={16} />
-                                    </Button>
+                                    {canEdit &&
+                                        <Button
+                                            size="icon"
+                                            variant="outline"
+                                            onClick={() =>
+                                                router.push(
+                                                    `/admin/subCategories/${item.slug}/edit`
+                                                )
+                                            }
+                                        >
+                                            <Pencil size={16} />
+                                        </Button>
+                                    }
+                                    {canDelete &&
+                                        <Button
+                                            variant="destructive"
+                                            onClick={() => handleDeleteClick(item._id)}
+                                        >
+                                            <Trash size={16} />
+                                        </Button>
+                                    }
                                 </div>
                             </TableCell>
                         </TableRow>

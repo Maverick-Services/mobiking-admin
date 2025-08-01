@@ -1,10 +1,19 @@
 import api from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import toast from "react-hot-toast";
+import { usePermissions } from "./usePermissions";
+import { Resources } from "@/lib/permissions";
 
 
 export const useQueries = () => {
     const queryClient = useQueryClient();
+    const { checkView, checkAdd, checkEdit, checkDelete } = usePermissions()
+
+    // Orders Permissions
+    const canView = checkView(Resources.QUERIES);
+    const canAdd = checkAdd(Resources.QUERIES);
+    const canEdit = checkEdit(Resources.QUERIES);
+    const canDelete = checkDelete(Resources.QUERIES);
 
     const queriesQuery = useQuery({
         queryKey: ['queries'],
@@ -66,6 +75,11 @@ export const useQueries = () => {
     })
 
     return {
-        queriesQuery, assignQueries, sendReply, closeQuery, getQueriesByDate
+        queriesQuery,
+        assignQueries,
+        sendReply,
+        closeQuery,
+        getQueriesByDate,
+        permissions: { canView, canAdd, canEdit, canDelete },
     }
 }

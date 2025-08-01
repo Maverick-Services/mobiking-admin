@@ -24,7 +24,7 @@ import DeleteConfirmationDialog from "./DeleteConfirmationDialog ";
 
 export default function NotificationTable() {
     const [search, setSearch] = useState('');
-    const { notificationsQuery, deleteNotification } = useNotifications();
+    const { notificationsQuery, deleteNotification, permissions: { canEdit, canDelete } } = useNotifications();
 
     const { isLoading, error, data } = notificationsQuery;
     const notifications = data?.data || [];
@@ -121,12 +121,16 @@ export default function NotificationTable() {
                             </TableCell>
                             <TableCell>
                                 <div className="flex gap-2 items-center justify-center">
-                                    <Button variant="outline" onClick={() => sendAgain(item)}>
-                                        <IoMdRefresh size={16} />
-                                    </Button>
-                                    <Button variant="destructive" onClick={() => handleDeleteClick(item._id)}>
-                                        <Trash size={16} />
-                                    </Button>
+                                    {canEdit &&
+                                        <Button variant="outline" onClick={() => sendAgain(item)}>
+                                            <IoMdRefresh size={16} />
+                                        </Button>
+                                    }
+                                    {canDelete &&
+                                        <Button variant="destructive" onClick={() => handleDeleteClick(item._id)}>
+                                            <Trash size={16} />
+                                        </Button>
+                                    }
                                 </div>
                             </TableCell>
                         </TableRow>

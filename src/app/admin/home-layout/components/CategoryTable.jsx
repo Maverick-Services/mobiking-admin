@@ -8,16 +8,19 @@ export default function CategoryTable({
     initialData = [],
     allCategories = [],
     onSave,
+    canEdit
 }) {
     return (
         <div>
             <div className="flex justify-between items-center w-full mb-5">
                 <h2 className="font-bold text-xl text-green-800">Product Categories</h2>
-                <CategorySequenceDialog
-                    allCategories={allCategories}
-                    initialCategories={initialData.map((g) => g._id)}
-                    onSave={onSave}
-                />
+                {canEdit &&
+                    <CategorySequenceDialog
+                        allCategories={allCategories}
+                        initialCategories={initialData.map((g) => g._id)}
+                        onSave={onSave}
+                    />
+                }
             </div>
 
             <div className="overflow-auto border rounded-md shadow-sm">

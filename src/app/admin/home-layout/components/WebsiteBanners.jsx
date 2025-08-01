@@ -10,7 +10,7 @@ import { uploadImage } from '@/lib/services/uploadImage'
 import LoaderButton from '@/components/custom/LoaderButton'
 import { Reorder } from 'framer-motion'
 
-function WebsiteBanners() {
+function WebsiteBanners({ canEdit }) {
     const { homeQuery, updateHome } = useHome()
     const homeData = homeQuery?.data?.data || {}
     const [bannerLoading, setBannerLoading] = useState(false)
@@ -26,60 +26,64 @@ function WebsiteBanners() {
         <div className='max-w-[600px]'>
             <div className='w-full flex items-center justify-between text-primary mb-5'>
                 <h2 className='font-bold'>Website Banners</h2>
-                <LoaderButton
-                    loading={bannerLoading}
-                    onClick={async () => {
-                        try {
-                            setBannerLoading(true)
-                            await updateHome.mutateAsync({ banners })
-                            toast.success('Banners saved successfully!')
-                        } catch (err) {
-                            toast.error('Failed to save banners')
-                        } finally {
-                            setBannerLoading(false)
-                        }
-                    }}
-                >
-                    Save Banners
-                </LoaderButton>
+                {canEdit &&
+                    <LoaderButton
+                        loading={bannerLoading}
+                        onClick={async () => {
+                            try {
+                                setBannerLoading(true)
+                                await updateHome.mutateAsync({ banners })
+                                toast.success('Banners saved successfully!')
+                            } catch (err) {
+                                toast.error('Failed to save banners')
+                            } finally {
+                                setBannerLoading(false)
+                            }
+                        }}
+                    >
+                        Save Banners
+                    </LoaderButton>
+                }
             </div>
 
-            {banners?.length === 0 ? (
-                <p className='text-muted-foreground'>No banners added yet.</p>
-            ) : (
-                <Reorder.Group
-                    axis='y'
-                    values={banners}
-                    onReorder={setBanners}
-                    className='flex flex-col gap-4'
-                >
-                    {banners.map((url, idx) => (
-                        <Reorder.Item
-                            key={url}
-                            value={url}
-                            className='relative group cursor-grab active:cursor-grabbing'
-                        >
-                            <Image
-                                src={url}
-                                alt={`banner-${idx}`}
-                                height={500}
-                                width={2000}
-                                className='h-64 w-full object-cover rounded-xl'
-                            />
-                            <button
-                                onClick={() => {
-                                    setBanners((prev) => prev.filter((_, i) => i !== idx))
-                                }}
-                                className='absolute top-2 right-2 bg-white text-red-500 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition'
-                                title='Remove Banner'
+            {
+                banners?.length === 0 ? (
+                    <p className='text-muted-foreground'>No banners added yet.</p>
+                ) : (
+                    <Reorder.Group
+                        axis='y'
+                        values={banners}
+                        onReorder={setBanners}
+                        className='flex flex-col gap-4'
+                    >
+                        {banners.map((url, idx) => (
+                            <Reorder.Item
+                                key={url}
+                                value={url}
+                                className='relative group cursor-grab active:cursor-grabbing'
                             >
-                                ✕
-                            </button>
-                            <Button className={'w-full mt-2'}>...</Button>
-                        </Reorder.Item>
-                    ))}
-                </Reorder.Group>
-            )}
+                                <Image
+                                    src={url}
+                                    alt={`banner-${idx}`}
+                                    height={500}
+                                    width={2000}
+                                    className='h-64 w-full object-cover rounded-xl'
+                                />
+                                <button
+                                    onClick={() => {
+                                        setBanners((prev) => prev.filter((_, i) => i !== idx))
+                                    }}
+                                    className='absolute top-2 right-2 bg-white text-red-500 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition'
+                                    title='Remove Banner'
+                                >
+                                    ✕
+                                </button>
+                                <Button className={'w-full mt-2'}>...</Button>
+                            </Reorder.Item>
+                        ))}
+                    </Reorder.Group>
+                )
+            }
 
             <input
                 type='file'
@@ -114,7 +118,7 @@ function WebsiteBanners() {
                     e.target.value = ''
                 }}
             />
-        </div>
+        </div >
     )
 }
 

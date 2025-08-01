@@ -1,18 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { toast } from 'react-hot-toast';
-import { Actions, checkPermission, Resources } from '@/lib/permissions';
-import { useAuthStore } from '@/store/useAuthStore';
+import { Resources } from '@/lib/permissions';
+import { usePermissions } from './usePermissions';
 
 export const useProducts = () => {
-    const { user } = useAuthStore()
     const queryClient = useQueryClient();
+    const { checkView, checkAdd, checkEdit, checkDelete } = usePermissions()
 
-    // Check permissions
-    const canView = checkPermission(user, Resources.PRODUCTS, Actions.VIEW)
-    const canAdd = checkPermission(user, Resources.PRODUCTS, Actions.ADD)
-    const canEdit = checkPermission(user, Resources.PRODUCTS, Actions.EDIT)
-    const canDelete = checkPermission(user, Resources.PRODUCTS, Actions.DELETE)
+    // Permissions
+    const canView = checkView(Resources.PRODUCTS)
+    const canAdd = checkAdd(Resources.PRODUCTS)
+    const canEdit = checkEdit(Resources.PRODUCTS)
+    const canDelete = checkDelete(Resources.PRODUCTS)
 
     // Get all products
     const productsQuery = useQuery({

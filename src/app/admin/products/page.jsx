@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/pagination"
 import { getPaginationRange } from "@/lib/services/getPaginationRange"
 import { LayoutGroup, motion } from 'framer-motion';
+import NotAuthorizedPage from "@/components/notAuthorized"
 
 const TABS = [
     { key: '', label: 'ALL PRODUCTS' },
@@ -96,17 +97,6 @@ export default function page() {
     const totalPages = products.data?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
 
-    // Filter by category ID if set
-    // const afterCategoryFilter = allProducts.filter((prod) => {
-    //     if (categoryFilter === "all") return true
-    //     return prod.parentCategory === categoryFilter
-    // })
-
-    // Filter by search term (case-insensitive match on name)
-    // const finalFiltered = afterCategoryFilter.filter((prod) =>
-    //     prod.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
-    // )
-
     // open dialog to add new 
     const handleAddClick = () => {
         resetCreate();
@@ -124,6 +114,8 @@ export default function page() {
         setIsDialogOpen(true);
     };
 
+    if (!canView) return <NotAuthorizedPage />
+
     return (
         <InnerDashboardLayout>
             <div className="w-full flex flex-col gap-4 pb-4">
@@ -132,10 +124,12 @@ export default function page() {
                         Products
                     </h1>
                     {/* Add New */}
-                    <Button onClick={handleAddClick}>
-                        <CirclePlus className="mr-2 h-4 w-4" />
-                        Add New
-                    </Button>
+                    {canAdd &&
+                        <Button onClick={handleAddClick}>
+                            <CirclePlus className="mr-2 h-4 w-4" />
+                            Add New
+                        </Button>
+                    }
                 </div>
 
                 {/* Toolbar */}

@@ -30,7 +30,7 @@ const STATUS_VARIANTS = {
     Hold: 'secondary',        // gray or custom secondary
 }
 
-export default function CancelOrdersTable({ error, orders = [] }) {
+export default function CancelOrdersTable({ error, orders = [], canEditCancel }) {
     const router = useRouter()
     const [cancelDialog, setCancelDialog] = useState(false)
     const [selectedOrder, setSelectedOrder] = useState(undefined)
@@ -149,7 +149,7 @@ export default function CancelOrdersTable({ error, orders = [] }) {
                                         >
                                             <Eye />
                                         </Button> */}
-                                        <OrderViewDialog order={o}>
+                                        <OrderViewDialog order={o} canEditCancel={canEditCancel}>
                                             <Button variant="outline">
                                                 <Eye />
                                             </Button>

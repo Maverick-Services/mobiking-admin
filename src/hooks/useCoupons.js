@@ -1,17 +1,19 @@
 import api from '@/lib/api';
 import { toast } from 'react-hot-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { usePermissions } from './usePermissions';
+import { Resources } from '@/lib/permissions';
 
 export const useCoupons = () => {
     const queryClient = useQueryClient();
 
-    // const { checkView, checkAdd, checkEdit, checkDelete } = usePermissions()
+    const { checkView, checkAdd, checkEdit, checkDelete } = usePermissions()
 
     // Permissions
-    // const canView = checkView(Resources.CATEGORIES)
-    // const canAdd = checkAdd(Resources.CATEGORIES)
-    // const canEdit = checkEdit(Resources.CATEGORIES)
-    // const canDelete = checkDelete(Resources.CATEGORIES)
+    const canView = checkView(Resources.COUPON_CODES)
+    const canAdd = checkAdd(Resources.COUPON_CODES)
+    const canEdit = checkEdit(Resources.COUPON_CODES)
+    const canDelete = checkDelete(Resources.COUPON_CODES)
 
     // Get all Categories
     const couponsQuery = (params) => {
@@ -67,11 +69,6 @@ export const useCoupons = () => {
 
     return {
         couponsQuery, deleteCoupon, updateCoupon, createCoupon,
-        // permissions: {
-        //     canView,
-        //     canAdd,
-        //     canEdit,
-        //     canDelete
-        // }
+        permissions: { canView, canAdd, canEdit, canDelete }
     };
 };

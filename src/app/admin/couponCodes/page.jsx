@@ -10,6 +10,7 @@ import CouponsTable from './components/CouponsTable';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, } from "@/components/ui/pagination"
+import NotAuthorizedPage from '@/components/notAuthorized';
 
 function page() {
     const [couponDialogOpen, setCouponDialogOpen] = useState(false)
@@ -31,7 +32,7 @@ function page() {
     const [searchTerm, setSearchTerm] = useState("")
     const debouncedSearch = useDebouncedValue(searchTerm, 500);
 
-    const { couponsQuery, deleteCoupon, updateCoupon } = useCoupons();
+    const { couponsQuery, deleteCoupon, updateCoupon, permissions: { canView, canAdd, canEdit, canDelete } } = useCoupons();
 
     const coupons = couponsQuery({
         page: page,
@@ -49,17 +50,21 @@ function page() {
         setCouponDialogOpen(true);
     }
 
+    if (!canView) return <NotAuthorizedPage />
+
     return (
         <InnerDashboardLayout>
             <div className="w-full flex flex-col gap-4 pb-4">
                 <div className='flex items-center justify-between w-full mb-3'>
                     <h1 className="text-primary font-bold sm:text-2xl lg:text-3xl mb-3">Coupon Codes</h1>
-                    <Button onClick={() => {
-                        setCouponDialogOpen(true)
-                        setSelectedCoupon(undefined)
-                    }}>
-                        Add New
-                    </Button>
+                    {canAdd &&
+                        <Button onClick={() => {
+                            setCouponDialogOpen(true)
+                            setSelectedCoupon(undefined)
+                        }}>
+                            Add New
+                        </Button>
+                    }
                 </div>
                 {/* Toolbar */}
                 <div className="flex flex-wrap justify-between items-center gap-2">
@@ -88,6 +93,8 @@ function page() {
                         isDeleting={deleteCoupon.isPending}
                         deleteError={deleteCoupon.error}
                         onEdit={handleEditCoupon}
+                        canEdit={canEdit}
+                        canDelete={canDelete}
                     />
                 </>
             }

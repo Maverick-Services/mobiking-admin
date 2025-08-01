@@ -1,18 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { toast } from 'react-hot-toast';
-import { Actions, checkPermission, Resources } from '@/lib/permissions';
-import { useAuthStore } from '@/store/useAuthStore';
+import { Resources } from '@/lib/permissions';
+import { usePermissions } from './usePermissions';
 
 export const useSubCategories = () => {
-    const { user } = useAuthStore()
     const queryClient = useQueryClient();
+    const { checkView, checkAdd, checkEdit, checkDelete } = usePermissions()
 
-    // Check permissions
-    const canView = checkPermission(user, Resources.SUB_CATEGORIES, Actions.VIEW)
-    const canAdd = checkPermission(user, Resources.SUB_CATEGORIES, Actions.ADD)
-    const canEdit = checkPermission(user, Resources.SUB_CATEGORIES, Actions.EDIT)
-    const canDelete = checkPermission(user, Resources.SUB_CATEGORIES, Actions.DELETE)
+    // Permissions
+    const canView = checkView(Resources.SUB_CATEGORIES)
+    const canAdd = checkAdd(Resources.SUB_CATEGORIES)
+    const canEdit = checkEdit(Resources.SUB_CATEGORIES)
+    const canDelete = checkDelete(Resources.SUB_CATEGORIES)
 
     // Get all SubCategories
     const subCategoriesQuery = useQuery({

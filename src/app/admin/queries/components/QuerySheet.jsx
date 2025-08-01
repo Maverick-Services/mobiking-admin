@@ -17,7 +17,7 @@ import CloseQueryDialog from "./CloseQueryDialog"
 import OrderOfQuery from "./OrderOfQuery"
 import Link from "next/link"
 
-function QuerySheet({ open, onOpenChange, query }) {
+function QuerySheet({ open, onOpenChange, query, canEdit }) {
     const { sendReply } = useQueries();
     const [message, setMessage] = useState("")
     const [closeDialogOpen, setCloseDialogOpen] = useState(false)
@@ -45,11 +45,11 @@ function QuerySheet({ open, onOpenChange, query }) {
                     <div className="w-full flex-1 sm:h-screen sm:overflow-y-auto bg-gray-100 px-4">
                         <div className="flex items-center justify-between py-3">
                             <h1 className="font-bold text-xl">Order Details</h1>
-                            {query?.orderId?._id &&
+                            {/* {query?.orderId?._id &&
                             <Link href={`/admin/orders/${query?.orderId?._id}`} target="_blank">
                                 <Button>View Order</Button>
                             </Link>
-                            }
+                            } */}
                         </div>
 
                         <OrderOfQuery order={query.orderId} />
@@ -103,7 +103,7 @@ function QuerySheet({ open, onOpenChange, query }) {
                                 <h3 className="font-semibold">Replies</h3>
 
                                 {/* Close Query Button */}
-                                {!query?.isResolved && (
+                                {canEdit && !query?.isResolved && (
                                     <div className="">
                                         <Button
                                             variant="destructive"
@@ -173,12 +173,14 @@ function QuerySheet({ open, onOpenChange, query }) {
                                             }
                                         }}
                                     />
-                                    <LoaderButton
-                                        loading={sendReply.isPending}
-                                        disabled={sendReply.isPending}
-                                        onClick={handleSendMessage}>
-                                        Send
-                                    </LoaderButton>
+                                    {canEdit &&
+                                        <LoaderButton
+                                            loading={sendReply.isPending}
+                                            disabled={sendReply.isPending}
+                                            onClick={handleSendMessage}>
+                                            Send
+                                        </LoaderButton>
+                                    }
                                 </div>
                             )}
                         </div>
