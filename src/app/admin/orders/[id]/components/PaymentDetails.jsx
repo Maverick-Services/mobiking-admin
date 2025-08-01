@@ -46,6 +46,17 @@ function PaymentDetails({ order }) {
                     </div>
                 ))}
             </div>
+            {
+                order?.comments &&
+                <div>
+                    <span className="block text-xs font-medium uppercase text-gray-400">
+                        Comments
+                    </span>
+                    <span className="mt-1 block text-base font-semibold text-yellow-600">
+                        {order?.comments ?? "—"}
+                    </span>
+                </div>
+            }
         </PCard>
     )
 }
