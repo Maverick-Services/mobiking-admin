@@ -8,7 +8,7 @@ import { usePermissions } from "./usePermissions";
 
 export const useOrders = () => {
   const queryClient = useQueryClient();
-  const { checkView, checkAdd, checkEdit, checkDelete } = usePermissions()
+  const { checkView, checkAdd, checkEdit, checkDelete, onlyAdmin } = usePermissions()
 
   // Orders Permissions
   const canView = checkView(Resources.ORDERS);
@@ -323,5 +323,6 @@ export const useOrders = () => {
     permissionsManual: { canViewManual, canAddManual, canEditManual, canDeleteManual },
     permissionsPos: { canViewPos, canAddPos, canEditPos, canDeletePos },
     permissionsPosTab: { canViewPosTab, canAddPosTab, canEditPosTab, canDeletePosTab },
+    onlyAdmin
   };
 };

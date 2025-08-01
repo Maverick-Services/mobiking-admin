@@ -30,11 +30,11 @@ function page() {
     const [rejectOpen, setRejectOpen] = useState(false)
     const [cancelOpen, setCancelOpen] = useState(false)
 
-    const { getSingleOrderQuery } = useOrders()
+    const { getSingleOrderQuery, onlyAdmin } = useOrders()
     const { data: orderResp, isLoading, error } = getSingleOrderQuery(id)
     const order = orderResp?.data || {}
 
-    console.log(order)
+    // console.log(order)
 
     if (isLoading) return <OrderSkeletonPage />
     if (error) return <p>Error: {error.message}</p>
@@ -107,7 +107,7 @@ function page() {
                             Reject
                         </Button>
                     }
-                    {isNewOrder() &&
+                    {isNewOrder() && onlyAdmin &&
                         <Button
                             onClick={() => setCancelOpen(true)}
                             variant="destructive"
