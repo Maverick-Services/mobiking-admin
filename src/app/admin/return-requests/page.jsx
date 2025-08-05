@@ -38,9 +38,9 @@ function page() {
     const startDate = format(range.from, 'yyyy-MM-dd')
     const endDate = format(range.to, 'yyyy-MM-dd')
 
-    const [page, setPage] = useState(1)
-    const [limit, setLimit] = useState(10)
-        ;
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+
     const { getCancelRequestOrders, permissionsReturn: { canViewReturn, canAddReturn, canEditReturn, canDeleteReturn } } = useOrders();
     const { data: returnReqOrders, isFetching, error } = getCancelRequestOrders({ requestType: 'Return', startDate, endDate, page, limit });
 

@@ -73,6 +73,7 @@ export default function CancelOrdersTable({ error, orders = [], canEditCancel })
                         <TableHead>Method</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Created At</TableHead>
+                        <TableHead>Cancel Request</TableHead>
                         <TableHead className="text-center">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -134,6 +135,12 @@ export default function CancelOrdersTable({ error, orders = [], canEditCancel })
                                         <div className="text-gray-500">
                                             {format(new Date(o.createdAt), 'hh:mm a')}
                                         </div>
+                                    </TableCell>
+
+                                    <TableCell>
+                                        <Badge variant={'secondary'}>
+                                            {o?.requests[o?.requests.length - 1]?.status}
+                                        </Badge>
                                     </TableCell>
 
                                     {/* action buttons */}

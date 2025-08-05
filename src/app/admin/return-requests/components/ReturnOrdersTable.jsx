@@ -31,6 +31,7 @@ const STATUS_VARIANTS = {
 
 export default function ReturnOrdersTable({ error, orders = [], canEditReturn }) {
     const router = useRouter()
+    console.log(orders)
 
     if (error) {
         return (
@@ -70,6 +71,7 @@ export default function ReturnOrdersTable({ error, orders = [], canEditReturn })
                         <TableHead>Method</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Created At</TableHead>
+                        <TableHead>Return Request</TableHead>
                         <TableHead className="text-center">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -131,6 +133,12 @@ export default function ReturnOrdersTable({ error, orders = [], canEditReturn })
                                         <div className="text-gray-500">
                                             {format(new Date(o.createdAt), 'hh:mm a')}
                                         </div>
+                                    </TableCell>
+
+                                    <TableCell>
+                                        <Badge variant={'secondary'}>
+                                            {o?.requests[o?.requests.length - 1]?.status}
+                                        </Badge>
                                     </TableCell>
 
                                     {/* action buttons */}

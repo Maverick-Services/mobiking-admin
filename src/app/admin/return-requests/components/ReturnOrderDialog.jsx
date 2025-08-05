@@ -30,7 +30,7 @@ export default function ReturnDialog({ open, onOpenChange, order }) {
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>Reject Order?</DialogTitle>
+                    <DialogTitle>Accept Return Request?</DialogTitle>
                     <div className="mt-2 space-y-1 text-sm">
                         <p><strong>Order ID:</strong> {order?.orderId || '-'}</p>
                         <p><strong>Customer:</strong> {order?.name || '-'} ({order?.phoneNo || '-'})</p>
@@ -67,7 +67,7 @@ export default function ReturnDialog({ open, onOpenChange, order }) {
                             returnOrder.isPending
                         }
                     >
-                        Reject
+                        Accept
                     </LoaderButton>
                 </DialogFooter>
             </DialogContent>
