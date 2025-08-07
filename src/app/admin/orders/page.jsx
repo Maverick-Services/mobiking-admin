@@ -213,11 +213,11 @@ export default function Page() {
 
     const { getOrdersByDate, permissions: { canView, canAdd, canEdit, canDelete }, } = useOrders();
 
-    const formattedStart = format(range.from, 'dd MMM yyyy')
-    const formattedEnd = format(range.to, 'dd MMM yyyy')
+    const formattedStart = format(range?.from, 'dd MMM yyyy')
+    const formattedEnd = format(range?.to, 'dd MMM yyyy')
 
-    const startDate = format(range.from, 'yyyy-MM-dd')
-    const endDate = format(range.to, 'yyyy-MM-dd')
+    const startDate = format(range?.from, 'yyyy-MM-dd')
+    const endDate = format(range?.to, 'yyyy-MM-dd')
 
     // Data fetching
     const { data: customOrdersData, isFetching, error } = getOrdersByDate({
@@ -354,8 +354,9 @@ export default function Page() {
                         queryPrefix='orders'
                     />
 
-                    <DateRangeSelector onChange={() => {
-                        setRange()
+                    <DateRangeSelector onChange={(selected) => {
+                        // console.log(sele)
+                        setRange(selected)
                         setPage(1)
                     }
                     } defaultRange={initialRange} />
