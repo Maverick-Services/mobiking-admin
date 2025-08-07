@@ -21,14 +21,17 @@ const formSchema = z.object({
     isBackgroundColorVisible: z.boolean(),
     banner: z.string().nullable(),
     backgroundColor: z.string().optional(),
-    categories: z.array(z.string()).optional(),
+    categories: z.array(z.string()).nullable(),
 });
 
 function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, isSubmitting, error, }) {
 
     const { subCategoriesQuery } = useSubCategories();
     const subCategoriesData = subCategoriesQuery?.data?.data || [];
+
     // console.log(subCategoriesData)
+    const initialCategories = selectedGroup?.categories?.map(s => s._id)
+    // console.log(initialCategories)
 
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -41,7 +44,7 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
             isBannerVisble: false,
             isBackgroundColorVisible: false,
             backgroundColor: "#ffffff",
-            categories: selectedGroup?.categories ?? [],   // ← initialize
+            categories: initialCategories ?? [],   // ← initialize
         }
     });
     const { watch, setValue, control, reset } = form;
@@ -56,7 +59,7 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                 isBannerVisble: selectedGroup.isBannerVisble,
                 isBackgroundColorVisible: selectedGroup.isBackgroundColorVisible,
                 backgroundColor: selectedGroup?.backgroundColor || "#ffffff",
-                categories: selectedGroup?.categories ?? [],   // ← reset here too
+                categories: initialCategories ?? [],   // ← reset here too
             });
         } else {
             reset({
@@ -98,6 +101,7 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
 
     // get current selected IDs
     const selectedIds = watch('categories') || [];
+    // console.log('selected ids', selectedIds)
 
     async function onSubmit(values) {
         if (selectedGroup) {
@@ -107,7 +111,6 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
             await onCreate(values)
             onOpenChange(false)
         }
-        // console.log(values)
     }
 
     return (
@@ -278,10 +281,11 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                                 )}
                             />
 
+                            {/* categories */}
                             <FormField
                                 control={control}
                                 name="categories"
-                                render={() => (
+                                render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Sub‑Categories</FormLabel>
                                         <FormDescription>Select all that apply</FormDescription>
@@ -292,6 +296,7 @@ function GroupDialog({ open, onOpenChange, selectedGroup, onCreate, onUpdate, is
                                                         <input
                                                             type="checkbox"
                                                             value={sub._id}
+                                                            // {...field}
                                                             checked={selectedIds.includes(sub._id)}
                                                             onChange={e => {
                                                                 const checked = e.target.checked;

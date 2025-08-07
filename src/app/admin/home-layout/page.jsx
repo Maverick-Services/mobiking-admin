@@ -27,7 +27,7 @@ function page() {
         return (
             <InnerDashboardLayout>
                 <div className='w-full flex items-center justify-between text-primary mb-5'>
-                    <h1 className='font-bold sm:text-2xl lg:text-4xl w-full'>Design Studio</h1>
+                    <h1 className='font-bold sm:text-2xl lg:text-4xl w-full'>Home Layout</h1>
                 </div>
                 <Loader />
             </InnerDashboardLayout>
