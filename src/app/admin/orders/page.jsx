@@ -273,6 +273,7 @@ export default function Page() {
 
     //Export data Function
     const handleExportData = async () => {
+        const toastId = toast.loading("Exporting");
         try {
             const res = await axios.get(
                 `${process.env.NEXT_PUBLIC_BACKEND_URL}/orders/custom?startDate=${startDate}&endDate=${endDate}`,
@@ -293,6 +294,8 @@ export default function Page() {
         } catch (err) {
             console.error("Failed to export:", err);
             toast.error(err?.message || err?.response?.data?.message);
+        } finally {
+            toast.dismiss(toastId);
         }
     }
 
