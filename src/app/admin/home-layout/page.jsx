@@ -52,7 +52,7 @@ function page() {
                         allCategories={allCategories}
                         onSave={(newSeq) => {
                             const data = {
-                                ...homeData,
+                                // ...homeData,
                                 categories: newSeq
                             }
                             updateHome.mutateAsync(data)
@@ -69,7 +69,7 @@ function page() {
                         onSave={(newSequence) => {
                             console.log('New sequence of IDs:', newSequence)
                             const data = {
-                                ...homeData,
+                                // ...homeData,
                                 groups: newSequence
                             }
                             updateHome.mutateAsync(data)
