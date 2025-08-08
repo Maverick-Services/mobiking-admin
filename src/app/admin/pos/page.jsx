@@ -79,10 +79,10 @@ function page() {
     const [addedProducts, setAddedProducts] = useState([])
     const [addUserDialog, setAddUserDialog] = useState(false)
 
-    console.log(canAddPos)
-    console.log(canDeletePos)
-    console.log(canEditPos)
-    console.log(canViewPos)
+    // console.log(canAddPos)
+    // console.log(canDeletePos)
+    // console.log(canEditPos)
+    // console.log(canViewPos)
 
     // form hook
     const form = useForm({
@@ -120,6 +120,7 @@ function page() {
 
     async function onSubmit(values) {
         try {
+            setCreatedOrder(null);
             let finalUserId;
             const res = await api.get(`/users/customer/${values.phoneNo}`);
 

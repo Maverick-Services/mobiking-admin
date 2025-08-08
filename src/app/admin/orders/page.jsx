@@ -211,7 +211,7 @@ export default function Page() {
         setRange(initialRange)
     }, [])
 
-    const { getOrdersByDate, permissions: { canView, canAdd, canEdit, canDelete }, } = useOrders();
+    const { getOrdersByDate, onlyAdmin, permissions: { canView, canAdd, canEdit, canDelete }, } = useOrders();
 
     const formattedStart = format(range?.from, 'dd MMM yyyy')
     const formattedEnd = format(range?.to, 'dd MMM yyyy')
@@ -335,6 +335,7 @@ export default function Page() {
 
                     {/* Export Data */}
                     {
+                        onlyAdmin() &&
                         (
                             <Button variant="outline"
                                 disabled={isFetching}

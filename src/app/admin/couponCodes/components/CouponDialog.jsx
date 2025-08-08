@@ -37,18 +37,20 @@ export default function CouponDialog({ open, onOpenChange, selectedCoupon = {} }
         }
     })
 
+    function formatDateTimeLocal(date) {
+        const d = new Date(date);
+        d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); // shift to local time
+        return d.toISOString().slice(0, 16);
+    }
+
     useEffect(() => {
         if (selectedCoupon.code) {
             form.reset({
                 code: selectedCoupon.code,
                 value: selectedCoupon.value,
                 percent: selectedCoupon.percent,
-                startDate: new Date(selectedCoupon.startDate)
-                    .toISOString()
-                    .slice(0, 16),
-                endDate: new Date(selectedCoupon.endDate)
-                    .toISOString()
-                    .slice(0, 16)
+                startDate: formatDateTimeLocal(selectedCoupon.startDate),
+                endDate: formatDateTimeLocal(selectedCoupon.endDate)
             })
         }
     }, [selectedCoupon, form])

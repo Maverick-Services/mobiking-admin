@@ -135,7 +135,7 @@ export default function UserDialog({ open, onOpenChange, selectedUser, onCreate,
                         {/* Phone Number */}
                         <div className="grid grid-cols-4 items-start gap-4">
                             <Label htmlFor="phone" className="text-right mt-2">
-                                Phone Number<span className="text-red-500"> *</span>
+                                Unique ID <span className="text-red-500"> *</span>
                             </Label>
                             <div className="col-span-3">
                                 <Input
@@ -149,7 +149,7 @@ export default function UserDialog({ open, onOpenChange, selectedUser, onCreate,
                                         }
                                     })}
                                     className={clsx({ "border-red-500": errors.phone })}
-                                    placeholder="9876543210"
+                                    placeholder="10 Digit Unique ID"
                                 />
                                 {errors.phone && (
                                     <p className="text-sm text-red-500 mt-1">

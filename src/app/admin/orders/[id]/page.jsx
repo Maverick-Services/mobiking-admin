@@ -107,7 +107,7 @@ function page() {
                             Reject
                         </Button>
                     }
-                    {isNewOrder() && onlyAdmin &&
+                    {isNewOrder() && onlyAdmin() &&
                         <Button
                             onClick={() => setCancelOpen(true)}
                             variant="destructive"

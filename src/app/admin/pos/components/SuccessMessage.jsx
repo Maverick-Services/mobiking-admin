@@ -12,6 +12,7 @@ function SuccessMessage({ order, resetOrder, reset }) {
 
     const handleSendLink = async () => {
         setLinkSent(false)
+        setLinkData(null);
         const data = {
             orderId: order?.order?._id,
             name: order?.order?.name,
