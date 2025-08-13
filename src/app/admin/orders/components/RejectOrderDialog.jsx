@@ -34,9 +34,13 @@ export default function RejectDialog({ open, onOpenChange, order }) {
     }
 
     const predefinedReasons = [
-        "Address not serviceable",
-        "Customer canceled",
-        "Out of stock",
+        "Call not connected",
+        "Want in Different deleviry date",
+        "Not Required",
+        "Client wants high discount",
+        "Trust isuee",
+        "Internal notepad",
+        "Got same quality in Better price somewhare",
         "Other"
     ]
 
