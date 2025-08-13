@@ -26,10 +26,10 @@ import { cn } from '@/lib/utils'
 import { Loader2 } from 'lucide-react'
 
 function GroupProductsSheet({ open, onOpenChange, group, onProductsAdd, updatingProducts, updateProductsError }) {
-    const { productsQuery } = useProducts()
+    const { productsQuery, availableProductsQuery } = useProducts()
     const allProducts = productsQuery?.data || []
 
-    // console.log(allProducts)
+    console.log(availableProductsQuery?.data)
 
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedProducts, setSelectedProducts] = useState([])

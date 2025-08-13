@@ -25,6 +25,15 @@ export const useProducts = () => {
         }
     });
 
+    const availableProductsQuery = useQuery({
+        queryKey: ['availableProducts'],
+        queryFn: () => api.get('/products/available').then((res) => res.data.data),
+        staleTime: 1000 * 60 * 5,
+        onError: (err) => {
+            toast.error(err?.response?.data?.message || 'Failed to fetch products');
+        }
+    });
+
     const productsPaginationQuery = (params) => {
         // Filter out undefined or null params
         const filteredParams = Object.fromEntries(
@@ -126,7 +135,7 @@ export const useProducts = () => {
     return {
         productsQuery, createProduct, getProductQuery, updateProduct, addProductStock,
         // deleteProduct,
-        productsPaginationQuery, updateProductStatus,
+        productsPaginationQuery, updateProductStatus, availableProductsQuery,
         permissions: {
             canView,
             canAdd,
