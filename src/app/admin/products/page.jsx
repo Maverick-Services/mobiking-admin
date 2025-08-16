@@ -97,6 +97,8 @@ export default function page() {
     const totalPages = products.data?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
 
+    console.log(allProducts)
+
     // open dialog to add new 
     const handleAddClick = () => {
         resetCreate();
@@ -210,7 +212,7 @@ export default function page() {
                         </div>
                     </LayoutGroup>
                     {/* Table */}
-                    {(products.isLoading || products.isFetching || productsQuery.isLoading || subCategoriesQuery.isLoading)
+                    {(products.isLoading || products.isFetching)
                         ? <TableSkeleton showHeader={false} />
                         : <>
                             <ProductsListView
