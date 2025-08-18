@@ -97,6 +97,8 @@ export default function page() {
     const paginationRange = getPaginationRange(page, totalPages)
     console.log(allProducts)
 
+    console.log(allProducts)
+
     // open dialog to add new 
     const handleAddClick = () => {
         resetCreate();

@@ -1,249 +1,306 @@
 'use client'
 import React, { useState } from 'react'
-import { Page, Text, View, Document, StyleSheet, Font, PDFDownloadLink, Image, pdf } from '@react-pdf/renderer'
-import { Button } from './ui/button';
-import LoaderButton from './custom/LoaderButton';
+import { Page, Text, View, Document, StyleSheet, Font, pdf, Image } from '@react-pdf/renderer'
 import MiniLoaderButton from './custom/MiniLoaderButton';
 import { Download } from 'lucide-react';
 
-// Register Inter font
+// Register Inter font (keep your font files in /public/fonts)
 Font.register({
     family: 'Inter',
     fonts: [
-        {
-            src: '/fonts/Inter-Medium.ttf',
-            fontWeight: 500,
-        },
-        {
-            src: '/fonts/Inter-Regular.ttf',
-            fontWeight: 400,
-        },
-        {
-            src: '/fonts/Inter-SemiBold.ttf',
-            fontWeight: 600,
-        },
+        { src: '/fonts/Inter-Regular.ttf', fontWeight: 400 },
+        { src: '/fonts/Inter-Medium.ttf', fontWeight: 500 },
+        { src: '/fonts/Inter-SemiBold.ttf', fontWeight: 600 },
     ],
 })
 
-// Styles
 const styles = StyleSheet.create({
     page: {
-        padding: 30,
-        fontSize: 10,
+        padding: 12,
+        fontSize: 9,
         fontFamily: 'Inter',
-        lineHeight: 1.4,
+        lineHeight: 1.2,
     },
-    header: {
+    topTitleRow: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: '#000',
-        paddingBottom: 10,
-        alignItems: 'flex-start',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 6,
+        position: 'relative',
     },
-    sellerDetails: {
-        width: '60%',
-    },
-    invoiceDetails: {
-        width: '40%',
-        alignItems: 'flex-end',
-    },
-    section: {
-        marginBottom: 10,
-        padding: 5,
-    },
-    heading: {
-        fontSize: 16,
-        fontWeight: 700,
-        marginBottom: 5,
-        textTransform: 'uppercase',
-    },
-    subheading: {
+    topTitle: {
         fontSize: 12,
-        fontWeight: 600,
+        fontWeight: 700,
+        textAlign: 'center',
+        width: '100%',
+    },
+    // originalCopy: {
+    //     position: 'absolute',
+    //     right: 0,
+    //     top: -2,
+    //     fontSize: 8,
+    // },
+
+    headerBox: {
+        flexDirection: 'row',
+        borderWidth: 1,
+        padding: 6,
+        marginBottom: 6,
+    },
+    headerLeft: {
+        width: '62%',
+        paddingRight: 6,
+        borderRightWidth: 1,
+        borderStyle: 'solid',
+    },
+    headerRight: {
+        width: '38%',
+        paddingLeft: 6,
+        justifyContent: 'flex-start',
+    },
+
+    sellerName: {
+        fontSize: 13,
+        fontWeight: 700,
         marginBottom: 4,
     },
-    table: {
-        display: 'table',
-        width: '100%',
-        borderStyle: 'solid',
+    smallText: { fontSize: 9 },
+
+    invoiceSmallBox: {
         borderWidth: 1,
+        borderStyle: 'solid',
+        padding: 6,
+        marginBottom: 6,
+    },
+    invoiceLabel: { fontSize: 8, fontWeight: 600, marginBottom: 2 },
+
+    billBox: {
+        borderWidth: 1,
+        marginBottom: 6,
+        padding: 6,
+        flexDirection: 'row',
+    },
+    billLeft: {
+        width: '62%',
+        paddingRight: 6,
+        borderRightWidth: 1,
+        borderStyle: 'solid',
+    },
+    billRight: {
+        width: '38%',
+        paddingLeft: 6,
+    },
+    billHeading: { fontWeight: 700, marginBottom: 4 },
+
+    // Items table
+    table: {
+        borderWidth: 1,
+        borderStyle: 'solid',
         borderRightWidth: 0,
         borderBottomWidth: 0,
-        marginTop: 10,
-        marginBottom: 15,
+        marginBottom: 6,
     },
-    row: {
+    tableRow: {
         flexDirection: 'row',
         borderBottomWidth: 1,
         borderStyle: 'solid',
     },
-    cell: {
-        padding: 5,
+    tableCell: {
+        padding: 4,
         borderRightWidth: 1,
         borderStyle: 'solid',
         textAlign: 'center',
+        fontSize: 9,
     },
-    headerCell: {
-        backgroundColor: '#f0f0f0',
-        fontWeight: 600,
+    tableHeaderCell: {
+        backgroundColor: '#eee',
+        fontWeight: 700,
     },
-    bold: {
-        fontWeight: 600
-    },
-    alignRight: {
-        textAlign: 'right',
-        width: '100%',
-        paddingRight: 10,
-    },
-    summary: {
-        marginLeft: 'auto',
-        width: '40%',
-        marginTop: 10,
+
+    // Summary area (right)
+    rightSummaryBox: {
+        width: '38%',
+        marginLeft: '62%',
+        marginTop: 4,
+        borderWidth: 1,
+        borderStyle: 'solid',
+        padding: 6,
     },
     summaryRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 5,
+        marginBottom: 4,
     },
-    footer: {
-        position: 'absolute',
-        bottom: 30,
-        left: 30,
-        right: 30,
-        textAlign: 'center',
-        fontSize: 9,
-        color: '#555',
+    totalAmountBox: {
+        marginTop: 6,
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderStyle: 'solid',
+        paddingTop: 6,
     },
-    watermark: {
-        position: 'absolute',
-        top: '50%',
-        left: '30%',
-        fontSize: 48,
-        color: '#f0f0f0',
-        transform: 'rotate(-45deg)',
-        opacity: 0.3,
+
+    // Lower split: amount in words + total amount
+    lowerSplit: {
+        flexDirection: 'row',
+        marginTop: 4,
     },
-    logo: {
-        width: 80,
-        height: 80,
-        marginBottom: 5,
+    lowerLeft: {
+        width: '62%',
+        padding: 6,
+        borderWidth: 1,
+        borderRightWidth: 0,
+        borderStyle: 'solid',
     },
-    taxHeaderCell: {
-        backgroundColor: '#f0f0f0',
-        fontWeight: 600,
-        padding: 3,
-        flex: 1,
+    lowerRight: {
+        width: '38%',
+        padding: 6,
+        borderWidth: 1,
+        borderStyle: 'solid',
+    },
+
+    // Tax breakdown table
+    taxTable: {
+        borderWidth: 1,
+        borderStyle: 'solid',
+        marginTop: 6,
+    },
+    taxRow: {
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderStyle: 'solid',
     },
     taxCell: {
-        padding: 3,
+        padding: 6,
         borderRightWidth: 1,
         borderStyle: 'solid',
-        flex: 1,
+        fontSize: 9,
+        textAlign: 'center',
     },
-    taxTotalCell: {
-        padding: 3,
-        flex: 1,
-        fontWeight: 600,
-    }
-});
 
-// Number to words conversion
+    // Bottom: terms / QR / signature
+    bottomSection: {
+        flexDirection: 'row',
+        marginTop: 8,
+        // height: 110,
+    },
+    bottomLeft: {
+        width: '74%',
+        borderWidth: 1,
+        // borderRightWidth: 0,
+        borderStyle: 'solid',
+        padding: 6,
+    },
+    // bottomMiddle: {
+    //     width: '12%',
+    //     borderWidth: 1,
+    //     padding: 6,
+    //     borderLeftWidth: 0,
+    //     borderRightWidth: 0,
+    //     borderStyle: 'solid',
+    //     alignItems: 'center',
+    //     justifyContent: 'center',
+    // },
+    bottomRight: {
+        width: '26%',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        padding: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    smallNote: { fontSize: 8, marginBottom: 4 },
+
+    footerText: { fontSize: 8, textAlign: 'center', marginTop: 6 },
+})
+
+
+Font.register({
+    family: 'Inter',
+    fonts: [
+        { src: '/fonts/Inter-Regular.ttf', fontWeight: 400 },
+        { src: '/fonts/Inter-Medium.ttf', fontWeight: 500 },
+        { src: '/fonts/Inter-SemiBold.ttf', fontWeight: 600 },
+    ],
+})
+
+// ... styles remain the same ...
+
+// Improved number to words function
 const numberToWords = (num) => {
-    const units = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
-    const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
-    const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
-
-    if (num === 0) return 'zero';
+    if (!num || num === 0) return 'Zero';
+    const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+    const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
 
     let words = '';
-
-    // Crores
-    if (Math.floor(num / 10000000) > 0) {
-        words += numberToWords(Math.floor(num / 10000000)) + ' crore ';
+    const crore = Math.floor(num / 10000000);
+    if (crore > 0) {
+        words += numberToWords(crore) + ' Crore ';
         num %= 10000000;
     }
 
-    // Lakhs
-    if (Math.floor(num / 100000) > 0) {
-        words += numberToWords(Math.floor(num / 100000)) + ' lakh ';
+    const lakh = Math.floor(num / 100000);
+    if (lakh > 0) {
+        words += numberToWords(lakh) + ' Lakh ';
         num %= 100000;
     }
 
-    // Thousands
-    if (Math.floor(num / 1000) > 0) {
-        words += numberToWords(Math.floor(num / 1000)) + ' thousand ';
+    const thousand = Math.floor(num / 1000);
+    if (thousand > 0) {
+        words += numberToWords(thousand) + ' Thousand ';
         num %= 1000;
     }
 
-    // Hundreds
-    if (Math.floor(num / 100) > 0) {
-        words += numberToWords(Math.floor(num / 100)) + ' hundred ';
+    const hundred = Math.floor(num / 100);
+    if (hundred > 0) {
+        words += units[hundred] + ' Hundred ';
         num %= 100;
     }
 
-    // Tens and Units
     if (num > 0) {
         if (words !== '') words += 'and ';
-
-        if (num < 10) {
-            words += units[num];
-        } else if (num < 20) {
-            words += teens[num - 10];
-        } else {
+        if (num < 10) words += units[num];
+        else if (num < 20) words += teens[num - 10];
+        else {
             words += tens[Math.floor(num / 10)];
-            if (num % 10 > 0) {
-                words += ' ' + units[num % 10];
-            }
+            if (num % 10 > 0) words += ' ' + units[num % 10];
         }
     }
-
     return words.trim();
-};
+}
 
-// GST Bill Component
 const GSTBill = ({ data }) => {
-    // Format dates
     const invoiceDate = new Date(data.createdAt).toLocaleDateString('en-IN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
+        day: '2-digit', month: '2-digit', year: 'numeric'
     });
 
-    // Calculate product totals
-    let productTaxableValue = 0;
-    let productTaxAmount = 0;
-    let totalTaxableValue = 0;
-    let totalTaxAmount = 0;
-    
-    // Process all items
-    const processedItems = data.items.map(item => {
-        const gstRate = item.productId.gst || 18;
+    // Process items
+    const processedItems = (data.items || []).map(item => {
+        const gstRate = item.productId?.gst ?? item.gst ?? 0;
         const exclusiveRate = item.price / (1 + gstRate / 100);
         const taxableValue = exclusiveRate * item.quantity;
         const taxAmount = taxableValue * (gstRate / 100);
-        
-        productTaxableValue += taxableValue;
-        productTaxAmount += taxAmount;
-        
+
         return {
             ...item,
             gstRate,
             exclusiveRate,
             taxableValue,
-            taxAmount
+            taxAmount,
+            hsn: item.productId?.hsn || '85044030'
         };
     });
 
-    // Calculate delivery if applicable
-    let deliveryData = null;
+    // Process delivery charge
+    let deliveryItem = null;
     if (data.deliveryCharge && data.deliveryCharge > 0) {
         const deliveryGstRate = 18;
         const deliveryExclusive = data.deliveryCharge / (1 + deliveryGstRate / 100);
         const deliveryTaxAmount = deliveryExclusive * (deliveryGstRate / 100);
-        
-        deliveryData = {
+        deliveryItem = {
+            name: 'Delivery Charges',
+            hsn: '9967',
+            quantity: 1,
             exclusiveRate: deliveryExclusive,
             taxableValue: deliveryExclusive,
             taxAmount: deliveryTaxAmount,
@@ -251,231 +308,248 @@ const GSTBill = ({ data }) => {
         };
     }
 
+    // Combine items and delivery
+    const allItems = [...processedItems];
+    if (deliveryItem) allItems.push(deliveryItem);
+
     // Calculate totals
-    totalTaxableValue = productTaxableValue;
-    totalTaxAmount = productTaxAmount;
-    
-    if (deliveryData) {
-        totalTaxableValue += deliveryData.taxableValue;
-        totalTaxAmount += deliveryData.taxAmount;
-    }
+    const totalTaxableValue = allItems.reduce((sum, item) => sum + item.taxableValue, 0);
+    const totalTaxAmount = allItems.reduce((sum, item) => sum + item.taxAmount, 0);
+    const discountApplied = data.discount || 0;
 
-    // Apply discount if exists
-    let discountApplied = 0;
-    let afterDiscountAmount = totalTaxableValue;
-    
-    if (data.discount && data.discount > 0) {
-        discountApplied = data.discount;
-        afterDiscountAmount = totalTaxableValue - discountApplied;
-        // Recalculate tax on discounted amount (proportionally)
-        const taxMultiplier = afterDiscountAmount / totalTaxableValue;
-        totalTaxAmount = totalTaxAmount * taxMultiplier;
-    }
+    // Apply discount proportionally
+    const discountRatio = discountApplied > 0 ?
+        Math.max(1 - (discountApplied / totalTaxableValue), 0) : 1;
 
-    const totalAmount = (afterDiscountAmount + totalTaxAmount).toFixed(2);
+    const discountedTaxableValue = totalTaxableValue * discountRatio;
+    const discountedTaxAmount = totalTaxAmount * discountRatio;
+    const totalAmount = discountedTaxableValue + discountedTaxAmount;
 
-    // Amount in words
-    const amountInWords = numberToWords(Math.floor(totalAmount))
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ') + ' Rupees Only';
+    const amountInWords = numberToWords(Math.floor(totalAmount)) + ' Rupees Only';
 
     return (
         <Document>
             <Page size="A4" style={styles.page}>
-                <Text style={styles.watermark}>ORIGINAL COPY</Text>
+                {/* Top title */}
+                <View style={styles.topTitleRow}>
+                    <Text style={styles.topTitle}>TAX INVOICE</Text>
+                </View>
 
-                {/* Header */}
-                <View style={styles.header}>
-                    <View style={styles.sellerDetails}>
-                        <Text style={{ ...styles.heading, marginTop: 0 }}>MOBIKING WHOLESALE</Text>
-                        <Text>3rd floor B-91 opp.isckon temple east of kailash,</Text>
-                        <Text>New Delhi 110065</Text>
-                        <Text>Contact: 8587901901 | Email: mobiking507@gmail.com</Text>
-                        <Text style={styles.bold}>GSTIN: 07BESPC8834B1ZG</Text>
+                {/* Header box */}
+                <View style={styles.headerBox}>
+                    <View style={styles.headerLeft}>
+                        <Text style={styles.sellerName}>MOBIKING WHOLESALE</Text>
+                        <Text style={styles.smallText}>3rd floor B-91 opp.isckon temple east of kailash,</Text>
+                        <Text style={styles.smallText}>New Delhi 110065</Text>
+                        <Text style={styles.smallText}>Contact : 8587901901</Text>
+                        <Text style={styles.smallText}>Email : mobiking507@gmail.com</Text>
+                        <Text style={{ ...styles.smallText, marginTop: 6, fontWeight: 600 }}>GSTIN : 07BESPC8834B1ZG</Text>
                     </View>
 
-                    <View style={styles.invoiceDetails}>
-                        <Text style={styles.heading}>Tax Invoice</Text>
-                        <Text>Invoice No: GST-{data.orderId}</Text>
-                        <Text>Date: {invoiceDate}</Text>
-                        <Text>State: Delhi</Text>
-                        <Text>State Code: 07</Text>
+                    <View style={styles.headerRight}>
+                        <View style={styles.invoiceSmallBox}>
+                            <Text style={styles.invoiceLabel}>Invoice No.</Text>
+                            <Text>GST-{data.orderId}</Text>
+                        </View>
+                        <View style={styles.invoiceSmallBox}>
+                            <Text style={styles.invoiceLabel}>Date</Text>
+                            <Text>{invoiceDate}</Text>
+                        </View>
                     </View>
                 </View>
 
-                {/* Customer Info */}
-                <View style={styles.section}>
-                    <Text style={styles.subheading}>Bill To:</Text>
-                    <Text>{data.name}</Text>
-                    <Text>{data.address}</Text>
-                    <Text>Contact: {data.phoneNo}</Text>
-                    <Text>Email: {data.email}</Text>
-                    <Text>State: Madhya Pradesh (State Code: 23)</Text>
+                {/* Bill To box */}
+                <View style={styles.billBox}>
+                    <View style={styles.billLeft}>
+                        <Text style={styles.billHeading}>Bill To :</Text>
+                        <Text style={{ fontWeight: 700 }}>{data.name}</Text>
+                        <Text style={styles.smallText}>{data.address}</Text>
+                        <Text style={styles.smallText}>Contact: {data.phoneNo}</Text>
+
+                        <View style={{ flexDirection: 'row', marginTop: 8 }}>
+                            <Text style={{ fontSize: 8, width: '45%' }}>Contact: {data.phoneNo}</Text>
+                            {/* <Text style={{ fontSize: 8, width: '30%' }}>PoS: {data.pos || '-'}</Text>
+                            <Text style={{ fontSize: 8, width: '25%' }}>GSTIN: {data.gstin || '-'}</Text> */}
+                        </View>
+                    </View>
+                    <View style={styles.billRight}></View>
                 </View>
 
-                {/* Items Table */}
+                {/* Items table */}
                 <View style={styles.table}>
-                    {/* Table Header */}
-                    <View style={{ ...styles.row, ...styles.headerCell }}>
-                        <Text style={{ ...styles.cell, width: '5%' }}>S.No.</Text>
-                        <Text style={{ ...styles.cell, width: '45%' }}>DESCRIPTION OF GOODS</Text>
-                        <Text style={{ ...styles.cell, width: '10%' }}>HSN/SAC</Text>
-                        <Text style={{ ...styles.cell, width: '8%' }}>QTY</Text>
-                        <Text style={{ ...styles.cell, width: '12%' }}>RATE (₹)</Text>
-                        <Text style={{ ...styles.cell, width: '10%' }}>GST (%)</Text>
-                        <Text style={{ ...styles.cell, width: '10%' }}>AMOUNT (₹)</Text>
+                    <View style={{ ...styles.tableRow, ...styles.tableHeaderCell }}>
+                        <Text style={{ ...styles.tableCell, width: '6%' }}>S.No.</Text>
+                        <Text style={{ ...styles.tableCell, width: '46%', textAlign: 'left' }}>PARTICULARS</Text>
+                        <Text style={{ ...styles.tableCell, width: '12%' }}>HSN/SAC</Text>
+                        <Text style={{ ...styles.tableCell, width: '8%' }}>QTY</Text>
+                        <Text style={{ ...styles.tableCell, width: '12%' }}>UNIT PRICE</Text>
+                        <Text style={{ ...styles.tableCell, width: '8%' }}>GST</Text>
+                        <Text style={{ ...styles.tableCell, width: '8%' }}>AMOUNT</Text>
                     </View>
 
-                    {/* Product Rows */}
-                    {processedItems.map((item, index) => (
-                        <View style={styles.row} key={index}>
-                            <Text style={{ ...styles.cell, width: '5%' }}>{index + 1}</Text>
-                            <Text style={{ ...styles.cell, width: '45%', textAlign: 'left' }}>
-                                {item.productId.fullName}
+                    {/* Items */}
+                    {allItems.map((item, idx) => (
+                        <View style={styles.tableRow} key={idx}>
+                            <Text style={{ ...styles.tableCell, width: '6%' }}>{idx + 1}</Text>
+                            <Text style={{ ...styles.tableCell, width: '46%', textAlign: 'left' }}>
+                                {item.productId?.fullName || item.name}
                             </Text>
-                            <Text style={{ ...styles.cell, width: '10%' }}>85182100</Text>
-                            <Text style={{ ...styles.cell, width: '8%' }}>{item.quantity}</Text>
-                            <Text style={{ ...styles.cell, width: '12%' }}>
-                                {item.exclusiveRate.toFixed(2)}
+                            <Text style={{ ...styles.tableCell, width: '12%' }}>{item.hsn}</Text>
+                            <Text style={{ ...styles.tableCell, width: '8%' }}>{item.quantity}</Text>
+                            <Text style={{ ...styles.tableCell, width: '12%' }}>
+                                {item.exclusiveRate?.toFixed(2)}
                             </Text>
-                            <Text style={{ ...styles.cell, width: '10%' }}>{item.gstRate}%</Text>
-                            <Text style={{ ...styles.cell, width: '10%' }}>
+                            <Text style={{ ...styles.tableCell, width: '8%' }}>{item.gstRate}%</Text>
+                            <Text style={{ ...styles.tableCell, width: '8%' }}>
                                 {item.taxableValue.toFixed(2)}
                             </Text>
                         </View>
                     ))}
 
-                    {/* Delivery Row - Conditionally rendered */}
-                    {deliveryData && (
-                        <View style={styles.row}>
-                            <Text style={{ ...styles.cell, width: '5%' }}>{processedItems.length + 1}</Text>
-                            <Text style={{ ...styles.cell, width: '45%', textAlign: 'left' }}>
-                                Delivery Charges
-                            </Text>
-                            <Text style={{ ...styles.cell, width: '10%' }}>996511</Text>
-                            <Text style={{ ...styles.cell, width: '8%' }}></Text>
-                            <Text style={{ ...styles.cell, width: '12%' }}>
-                                {deliveryData.exclusiveRate.toFixed(2)}
-                            </Text>
-                            <Text style={{ ...styles.cell, width: '10%' }}>18%</Text>
-                            <Text style={{ ...styles.cell, width: '10%' }}>
-                                {deliveryData.taxableValue.toFixed(2)}
-                            </Text>
-                        </View>
-                    )}
-                </View>
-
-                {/* Summary */}
-                <View style={styles.summary}>
-                    <View style={styles.summaryRow}>
-                        <Text>Sub Total:</Text>
-                        <Text>₹ {totalTaxableValue.toFixed(2)}</Text>
-                    </View>
-
-                    {/* Discount - Conditionally rendered */}
+                    {/* Discount row if applicable */}
                     {discountApplied > 0 && (
-                        <>
-                            <View style={styles.summaryRow}>
-                                <Text>Discount:</Text>
-                                <Text>- ₹ {discountApplied.toFixed(2)}</Text>
-                            </View>
-                            <View style={styles.summaryRow}>
-                                <Text>Total:</Text>
-                                <Text>₹ {afterDiscountAmount.toFixed(2)}</Text>
-                            </View>
-                        </>
+                        <View style={styles.tableRow}>
+                            <Text style={{ ...styles.tableCell, width: '6%' }}></Text>
+                            <Text style={{ ...styles.tableCell, width: '46%', textAlign: 'left' }}>
+                                Discount
+                            </Text>
+                            <Text style={{ ...styles.tableCell, width: '12%' }}></Text>
+                            <Text style={{ ...styles.tableCell, width: '8%' }}></Text>
+                            <Text style={{ ...styles.tableCell, width: '12%' }}></Text>
+                            <Text style={{ ...styles.tableCell, width: '8%' }}></Text>
+                            <Text style={{ ...styles.tableCell, width: '8%', color: 'red' }}>
+                                -{discountApplied.toFixed(2)}
+                            </Text>
+                        </View>
                     )}
 
+                    {/* TOTAL row */}
+                    <View style={{ ...styles.tableRow, borderBottomWidth: 1 }}>
+                        <Text style={{ ...styles.tableCell, width: '6%' }}></Text>
+                        <Text style={{ ...styles.tableCell, width: '46%', textAlign: 'left', fontWeight: 700 }}>TOTAL</Text>
+                        <Text style={{ ...styles.tableCell, width: '12%' }}></Text>
+                        <Text style={{ ...styles.tableCell, width: '8%' }}>
+                            {processedItems.reduce((s, it) => s + (it.quantity || 0), 0)}
+                        </Text>
+                        <Text style={{ ...styles.tableCell, width: '12%' }}></Text>
+                        <Text style={{ ...styles.tableCell, width: '8%' }}></Text>
+                        <Text style={{ ...styles.tableCell, width: '8%', fontWeight: 700 }}>
+                            {discountedTaxableValue.toFixed(2)}
+                        </Text>
+                    </View>
+                </View>
+
+                {/* Summary box */}
+                <View style={styles.rightSummaryBox}>
                     <View style={styles.summaryRow}>
-                        <Text>CGST:</Text>
-                        <Text>₹ {(totalTaxAmount / 2).toFixed(2)}</Text>
+                        <Text>Sub Total</Text>
+                        <Text>₹ {discountedTaxableValue.toFixed(2)}</Text>
                     </View>
                     <View style={styles.summaryRow}>
-                        <Text>SGST:</Text>
-                        <Text>₹ {(totalTaxAmount / 2).toFixed(2)}</Text>
-                    </View>
-                    <View style={{ ...styles.summaryRow, borderTopWidth: 1, paddingTop: 5 }}>
-                        <Text style={styles.bold}>Total Amount:</Text>
-                        <Text style={styles.bold}>₹ {totalAmount}</Text>
+                        <Text>Tax Amount (+)</Text>
+                        <Text>₹ {discountedTaxAmount.toFixed(2)}</Text>
                     </View>
                 </View>
 
-                {/* Amount in Words */}
-                <View style={{ marginTop: 10 }}>
-                    <Text style={styles.bold}>Amount in Words:</Text>
-                    <Text>{amountInWords}</Text>
+                {/* Lower split */}
+                <View style={styles.lowerSplit}>
+                    <View style={styles.lowerLeft}>
+                        <Text style={{ fontWeight: 700, marginBottom: 4 }}>Amount in Words :</Text>
+                        <Text style={styles.smallText}>{amountInWords}</Text>
+                    </View>
+
+                    <View style={styles.lowerRight}>
+                        <Text style={{ fontWeight: 700 }}>TOTAL AMOUNT</Text>
+                        <Text style={{ fontWeight: 700, fontSize: 12, marginTop: 8 }}>
+                            ₹ {totalAmount.toFixed(2)}
+                        </Text>
+                        <Text style={{ fontSize: 9, marginTop: 8 }}>Amount Paid</Text>
+                        <Text style={{ fontSize: 9 }}>₹ {data.paidAmount ? Number(data.paidAmount).toFixed(2) : '0.00'}</Text>
+                        <Text style={{ fontSize: 9, marginTop: 6 }}>Balance</Text>
+                        <Text style={{ fontSize: 9 }}>
+                            ₹ {(totalAmount - (data.paidAmount || 0)).toFixed(2)}
+                        </Text>
+                    </View>
                 </View>
 
-                {/* Tax Breakdown */}
-                <View style={{ marginTop: 15 }}>
-                    <Text style={styles.subheading}>Tax Breakdown:</Text>
-                    <View style={{ display: 'flex', flexDirection: 'column', borderWidth: 1, marginTop: 5 }}>
-                        {/* Table Header */}
-                        <View style={{ flexDirection: 'row', borderBottomWidth: 1 }}>
-                            <Text style={{ ...styles.taxHeaderCell, width: '16%' }}>HSN/SAC</Text>
-                            <Text style={{ ...styles.taxHeaderCell, width: '16%' }}>Taxable Value (₹)</Text>
-                            <Text style={{ ...styles.taxHeaderCell, width: '16%' }}>CGST Rate</Text>
-                            <Text style={{ ...styles.taxHeaderCell, width: '16%' }}>SGST Rate</Text>
-                            <Text style={{ ...styles.taxHeaderCell, width: '16%' }}>CGST Amt (₹)</Text>
-                            <Text style={{ ...styles.taxHeaderCell, width: '16%' }}>SGST Amt (₹)</Text>
-                        </View>
+                {/* Tax breakdown table */}
+                <View style={styles.taxTable}>
+                    <View style={{ ...styles.taxRow, backgroundColor: '#eee' }}>
+                        <Text style={{ ...styles.taxCell, width: '25%', fontWeight: 700 }}>HSN/SAC</Text>
+                        <Text style={{ ...styles.taxCell, width: '25%', fontWeight: 700 }}>Taxable Amount</Text>
+                        <Text style={{ ...styles.taxCell, width: '15%', fontWeight: 700 }}>Rate</Text>
+                        <Text style={{ ...styles.taxCell, width: '15%', fontWeight: 700 }}>Amount</Text>
+                        <Text style={{ ...styles.taxCell, width: '20%', fontWeight: 700 }}>Total Tax Amount</Text>
+                    </View>
 
-                        {/* Product Tax Rows */}
-                        {processedItems.map((item, index) => (
-                            <View style={{ flexDirection: 'row', borderBottomWidth: 1 }} key={index}>
-                                <Text style={{ ...styles.taxCell, width: '16%' }}>85182100</Text>
-                                <Text style={{ ...styles.taxCell, width: '16%' }}>{item.taxableValue.toFixed(2)}</Text>
-                                <Text style={{ ...styles.taxCell, width: '16%' }}>{item.gstRate / 2}%</Text>
-                                <Text style={{ ...styles.taxCell, width: '16%' }}>{item.gstRate / 2}%</Text>
-                                <Text style={{ ...styles.taxCell, width: '16%' }}>{(item.taxAmount / 2).toFixed(2)}</Text>
-                                <Text style={{ ...styles.taxCell, width: '16%' }}>{(item.taxAmount / 2).toFixed(2)}</Text>
+                    {/* Tax rows */}
+                    {allItems.map((item, i) => {
+                        const adjustedTaxableValue = item.taxableValue * discountRatio;
+                        const adjustedTaxAmount = item.taxAmount * discountRatio;
+
+                        return (
+                            <View style={styles.taxRow} key={i}>
+                                <Text style={{ ...styles.taxCell, width: '25%' }}>{item.hsn}</Text>
+                                <Text style={{ ...styles.taxCell, width: '25%' }}>
+                                    ₹ {adjustedTaxableValue.toFixed(2)}
+                                </Text>
+                                <Text style={{ ...styles.taxCell, width: '15%' }}>{item.gstRate}%</Text>
+                                <Text style={{ ...styles.taxCell, width: '15%' }}>
+                                    ₹ {adjustedTaxAmount.toFixed(2)}
+                                </Text>
+                                <Text style={{ ...styles.taxCell, width: '20%' }}>
+                                    ₹ {adjustedTaxAmount.toFixed(2)}
+                                </Text>
                             </View>
-                        ))}
+                        )
+                    })}
 
-                        {/* Delivery Tax Row - Conditionally rendered */}
-                        {deliveryData && (
-                            <View style={{ flexDirection: 'row', borderBottomWidth: 1 }}>
-                                <Text style={{ ...styles.taxCell, width: '16%' }}>996511</Text>
-                                <Text style={{ ...styles.taxCell, width: '16%' }}>{deliveryData.taxableValue.toFixed(2)}</Text>
-                                <Text style={{ ...styles.taxCell, width: '16%' }}>9%</Text>
-                                <Text style={{ ...styles.taxCell, width: '16%' }}>9%</Text>
-                                <Text style={{ ...styles.taxCell, width: '16%' }}>{(deliveryData.taxAmount / 2).toFixed(2)}</Text>
-                                <Text style={{ ...styles.taxCell, width: '16%' }}>{(deliveryData.taxAmount / 2).toFixed(2)}</Text>
-                            </View>
-                        )}
-
-                        {/* Total Tax */}
-                        <View style={{ flexDirection: 'row', ...styles.bold }}>
-                            <Text style={{ ...styles.taxTotalCell, width: '16%' }}>TOTAL</Text>
-                            <Text style={{ ...styles.taxTotalCell, width: '16%' }}>{afterDiscountAmount.toFixed(2)}</Text>
-                            <Text style={{ ...styles.taxTotalCell, width: '16%' }}>-</Text>
-                            <Text style={{ ...styles.taxTotalCell, width: '16%' }}>-</Text>
-                            <Text style={{ ...styles.taxTotalCell, width: '16%' }}>{(totalTaxAmount / 2).toFixed(2)}</Text>
-                            <Text style={{ ...styles.taxTotalCell, width: '16%' }}>{(totalTaxAmount / 2).toFixed(2)}</Text>
-                        </View>
+                    {/* Tax totals */}
+                    <View style={{ ...styles.taxRow, borderBottomWidth: 0 }}>
+                        <Text style={{ ...styles.taxCell, width: '25%', fontWeight: 700 }}>Total</Text>
+                        <Text style={{ ...styles.taxCell, width: '25%', fontWeight: 700 }}>
+                            ₹ {discountedTaxableValue.toFixed(2)}
+                        </Text>
+                        <Text style={{ ...styles.taxCell, width: '15%' }}>-</Text>
+                        <Text style={{ ...styles.taxCell, width: '15%' }}>
+                            ₹ {discountedTaxAmount.toFixed(2)}
+                        </Text>
+                        <Text style={{ ...styles.taxCell, width: '20%', fontWeight: 700 }}>
+                            ₹ {discountedTaxAmount.toFixed(2)}
+                        </Text>
                     </View>
                 </View>
 
-                {/* Bank Info */}
-                <View style={{ marginTop: 15 }}>
-                    <Text style={styles.subheading}>Bank Details:</Text>
-                    <Text>Bank Name: HDFC BANK</Text>
-                    <Text>Account No.: 50200048030390</Text>
-                    <Text>Branch & IFSC: HDFC0000480</Text>
+                {/* Bottom section */}
+                <View style={styles.bottomSection}>
+                    <View style={styles.bottomLeft}>
+                        <Text style={{ fontWeight: 700, marginBottom: 6 }}>Terms / Declaration</Text>
+                        <Text style={styles.smallNote}>1. Goods once sold will not be taken back or exchange</Text>
+                        <Text style={styles.smallNote}>2. Mobiking will not be responsible for any warranty</Text>
+                        <Text style={styles.smallNote}>3. All the disputes are subject to delhi jurisdiction only</Text>
+
+                        <Text style={{ marginTop: 8, fontWeight: 700 }}>Bank Details -</Text>
+                        <Text style={styles.smallNote}>Bank Name : MOBIKING</Text>
+                        <Text style={styles.smallNote}>Account No. : 50200048030390</Text>
+                        <Text style={styles.smallNote}>Branch & IFSC : HDFC0000480</Text>
+                    </View>
+
+                    <View style={styles.bottomRight}>
+                        <Text style={{ fontWeight: 700 }}>For, Mobiking</Text>
+                        <Text style={{ marginTop: 28 }}> </Text>
+                        <Text style={{ marginTop: 8, fontSize: 9 }}>Authorised Signatory</Text>
+                    </View>
                 </View>
 
-                {/* Footer */}
-                <View style={styles.footer}>
-                    <Text>This is a computer generated invoice and does not require signature</Text>
-                    <Text>For MOBIKING WHOLESALE</Text>
-                </View>
+                <Text style={styles.footerText}>This is a computer generated invoice and does not require signature</Text>
             </Page>
         </Document>
     )
 }
 
-// Exportable PDF Button
+// Download button component remains the same ...
+
+// Download button component
 const GSTBillDownload = ({ billData }) => {
     const [isLoading, setIsLoading] = useState(false)
 
@@ -484,29 +558,23 @@ const GSTBillDownload = ({ billData }) => {
         try {
             const blob = await pdf(<GSTBill data={billData} />).toBlob()
             const url = URL.createObjectURL(blob)
-
             const link = document.createElement('a')
             link.href = url
             link.download = `GST_${billData.orderId}.pdf`
             document.body.appendChild(link)
             link.click()
             link.remove()
-
             URL.revokeObjectURL(url)
-        } catch (error) {
-            console.error('Error generating PDF:', error)
+        } catch (err) {
+            console.error('Error generating PDF:', err)
         } finally {
             setIsLoading(false)
         }
     }
 
     return (
-        <div className="">
-            <MiniLoaderButton
-                onClick={handleDownload}
-                loading={isLoading}
-                variant={'outline'}
-            >
+        <div>
+            <MiniLoaderButton onClick={handleDownload} loading={isLoading} variant={'outline'}>
                 <Download />
             </MiniLoaderButton>
         </div>
