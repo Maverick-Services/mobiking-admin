@@ -91,11 +91,11 @@ export default function page() {
         filterBy: typeFilter,
     })
 
-    // console.log(ab?.data)
 
     const allProducts = products.data?.products || []
     const totalPages = products.data?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
+    console.log(allProducts)
 
     // open dialog to add new 
     const handleAddClick = () => {
@@ -210,7 +210,7 @@ export default function page() {
                         </div>
                     </LayoutGroup>
                     {/* Table */}
-                    {(products.isLoading || products.isFetching || productsQuery.isLoading || subCategoriesQuery.isLoading)
+                    {(products.isLoading || products.isFetching)
                         ? <TableSkeleton showHeader={false} />
                         : <>
                             <ProductsListView

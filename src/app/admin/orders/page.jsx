@@ -102,8 +102,8 @@ const flattenOrder = (orders) => {
                     itemNo: index + 1,
                     productId: item?.productId?._id || "",
                     name_item: item?.productId?.name || "",
-                    fullName: item?.productId?.fullName || "",
-                    variant: item?.productId?.variantName || "",
+                    fullName: item?.fullName || "",
+                    variant: item?.variantName || "",
                     quantity: item?.quantity ?? "",
                     price: item?.price ?? "",
 
@@ -143,8 +143,8 @@ const flattenOrder = (orders) => {
                         itemNo: index + 1,
                         productId: item?.productId?._id || "",
                         name_item: item?.productId?.name || "",
-                        fullName: item?.productId?.fullName || "",
-                        variant: item?.productId?.variantName || "",
+                        fullName: item?.fullName || "",
+                        variant: item?.variantName || "",
                         quantity: item?.quantity ?? "",
                         price: item?.price ?? "",
 
@@ -271,6 +271,8 @@ export default function Page() {
     const totalPages = customOrdersData?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
 
+    // console.log(customOrdersData)
+
     //Export data Function
     const handleExportData = async () => {
         const toastId = toast.loading("Exporting");
@@ -288,6 +290,7 @@ export default function Page() {
             if (!res?.data?.success)
                 throw new Error("Could not export data");
 
+            console.log("result:", res.data.data)
             const flattened = flattenOrder(res.data.data);
             setCsvData(flattened);
 
