@@ -271,36 +271,104 @@ export default function Page() {
     const totalPages = customOrdersData?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
 
-    // console.log(customOrdersData)
+    console.log("Customer Data", customOrdersData)
 
-    //Export data Function
+    // //Export data Function
+    // const handleExportData = async () => {
+    //     const toastId = toast.loading("Exporting");
+    //     try {
+    //         const res = await axios.get(
+    //             `${process.env.NEXT_PUBLIC_BACKEND_URL}/orders/custom?startDate=${startDate}&endDate=${endDate}`,
+    //             {
+    //                 headers: {
+    //                     Authorization: `Bearer ${accessToken}`, // replace `token` with your actual token variable
+    //                 },
+    //             }
+    //         );
+
+    //         // fetch your order data
+    //         if (!res?.data?.success)
+    //             throw new Error("Could not export data");
+
+    //         console.log("result:", res.data.data)
+    //         // const flattened = flattenOrder(res.data.data);
+    //         // setCsvData(flattened);
+
+    //     } catch (err) {
+    //         console.error("Failed to export:", err);
+    //         toast.error(err?.message || err?.response?.data?.message);
+    //     } finally {
+    //         toast.dismiss(toastId);
+    //     }
+    // }
+    //Export data Function (Excel Download)
+    // const handleExportData = async () => {
+    //     const toastId = toast.loading("Exporting...");
+
+    //     try {
+    //         const res = await axios.get(
+    //             `${process.env.NEXT_PUBLIC_BACKEND_URL}/orders/custom?startDate=${startDate}&endDate=${endDate}`,
+    //             {
+    //                 headers: {
+    //                     Authorization: `Bearer ${accessToken}`,
+    //                 },
+    //                 responseType: "blob", // ⬅️ IMPORTANT: handle binary Excel stream
+    //             }
+    //         );
+
+    //         // Create blob link to download
+    //         const url = window.URL.createObjectURL(new Blob([res.data]));
+    //         const link = document.createElement("a");
+    //         link.href = url;
+    //         link.setAttribute("download", `orders_${startDate}_to_${endDate}.xlsx`);
+    //         document.body.appendChild(link);
+    //         link.click();
+    //         link.remove();
+
+    //         toast.success("Export successful!");
+    //     } catch (err) {
+    //         console.error("Failed to export:", err);
+    //         toast.error(err?.message || err?.response?.data?.message);
+    //     } finally {
+    //         toast.dismiss(toastId);
+    //     }
+    // };
     const handleExportData = async () => {
-        const toastId = toast.loading("Exporting");
+        const toastId = toast.loading("Exporting...");
         try {
+            console.log("📤 Sending request to backend:", {
+                startDate,
+                endDate,
+                url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/orders/custom`
+            });
+
             const res = await axios.get(
                 `${process.env.NEXT_PUBLIC_BACKEND_URL}/orders/custom?startDate=${startDate}&endDate=${endDate}`,
                 {
                     headers: {
-                        Authorization: `Bearer ${accessToken}`, // replace `token` with your actual token variable
+                        Authorization: `Bearer ${accessToken}`,
                     },
+                    responseType: "blob", // important for file download
                 }
             );
 
-            // fetch your order data
-            if (!res?.data?.success)
-                throw new Error("Could not export data");
+            console.log("✅ Received response from backend:", res);
 
-            console.log("result:", res.data.data)
-            const flattened = flattenOrder(res.data.data);
-            setCsvData(flattened);
+            // Trigger browser download
+            const blob = new Blob([res.data], { type: res.headers["content-type"] });
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = `orders_${startDate}_to_${endDate}.xlsx`;
+            link.click();
 
+            toast.success("Export completed ✅");
         } catch (err) {
-            console.error("Failed to export:", err);
+            console.error("❌ Failed to export:", err);
             toast.error(err?.message || err?.response?.data?.message);
         } finally {
             toast.dismiss(toastId);
         }
-    }
+    };
 
     useEffect(() => {
         // console.log(csvData)
