@@ -285,77 +285,7 @@ export default function Page() {
         }
     }, [showAmountCards, startDate, endDate, refetchSales]);
 
-    // if (showAmountCards) {
-    const {
-        data: salesCountData,
-        isFetching: isSalesFetching,
-        refetch: refetchSales
-    } = getSalesByDate({ params: { startDate, endDate }, enabled: false });
-
-    // run only when cards are shown
-    useEffect(() => {
-        if (showAmountCards) {
-            refetchSales();
-        }
-    }, [showAmountCards, startDate, endDate, refetchSales]);
-
-    //     try {
-    //         const res = await axios.get(
-    //             `${process.env.NEXT_PUBLIC_BACKEND_URL}/orders/custom?startDate=${startDate}&endDate=${endDate}`,
-    //             {
-    //                 headers: {
-    //                     Authorization: `Bearer ${accessToken}`, // replace `token` with your actual token variable
-    //                 },
-    //             }
-    //         );
-
-    //         // fetch your order data
-    //         if (!res?.data?.success)
-    //             throw new Error("Could not export data");
-
-    //         console.log("result:", res.data.data)
-    //         // const flattened = flattenOrder(res.data.data);
-    //         // setCsvData(flattened);
-
-    //     } catch (err) {
-    //         console.error("Failed to export:", err);
-    //         toast.error(err?.message || err?.response?.data?.message);
-    //     } finally {
-    //         toast.dismiss(toastId);
-    //     }
-    // }
-    //Export data Function (Excel Download)
-    // const handleExportData = async () => {
-    //     const toastId = toast.loading("Exporting...");
-
-    //     try {
-    //         const res = await axios.get(
-    //             `${process.env.NEXT_PUBLIC_BACKEND_URL}/orders/custom?startDate=${startDate}&endDate=${endDate}`,
-    //             {
-    //                 headers: {
-    //                     Authorization: `Bearer ${accessToken}`,
-    //                 },
-    //                 responseType: "blob", // ⬅️ IMPORTANT: handle binary Excel stream
-    //             }
-    //         );
-
-    //         // Create blob link to download
-    //         const url = window.URL.createObjectURL(new Blob([res.data]));
-    //         const link = document.createElement("a");
-    //         link.href = url;
-    //         link.setAttribute("download", `orders_${startDate}_to_${endDate}.xlsx`);
-    //         document.body.appendChild(link);
-    //         link.click();
-    //         link.remove();
-
-    //         toast.success("Export successful!");
-    //     } catch (err) {
-    //         console.error("Failed to export:", err);
-    //         toast.error(err?.message || err?.response?.data?.message);
-    //     } finally {
-    //         toast.dismiss(toastId);
-    //     }
-    // };
+    //Export data Function
     const handleExportData = async () => {
         const toastId = toast.loading("Exporting...");
         try {
