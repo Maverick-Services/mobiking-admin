@@ -91,11 +91,11 @@ export default function page() {
         filterBy: typeFilter,
     })
 
-    // console.log(ab?.data)
 
     const allProducts = products.data?.products || []
     const totalPages = products.data?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
+    console.log(allProducts)
 
     console.log(allProducts)
 
