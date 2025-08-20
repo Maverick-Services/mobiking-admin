@@ -23,7 +23,7 @@ export default function CourierDialog({ open, onOpenChange, order }) {
     const [loading, setLoading] = useState(false)
     const [selectedCourier, setSelectedCourier] = useState(null)
     const [formValues, setFormValues] = useState({
-        pickup_postcode: "201206",
+        pickup_postcode: "110065",
         delivery_postcode: order.pincode || "",
         cod: order.method === "COD" ? 1 : 0,
         weight: 0.5,
@@ -67,7 +67,7 @@ export default function CourierDialog({ open, onOpenChange, order }) {
                 orderId: order._id,
                 courierId: selectedCourier
             })
-            if(acceptOrder.isSuccess){
+            if (acceptOrder.isSuccess) {
                 onOpenChange(false)
             }
         } catch (error) {
