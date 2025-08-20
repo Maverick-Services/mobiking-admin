@@ -53,12 +53,12 @@ export const useOrders = () => {
   const canDeletePosTab = checkDelete(Resources.POS_ORDERS);
 
   // all orders
-  const ordersQuery = useQuery({
-    queryKey: ["orders", "all"],
-    queryFn: () => api.get("/orders").then((res) => res.data),
-    staleTime: 1000 * 60 * 5,
-    onError: (err) => toast.error(err.message || "Failed to fetch orders"),
-  });
+  // const ordersQuery = useQuery({
+  //   queryKey: ["orders", "all"],
+  //   queryFn: () => api.get("/orders").then((res) => res.data),
+  //   staleTime: 1000 * 60 * 5,
+  //   onError: (err) => toast.error(err.message || "Failed to fetch orders"),
+  // });
 
   // get orders by date
   const getOrdersByDate = ({ params }) => {
@@ -320,7 +320,7 @@ export const useOrders = () => {
   });
 
   return {
-    ordersQuery,
+    // ordersQuery,
     getOrdersByDate,
     acceptOrder,
     cancelOrder,
