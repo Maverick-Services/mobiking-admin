@@ -211,7 +211,7 @@ export default function Page() {
         setRange(initialRange)
     }, [])
 
-    const { getOrdersByDate, onlyAdmin, permissions: { canView, canAdd, canEdit, canDelete }, } = useOrders();
+    const { getOrdersByDate, onlyAdmin, getSalesByDate, permissions: { canView, canAdd, canEdit, canDelete }, } = useOrders();
 
     const formattedStart = format(range?.from, 'dd MMM yyyy')
     const formattedEnd = format(range?.to, 'dd MMM yyyy')
@@ -270,6 +270,20 @@ export default function Page() {
     const orders = customOrdersData?.orders || [];
     const totalPages = customOrdersData?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
+
+    // if (showAmountCards) {
+    const {
+        data: salesCountData,
+        isFetching: isSalesFetching,
+        refetch: refetchSales
+    } = getSalesByDate({ params: { startDate, endDate }, enabled: false });
+
+    // run only when cards are shown
+    useEffect(() => {
+        if (showAmountCards) {
+            refetchSales();
+        }
+    }, [showAmountCards, startDate, endDate, refetchSales]);
 
     //Export data Function
     const handleExportData = async () => {
@@ -359,12 +373,10 @@ export default function Page() {
                     />
 
                     <DateRangeSelector onChange={(selected) => {
-                        // console.log(sele)
                         setRange(selected)
                         setPage(1)
                     }
                     } defaultRange={initialRange} />
-                    {/* <PosButton /> */}
                 </div>
             </div>
 
@@ -372,10 +384,15 @@ export default function Page() {
             <div
                 className={`transition-all mb-6 duration-500 overflow-hidden ${showAmountCards ? 'max-h-[1000px] opacity-100 scale-100' : 'max-h-0 opacity-0 scale-95'}`}
             >
-                <AmountCards
-                    orders={orders}
-                    data={customOrdersData?.salesData}
-                />
+                {showAmountCards && (
+                    isSalesFetching ? (
+                        <div className="flex justify-center p-6">
+                            <Loader2 className="animate-spin" size={28} />
+                        </div>
+                    ) : (
+                        <AmountCards data={salesCountData} />
+                    )
+                )}
             </div>
 
             {/* STATUS CARDS */}
@@ -482,11 +499,12 @@ export default function Page() {
                 </div>
             </LayoutGroup>
             {/* Table */}
-            {isFetching ?
-                <TableSkeleton showHeader={false} />
-                : <OrdersListView
-                    orders={orders}
-                />
+            {
+                isFetching ?
+                    <TableSkeleton showHeader={false} />
+                    : <OrdersListView
+                        orders={orders}
+                    />
             }
 
             {/* Pagination */}
@@ -539,6 +557,6 @@ export default function Page() {
                     </PaginationContent>
                 </Pagination>
             </div>
-        </InnerDashboardLayout>
+        </InnerDashboardLayout >
     )
 }

@@ -82,6 +82,28 @@ export const useOrders = () => {
     });
   };
 
+  const getSalesByDate = ({ params, enabled = true }) => {
+    const filtered = Object.fromEntries(
+      Object.entries(params).filter(
+        ([_, v]) => v !== undefined && v !== null && v !== "" && v !== "all"
+      )
+    );
+
+    return useQuery({
+      queryKey: ["orderSales", filtered],
+      queryFn: () =>
+        api
+          .get("/orders/sales", { params: filtered })
+          .then((res) => res.data.data),
+      keepPreviousData: true,
+      staleTime: 1000 * 60 * 5,
+      enabled,
+      onError: (err) => {
+        toast.error(err?.response?.data?.message || "Failed to fetch sales data");
+      },
+    });
+  }
+
   const getCancelRequestOrders = ({
     requestType,
     page,
@@ -315,6 +337,7 @@ export const useOrders = () => {
     getCancelRequestOrders,
     sendPaymentLink,
     getPaymentLinks,
+    getSalesByDate,
     createManualOrder,
     permissions: { canView, canAdd, canEdit, canDelete },
     permissionsPayment: { canViewPayment, canAddPayment, canEditPayment, canDeletePayment },
