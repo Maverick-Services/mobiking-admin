@@ -1,4 +1,14 @@
+// <file top unchanged imports — same as yours>
 import React from 'react'
+import dynamic from 'next/dynamic';
+const RTEFieldGlobal = dynamic(
+    () => import('@/components/RTEFieldGlobal'),
+    {
+        ssr: false,
+        loading: () => <p className="py-10 text-center text-gray-500">Loading editor...</p>
+    }
+);
+
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -17,29 +27,52 @@ import { Textarea } from '@/components/ui/textarea';
 import toast from 'react-hot-toast';
 import { uploadImage } from '@/lib/services/uploadImage';
 
+/* ===========================
+   Schema: coerce numerics + optional arrays
+   =========================== */
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
     fullName: z.string().min(1, "Full name is required"),
-    price: z.number().min(0, "Selling Price is required"),
-    regularPrice: z.number().optional(),
-    basePrice: z.number().min(0, "Base Price is required"),
-    gst: z.number().min(0, "GST must be a positive number"),
+
+    // Coerce numeric values to numbers if strings come in from inputs
+    price: z.preprocess((val) => {
+        if (val === "" || val === null || val === undefined) return val;
+        return typeof val === "string" ? Number(val) : val;
+    }, z.number().min(0, "Selling Price is required")),
+
+    regularPrice: z.preprocess((val) => {
+        if (val === "" || val === null || val === undefined) return undefined;
+        return typeof val === "string" ? Number(val) : val;
+    }, z.number().optional()),
+
+    basePrice: z.preprocess((val) => {
+        if (val === "" || val === null || val === undefined) return val;
+        return typeof val === "string" ? Number(val) : val;
+    }, z.number().min(0, "Base Price is required")),
+
+    gst: z.preprocess((val) => {
+        if (val === "" || val === null || val === undefined) return val;
+        return typeof val === "string" ? Number(val) : val;
+    }, z.number().min(0, "GST must be a positive number")),
+
     sku: z.string().optional(),
     hsn: z.string().optional(),
     slug: z.string().min(1, "Slug is required"),
     active: z.boolean(),
     description: z.string().min(1, "Description is required"),
-    descriptionPoints: z.array(z.string()).nullable(),
+
+    // Make arrays optional so empty (or undefined) doesn't break validation.
+    descriptionPoints: z.array(z.string()).optional(),
     keyInformation: z.array(z.object({
         title: z.string(),
         content: z.string()
-    })).nullable(),
+    })).optional(),
+
     categoryId: z.string().min(1, "Category is required"),
     images: z.array(z.string().min(1, "At least one image is required")),
 });
 
 function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate, isSubmitting, error, categories }) {
-    // console.log(selectedProduct)
     // console.log(selectedProduct)
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -48,7 +81,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
             name: "",
             fullName: "",
             price: 0,
-            gst: 0,
+            gst: 18,
             regularPrice: 0,
             basePrice: 0,
             sku: "",
@@ -65,30 +98,33 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
     const { watch, setValue, control, reset } = form;
 
     useEffect(() => {
+        // Always provide safe fallbacks when resetting from selectedProduct.
+        // This fixes: (a) gst not present -> missing in payload, (b) empty descriptionPoints/keyInformation blocking submit.
         if (selectedProduct) {
             reset({
-                name: selectedProduct?.name,
-                fullName: selectedProduct?.fullName,
-                price: selectedProduct?.sellingPrice[selectedProduct.sellingPrice?.length - 1].price,
-                gst: selectedProduct?.gst,
-                regularPrice: selectedProduct?.regularPrice,
-                basePrice: selectedProduct?.basePrice,
-                sku: selectedProduct?.sku,
-                hsn: selectedProduct?.hsn,
-                slug: selectedProduct?.slug,
-                active: selectedProduct?.active,
-                description: selectedProduct?.description,
-                descriptionPoints: selectedProduct?.descriptionPoints,
-                keyInformation: selectedProduct?.keyInformation,
-                categoryId: selectedProduct?.category?._id || "",
-                images: selectedProduct?.images || [],
+                name: selectedProduct?.name ?? "",
+                fullName: selectedProduct?.fullName ?? "",
+                // price extraction stays same; fallback to 0 if not present
+                price: selectedProduct?.sellingPrice?.[selectedProduct.sellingPrice?.length - 1]?.price ?? 0,
+                gst: selectedProduct?.gst ?? 18,                          // <- fallback
+                regularPrice: selectedProduct?.regularPrice ?? 0,
+                basePrice: selectedProduct?.basePrice ?? 0,
+                sku: selectedProduct?.sku ?? "",
+                hsn: selectedProduct?.hsn ?? "",
+                slug: selectedProduct?.slug ?? "",
+                active: selectedProduct?.active ?? true,
+                description: selectedProduct?.description ?? "",
+                descriptionPoints: selectedProduct?.descriptionPoints ?? [], // <- fallback to []
+                keyInformation: selectedProduct?.keyInformation ?? [],       // <- fallback to []
+                categoryId: selectedProduct?.category?._id ?? "",
+                images: selectedProduct?.images ?? [],                       // <- fallback to []
             });
         } else {
             reset({
                 name: "",
                 fullName: "",
                 price: 0,
-                gst: 0,
+                gst: 18,
                 basePrice: 0,
                 regularPrice: 0,
                 sku: "",
@@ -140,10 +176,10 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
 
 
     async function onSubmit(values) {
-        console.log(values)
+        // values will now contain gst as a number (thanks to preprocess)
+        console.log("Submitting values:", values)
         if (selectedProduct) {
             await onUpdate({ id: selectedProduct._id, data: values })
-            // console.log(values)
             onOpenChange(false)
         } else {
             await onCreate(values)
@@ -153,7 +189,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[700px] max-h-[95vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[95vw] max-h-[95vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>
                         {selectedProduct ? "Edit Product" : "Add Product"}
@@ -218,9 +254,10 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                         <FormItem className={''}>
                                             <FormLabel>Category<span className="text-red-500"> *</span></FormLabel>
                                             <FormControl>
+                                                {/* <-- bind Select as controlled using value (not defaultValue) */}
                                                 <Select
-                                                    onValueChange={field.onChange}
-                                                    defaultValue={field.value}
+                                                    value={field.value}
+                                                    onValueChange={(val) => field.onChange(val)}
                                                 >
                                                     <SelectTrigger className={'w-full flex-1'}>
                                                         <SelectValue placeholder="Select a category" />
@@ -278,8 +315,8 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                 />
                             </div>
 
-                            <div className='flex gap-2'>
-                                {/* Base price */}
+                            <div className='grid grid-cols-4 gap-2'>
+                                {/* Regular Price - MRP */}
                                 <FormField
                                     control={form.control}
                                     name="regularPrice"
@@ -290,8 +327,10 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                                 <Input
                                                     type="number"
                                                     placeholder="1699"
-                                                    {...field}
-                                                    onChange={(e) => field.onChange(Number(e.target.value))}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                        field.onChange(value === '' ? '' : Number(value));
+                                                    }}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -312,7 +351,10 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                                     placeholder="1699"
                                                     {...field}
                                                     disabled
-                                                    onChange={(e) => field.onChange(Number(e.target.value))}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                        field.onChange(value === '' ? '' : Number(value));
+                                                    }}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -332,7 +374,10 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                                     type="number"
                                                     placeholder="18"
                                                     {...field}
-                                                    onChange={(e) => field.onChange(Number(e.target.value))}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                        field.onChange(value === '' ? '' : Number(value));
+                                                    }}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -352,7 +397,10 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                                     type="number"
                                                     placeholder="1999"
                                                     {...field}
-                                                    onChange={(e) => field.onChange(Number(e.target.value))}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                        field.onChange(value === '' ? '' : Number(value));
+                                                    }}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -479,15 +527,14 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                             <FormField
                                 control={form.control}
                                 name="description"
-                                render={({ field }) => (
+                                render={({ field: { name: fieldName, value: fieldValue } }) => (
                                     <FormItem>
                                         <FormLabel>Description<span className="text-red-500"> *</span></FormLabel>
                                         <FormControl>
-                                            <Textarea
-                                                {...field}
-                                                rows={3}
-                                                placeholder="Write something about the product..."
-                                                className="w-full p-2 border rounded-md resize-none"
+                                            <RTEFieldGlobal
+                                                name={fieldName}
+                                                content={fieldValue}
+                                                setValue={setValue}
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -603,17 +650,6 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                     </Form>
                 </div>
             </DialogContent>
-
-            {/* 
-            <MultiImageSelector
-                open={photosDialogOpen}
-                onOpenChange={setPhotosDialogOpen}
-                onChange={(newUrls) => {
-                    setValue("images", [...(images || []), ...newUrls], {
-                        shouldValidate: true,
-                    });
-                }}
-            /> */}
         </Dialog>
     )
 }

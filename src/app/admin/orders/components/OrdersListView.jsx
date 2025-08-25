@@ -67,7 +67,7 @@ export default function OrdersListView({ error, orders = [] }) {
         window.open(url, '_blank')
     }
 
-    // console.log(orders)
+    console.log(orders)
 
     return (
         <div>

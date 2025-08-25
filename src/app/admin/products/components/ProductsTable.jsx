@@ -18,6 +18,7 @@ import DeleteConfirmationDialog from './DeleteConfirmationDialog ';
 import toast from 'react-hot-toast';
 import { useGroups } from '@/hooks/useGroups';
 import { useProducts } from '@/hooks/useProducts';
+import Image from 'next/image';
 
 export default function ProductsListView({
     error,
@@ -156,8 +157,8 @@ export default function ProductsListView({
                                 {/* 2. Image */}
                                 <TableCell className="">
                                     <div className="py-2">
-                                        <img
-                                            src={product?.images[0]}
+                                        <Image
+                                            src={product?.images[0] || '/not-found-img.webp'}
                                             alt={product?.name}
                                             width={60}
                                             height={60}
