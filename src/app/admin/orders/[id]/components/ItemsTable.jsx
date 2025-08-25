@@ -59,8 +59,8 @@ function ItemsTable({ order, isNewOrder }) {
     return (
         <PCard className="p-4">
             <div className="flex items-center justify-between w-full">
-                <h2 className="mb-4 text-lg font-semibold text-gray-700">Items</h2>
-                {isNewOrder() && order?.method === 'COD' &&
+                <h2 className="mb-0 text-lg font-semibold text-gray-700">Items</h2>
+                {isNewOrder() && order?.method === 'COD' && order?.paymentStatus !== 'Paid' &&
                     <Button onClick={() => setAddingItem(true)} variant={'outline'}>Add Items</Button>
                 }
             </div>
@@ -139,7 +139,7 @@ function ItemsTable({ order, isNewOrder }) {
                 {/* Summary */}
                 <div className="flex flex-col gap-3 mt-8">
 
-                    {isNewOrder() && order?.method === 'COD' &&
+                    {isNewOrder() && order?.method === 'COD' && order?.paymentStatus !== 'Paid' &&
                         <Button
                             className='self-end'
                             onClick={() => setOpen(true)} variant={'outline'}>Edit</Button>

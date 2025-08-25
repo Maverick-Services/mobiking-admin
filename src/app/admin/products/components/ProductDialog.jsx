@@ -67,21 +67,21 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
     useEffect(() => {
         if (selectedProduct) {
             reset({
-                name: selectedProduct.name,
-                fullName: selectedProduct.fullName,
+                name: selectedProduct?.name,
+                fullName: selectedProduct?.fullName,
                 price: selectedProduct?.sellingPrice[selectedProduct.sellingPrice?.length - 1].price,
-                gst: selectedProduct.gst,
-                regularPrice: selectedProduct.regularPrice,
-                basePrice: selectedProduct.basePrice,
-                sku: selectedProduct.sku,
-                hsn: selectedProduct.hsn,
-                slug: selectedProduct.slug,
-                active: selectedProduct.active,
-                description: selectedProduct.description,
-                descriptionPoints: selectedProduct.descriptionPoints,
-                keyInformation: selectedProduct.keyInformation,
-                categoryId: selectedProduct.category?._id || "",
-                images: selectedProduct.images || [],
+                gst: selectedProduct?.gst,
+                regularPrice: selectedProduct?.regularPrice,
+                basePrice: selectedProduct?.basePrice,
+                sku: selectedProduct?.sku,
+                hsn: selectedProduct?.hsn,
+                slug: selectedProduct?.slug,
+                active: selectedProduct?.active,
+                description: selectedProduct?.description,
+                descriptionPoints: selectedProduct?.descriptionPoints,
+                keyInformation: selectedProduct?.keyInformation,
+                categoryId: selectedProduct?.category?._id || "",
+                images: selectedProduct?.images || [],
             });
         } else {
             reset({
@@ -366,7 +366,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                 control={form.control}
                                 name="active"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 border-gray-500">
                                         <div className="space-y-0.5">
                                             <FormLabel>Active</FormLabel>
                                             <DialogDescription>This product is visible to users</DialogDescription>

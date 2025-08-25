@@ -56,6 +56,7 @@ function page() {
         setCourierOpen(true)
     }
 
+    const isAdmin = onlyAdmin();
 
     return (
         <InnerDashboardLayout>
@@ -107,7 +108,7 @@ function page() {
                             Reject
                         </Button>
                     }
-                    {isNewOrder() && onlyAdmin() &&
+                    {isNewOrder() && isAdmin &&
                         <Button
                             onClick={() => setCancelOpen(true)}
                             variant="destructive"
@@ -120,7 +121,7 @@ function page() {
             </div>
             <div className='space-y-3'>
                 {/* Upper Details */}
-                <UpperDetailss order={order} />
+                <UpperDetailss order={order} admin={isAdmin} />
                 <PaymentDetails order={order} />
                 <PersonalDetails order={order} />
                 <ItemsTable

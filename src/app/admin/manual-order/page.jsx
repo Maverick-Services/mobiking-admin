@@ -53,6 +53,7 @@ function page() {
     const [createdOrder, setCreatedOrder] = useState(null)
     const [categoryFilter, setCategoryFilter] = useState()
     const [typeFilter, setTypeFilter] = useState('InStock')
+    const [linkSent, setLinkSent] = useState(false)
 
     // debounce hook
     function useDebouncedValue(value, delay = 500) {
@@ -129,6 +130,7 @@ function page() {
 
     async function onSubmit(values) {
         try {
+            setLinkSent(false)
             let finalUserId;
             const res = await api.get(`/users/customer/${values.phoneNo}`);
 
@@ -315,7 +317,10 @@ function page() {
                                         render={({ field }) => (
                                             <FormItem className="">
                                                 <FormLabel>Payment Method</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <Select
+                                                    value={field.value}
+                                                    onValueChange={field.onChange}
+                                                >
                                                     <FormControl>
                                                         <SelectTrigger className={'w-full'}>
                                                             <SelectValue placeholder="Select method" />
@@ -483,6 +488,8 @@ function page() {
                         reset={reset}
                         order={createdOrder}
                         resetOrder={setCreatedOrder}
+                        linkSent={linkSent}
+                        setLinkSent={setLinkSent}
                     />
                 }
             </div>

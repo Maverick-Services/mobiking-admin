@@ -3,12 +3,11 @@ import { Button } from '@/components/ui/button'
 import { useOrders } from '@/hooks/useOrders'
 import React, { useState } from 'react'
 
-function SuccessMessage({ order, resetOrder, reset }) {
-    const [linkSent, setLinkSent] = useState(false)
+function SuccessMessage({ order, resetOrder, reset, linkSent, setLinkSent }) {
     const [linkData, setLinkData] = useState(null)
     const { sendPaymentLink } = useOrders();
 
-    console.log(order)
+    console.log(linkSent)
 
     const handleSendLink = async () => {
         setLinkSent(false)
@@ -39,7 +38,7 @@ function SuccessMessage({ order, resetOrder, reset }) {
             </div>
             <div className='w-fit sm:w-1/2 flex flex-col items-end justify-end h-full gap-3'>
 
-                {order?.order?.method === 'UPI' && !linkSent &&
+                {order?.order?.method === 'Online' && !linkSent &&
                     <LoaderButton
                         onClick={handleSendLink}
                         loading={sendPaymentLink.isPending}

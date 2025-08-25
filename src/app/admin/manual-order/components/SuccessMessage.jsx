@@ -3,8 +3,7 @@ import { Button } from '@/components/ui/button'
 import { useOrders } from '@/hooks/useOrders'
 import React, { useState } from 'react'
 
-function SuccessMessage({ order, resetOrder, reset }) {
-    const [linkSent, setLinkSent] = useState(false)
+function SuccessMessage({ order, resetOrder, reset, linkSent, setLinkSent }) {
     const [linkData, setLinkData] = useState(null)
     const { sendPaymentLink } = useOrders();
 

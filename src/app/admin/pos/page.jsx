@@ -27,7 +27,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Textarea } from '@/components/ui/textarea'
 import NotAuthorizedPage from '@/components/notAuthorized'
-
+import { IoQrCode } from "react-icons/io5";
 const FILTERS = [
     // { key: '_all_', label: 'ALL' },
     { key: 'InStock', label: 'In stock' },
@@ -78,11 +78,7 @@ function page() {
     const { createPosOrder, permissionsPos: { canAddPos, canDeletePos, canEditPos, canViewPos } } = useOrders()
     const [addedProducts, setAddedProducts] = useState([])
     const [addUserDialog, setAddUserDialog] = useState(false)
-
-    // console.log(canAddPos)
-    // console.log(canDeletePos)
-    // console.log(canEditPos)
-    // console.log(canViewPos)
+    const [linkSent, setLinkSent] = useState(false)
 
     // form hook
     const form = useForm({
@@ -93,7 +89,7 @@ function page() {
             name: "",
             phoneNo: "",
             gst: "",
-            method: "UPI",
+            method: "Cash",
             subtotal: 0,
             discount: 0,
             orderAmount: 0,
@@ -120,6 +116,7 @@ function page() {
 
     async function onSubmit(values) {
         try {
+            setLinkSent(false)
             setCreatedOrder(null);
             let finalUserId;
             const res = await api.get(`/users/customer/${values.phoneNo}`);
@@ -333,11 +330,11 @@ function page() {
                                         name="gst"
                                         render={({ field }) => (
                                             <FormItem className="">
-                                                <FormLabel>GST Number</FormLabel>
+                                                <FormLabel>GST Number (Optional)</FormLabel>
                                                 <FormControl>
                                                     <Input
                                                         {...field}
-                                                        placeholder="Enter GST number"
+                                                        placeholder="Customer's GST number"
                                                     />
                                                 </FormControl>
                                             </FormItem>
@@ -351,7 +348,10 @@ function page() {
                                         render={({ field }) => (
                                             <FormItem className="">
                                                 <FormLabel>Payment Method</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={'UPI'}>
+                                                <Select
+                                                    value={field.value}
+                                                    onValueChange={field.onChange}
+                                                >
                                                     <FormControl>
                                                         <SelectTrigger className={'w-full'}>
                                                             <SelectValue placeholder="Select method" />
@@ -366,8 +366,14 @@ function page() {
                                                         </SelectItem>
                                                         <SelectItem value="UPI">
                                                             <div className="flex items-center gap-2">
-                                                                <FaGoogle className="w-4 h-4 text-gray-600" />
+                                                                <IoQrCode className="w-4 h-4 text-gray-600" />
                                                                 <span>UPI</span>
+                                                            </div>
+                                                        </SelectItem>
+                                                        <SelectItem value="Online">
+                                                            <div className="flex items-center gap-2">
+                                                                <FaGoogle className="w-4 h-4 text-gray-600" />
+                                                                <span>Online</span>
                                                             </div>
                                                         </SelectItem>
                                                     </SelectContent>
@@ -496,6 +502,8 @@ function page() {
                         reset={reset}
                         order={createdOrder}
                         resetOrder={setCreatedOrder}
+                        linkSent={linkSent}
+                        setLinkSent={setLinkSent}
                     />
                 }
             </div>

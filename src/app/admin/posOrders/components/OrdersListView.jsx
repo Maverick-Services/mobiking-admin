@@ -21,9 +21,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import GSTBillDownload from '@/components/GSTBill'
 import StatusUpdate from './StatusUpdate'
 import Link from 'next/link'
+import PaymentUpdateDialog from '@/components/PaymentUpdateDialog'
+import { BsPencil } from 'react-icons/bs'
 
 export default function OrdersListView({ error, orders = [], canEditPos }) {
-    const router = useRouter()
+    const [updatePayment, setUpdatePayment] = useState(false)
+    const [selectedOrder, setSelectedOrder] = useState(null)
 
     if (error) {
         return (
@@ -58,7 +61,7 @@ export default function OrdersListView({ error, orders = [], canEditPos }) {
                         <TableHead>Name</TableHead>
                         <TableHead>Phone</TableHead>
                         <TableHead>Amount</TableHead>
-                        <TableHead>Method</TableHead>
+                        <TableHead>Payment</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Created At</TableHead>
                         <TableHead className="text-center">Actions</TableHead>
@@ -124,8 +127,18 @@ export default function OrdersListView({ error, orders = [], canEditPos }) {
                                 </TableCell>
                                 <TableCell>₹{o.orderAmount.toFixed(2)}</TableCell>
                                 <TableCell>
-                                    <div className='text-xs flex flex-col gap-1 items-center'>
-                                        <p className='font-semibold'>{o.method}</p>
+                                    <div className='text-xs flex flex-col gap-1 items-start'>
+                                        <div className='flex gap-2 items-center justify-between'>
+                                            <p className='font-semibold'>{o?.method}</p>
+                                            <div className='px-1 py-1 bg-gray-100 text-gray-500 border border-gray-300 rounded-md cursor-pointer'
+                                                onClick={() => {
+                                                    setSelectedOrder(o)
+                                                    setUpdatePayment(true)
+                                                }}
+                                            >
+                                                <BsPencil />
+                                            </div>
+                                        </div>
                                         {o.paymentStatus == "Paid" ?
                                             <Badge className={'bg-emerald-600 text-white'} >Paid</Badge>
                                             : <Badge variant="destructive">Pending</Badge>
@@ -178,6 +191,11 @@ export default function OrdersListView({ error, orders = [], canEditPos }) {
                     {/* </AnimatePresence> */}
                 </TableBody>
             </Table>
+            <PaymentUpdateDialog
+                open={updatePayment}
+                onOpenChange={setUpdatePayment}
+                order={selectedOrder}
+            />
         </div>
     )
 }

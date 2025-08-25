@@ -95,9 +95,6 @@ export default function page() {
     const allProducts = products.data?.products || []
     const totalPages = products.data?.pagination?.totalPages || 1
     const paginationRange = getPaginationRange(page, totalPages)
-    console.log(allProducts)
-
-    console.log(allProducts)
 
     // open dialog to add new 
     const handleAddClick = () => {

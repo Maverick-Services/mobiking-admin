@@ -9,21 +9,27 @@ export default function SMSCredit() {
     const [isLoading, setIsLoading] = useState(true)
     const [credit, setCredit] = useState(null)
     const [error, setError] = useState(null)
+    const [lowCredit, setLowCredit] = useState(false)
 
     useEffect(() => {
         const fetchCredits = async () => {
             try {
                 const response = await axios.get('/api/sms-balance')
                 const rawCredit = response?.data?.Data?.[0]?.Credits // e.g. "INR1896.200000"
+                console.log("Raw Credit:", rawCredit)
 
-                // Remove "INR" and parse to float
                 const numericCredit = parseFloat(rawCredit.replace('INR', ''))
 
+                // Check for low balance
+                if (numericCredit < 50) {
+                    setLowCredit(true)
+                }
+
                 // Format with commas and 2 decimal places
-                const formatted = `₹ ${numericCredit.toLocaleString('en-IN', {
+                const formatted = numericCredit.toLocaleString('en-IN', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                })}`
+                })
 
                 setCredit(formatted)
             } catch (err) {
@@ -51,17 +57,17 @@ export default function SMSCredit() {
                 ) : error ? (
                     <p className="text-sm text-red-500">{error}</p>
                 ) : (
-                    <p className="text-2xl font-bold leading-tight">{credit}</p>
+                    <p className={`text-2xl font-bold leading-tight ${lowCredit ? "text-red-500 " : ""}`}>₹{credit}</p>
                 )}
                 <p className="text-sm text-muted-foreground mt-1">SMS Credits Balance</p>
             </div>
 
             <IconComponent
                 className={`h-8 w-8 ${isLoading
-                        ? 'animate-spin text-muted-foreground'
-                        : error
-                            ? 'text-red-500'
-                            : 'text-primary'
+                    ? 'animate-spin text-muted-foreground'
+                    : error
+                        ? 'text-red-500'
+                        : 'text-primary'
                     }`}
             />
         </PCard>

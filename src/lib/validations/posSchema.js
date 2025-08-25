@@ -5,7 +5,7 @@ export const posSchema = z.object({
   name: z.string().min(1, "User Name is required"),
   phoneNo: z.string().min(1, "Phone Number is required"),
   gst: z.string().optional(),
-  method: z.string().min(1, "Please select payment method").default('UPI'),
+  method: z.enum(["UPI", "Online", "Cash"]).default("Cash"),
   subtotal: z.number().min(0),
   discount: z.preprocess((val) => {
     if (val === "") return undefined;
@@ -43,7 +43,7 @@ export const manualOrderSchema = z.object({
 
   gst: z.string().optional(),
 
-  method: z.string().min(1, "Please select a payment method"),
+  method: z.enum(["COD", "Online"]).default("Online"),
 
   subtotal: z.number().min(0, "Subtotal must be 0 or more"),
 
