@@ -1,6 +1,5 @@
 'use client'
 import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import {
     Table,
@@ -11,19 +10,12 @@ import {
     TableCell,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { Download, Eye, MessageSquare, Pencil } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Eye } from 'lucide-react'
 import { format } from 'date-fns'
 import { FaWhatsapp } from 'react-icons/fa'
-import AcceptDialog from './AcceptDialog'
 import { OrderViewDialog } from './OrderViewDialog'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import GSTBillDownload from '@/components/GSTBill'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import UpdateStatus from '../[id]/components/UpdateStatus'
-import StatusUpdate from './StatusUpdate'
-import PaymentUpdateDialog from '@/components/PaymentUpdateDialog'
-import { BsPencil } from 'react-icons/bs'
 import Link from 'next/link'
 
 // Map each order status to a Badge variant
@@ -38,36 +30,15 @@ const STATUS_VARIANTS = {
     Hold: 'secondary',        // gray or custom secondary
 }
 
-export default function OrdersListView({ error, orders = [] }) {
-    const router = useRouter()
-    const [updatePayment, setUpdatePayment] = useState(false)
-    const [selectedOrder, setSelectedOrder] = useState(null)
+export default function UserOrdersTable({ orders = [] }) {
 
-
-    if (error) {
-        return (
-            <div className="text-red-600 p-4">
-                Error: {error.message}
-            </div>
-        )
-    }
-
-    if (orders.length === 0) {
+    if (orders?.length === 0) {
         return (
             <div className="p-4 text-gray-500 text-center">
-                No orders found.
+                No orders.
             </div>
         )
     }
-
-    const openWhatsApp = (phone) => {
-        // sanitize phone: remove non-digits
-        const digits = phone.replace(/\D/g, '')
-        const url = `https://wa.me/${digits}`
-        window.open(url, '_blank')
-    }
-
-    console.log(orders)
 
     return (
         <div>
@@ -86,7 +57,6 @@ export default function OrdersListView({ error, orders = [] }) {
                     </TableRow>
                 </TableHeader>
                 <TableBody className={'scrollbar-hide'}>
-                    {/* <AnimatePresence mode="wait"> */}
                     {orders.map((o, i) => {
                         const customerOrderNumber = o?.userId?.orders?.length || 0;
                         const returnedOrders = o?.userId?.orders?.filter(item => item.status === 'Returned')?.length || 0;
@@ -118,12 +88,7 @@ export default function OrdersListView({ error, orders = [] }) {
                                 </TableCell>
 
                                 <TableCell className="capitalize flex-col">
-                                    <div className='flex gap-1 items-center justify-start'>
-                                        <span>
-                                            {o.name || '—'}
-                                        </span>
-                                        <span className='bg-gray-200 px-1.5 text-[10px] py-0.5 rounded-full'>{o?.userId?.orders?.length}</span>
-                                    </div>
+                                    {o.name || '—'}
                                     <div className='flex gap-1 mt-1'>
                                         <span className="bg-purple-100 text-purple-700 px-1 font-medium rounded text-[10px]">
                                             RTO: {returnPercent || 0} %
@@ -151,14 +116,6 @@ export default function OrdersListView({ error, orders = [] }) {
                                     <div className='text-xs flex flex-col gap-1 items-start'>
                                         <div className='flex gap-2 items-center justify-between'>
                                             <p className='font-semibold'>{o?.method}</p>
-                                            <div className='px-1 py-1 bg-gray-100 text-gray-500 border border-gray-300 rounded-md cursor-pointer'
-                                                onClick={() => {
-                                                    setSelectedOrder(o)
-                                                    setUpdatePayment(true)
-                                                }}
-                                            >
-                                                <BsPencil />
-                                            </div>
                                         </div>
                                         {o.paymentStatus == "Paid" ?
                                             <Badge className={'bg-emerald-600 text-white'} >Paid</Badge>
@@ -168,11 +125,10 @@ export default function OrdersListView({ error, orders = [] }) {
                                 </TableCell>
 
                                 <TableCell>
-                                    <StatusUpdate
-                                        order={o}
-                                        orderId={o?._id}
-                                        status={o?.status}
-                                    />
+                                    <Badge variant={STATUS_VARIANTS}>
+                                        {o?.status}
+                                    </Badge>
+
                                 </TableCell>
 
                                 <TableCell>
@@ -184,23 +140,11 @@ export default function OrdersListView({ error, orders = [] }) {
 
                                 {/* action buttons */}
                                 <TableCell className="text-center space-x-2 flex items-center justify-center">
-                                    {/* {o.abondonedOrder && */}
                                     <OrderViewDialog order={o}>
                                         <Button variant="outline">
                                             <Eye />
                                         </Button>
                                     </OrderViewDialog>
-                                    {/* } */}
-
-                                    {/* {!o.abondonedOrder &&
-                                            <Button
-                                                // className={'h-7 w-7'}
-                                                variant="outline"
-                                                onClick={() => router.push(`/admin/orders/${o._id}`)}
-                                            >
-                                                <Eye />
-                                            </Button>
-                                        } */}
                                     {!o.abondonedOrder &&
                                         <GSTBillDownload billData={o} />
                                     }
@@ -209,14 +153,8 @@ export default function OrdersListView({ error, orders = [] }) {
                             </motion.tr>
                         )
                     })}
-                    {/* </AnimatePresence> */}
                 </TableBody>
             </Table>
-            <PaymentUpdateDialog
-                open={updatePayment}
-                onOpenChange={setUpdatePayment}
-                order={selectedOrder}
-            />
         </div>
     )
 }

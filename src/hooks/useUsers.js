@@ -124,6 +124,26 @@ export const useUsers = () => {
         }
     });
 
+    // get single user by Id
+    const getSingleUserQuery = (id) =>
+        useQuery({
+            queryKey: ["singleUser", id],
+            queryFn: async () => {
+                const res = await api.get(`/users/customer/id/${id}`);
+                const data = res.data;
+
+                if (!data || data.message === "User not found") {
+                    throw new Error("User not found");
+                }
+
+                return data;
+            },
+            staleTime: 1000 * 60 * 5,
+            onError: (err) => {
+                toast.error(err.message || "Failed to fetch User");
+            },
+        });
+
     return {
         usersQuery,
         createUser,
@@ -132,6 +152,7 @@ export const useUsers = () => {
         employeesQuery,
         allUsersQuery,
         // changePassword,
+        getSingleUserQuery,
         createCustomer,
         permissions: {
             canView,

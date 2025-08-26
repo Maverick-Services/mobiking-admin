@@ -8,6 +8,7 @@ import Loader from '@/components/Loader'
 import DeleteConfirmationDialog from './DeleteConfirmationDialog '
 import { format } from 'date-fns';
 import TableSkeleton from '@/components/custom/TableSkeleton'
+import Link from 'next/link'
 
 export default function UsersListView({
     isLoading,
@@ -24,6 +25,8 @@ export default function UsersListView({
     canEdit,
     onlyAdmin
 }) {
+
+    console.log(users)
     const [deletingUserId, setDeletingUserId] = useState(null)
 
     const handleDeleteClick = (userId) => {
@@ -75,15 +78,19 @@ export default function UsersListView({
                     </TableHeader>
                     <TableBody>
                         {users.map((user, idx) => (
-                            <TableRow key={user._id}>
+                            <TableRow key={user?._id}>
                                 <TableCell>{idx + 1}</TableCell>
-                                <TableCell>{user.name}</TableCell>
-                                <TableCell>{user.phoneNo}</TableCell>
-                                <TableCell>{user.email}</TableCell>
+                                <TableCell>{user?.name || "-"} <span className='bg-gray-200 px-2 text-xs py-1 rounded-full'>{user?.orders?.length}</span></TableCell>
+                                <TableCell>
+                                    <Link href={`/admin/customers/${user?._id}`}>
+                                        {user?.phoneNo}
+                                    </Link>
+                                </TableCell>
+                                <TableCell>{user?.email}</TableCell>
                                 <TableCell>
                                     {(() => {
                                         try {
-                                            return format(new Date(user.createdAt), "dd MMM yyyy, hh:mm a");
+                                            return format(new Date(user?.createdAt), "dd MMM yyyy, hh:mm a");
                                         } catch (e) {
                                             return "-";
                                         }
@@ -103,7 +110,7 @@ export default function UsersListView({
                                         <Button
                                             size="icon"
                                             variant="destructive"
-                                            onClick={() => handleDeleteClick(user._id)}
+                                            onClick={() => handleDeleteClick(user?._id)}
                                             disabled={isDeleting}
                                         >
                                             <Trash size={16} />
