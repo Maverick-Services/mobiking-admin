@@ -27,11 +27,8 @@ import { Textarea } from '@/components/ui/textarea';
 import toast from 'react-hot-toast';
 import { uploadImage } from '@/lib/services/uploadImage';
 
-/* ===========================
-   Schema: coerce numerics + optional arrays
-   =========================== */
 const formSchema = z.object({
-    name: z.string().min(1, "Name is required"),
+    brandId: z.string().optional(),
     fullName: z.string().min(1, "Full name is required"),
 
     // Coerce numeric values to numbers if strings come in from inputs
@@ -59,6 +56,7 @@ const formSchema = z.object({
     hsn: z.string().optional(),
     slug: z.string().min(1, "Slug is required"),
     active: z.boolean(),
+    tags: z.string().optional(),
     description: z.string().min(1, "Description is required"),
 
     // Make arrays optional so empty (or undefined) doesn't break validation.
@@ -72,13 +70,14 @@ const formSchema = z.object({
     images: z.array(z.string().min(1, "At least one image is required")),
 });
 
-function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate, isSubmitting, error, categories }) {
-    // console.log(selectedProduct)
+function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate, isSubmitting, error, categories, brands }) {
+    console.log(selectedProduct)
+    // console.log(brands)
     const form = useForm({
         resolver: zodResolver(formSchema),
         mode: 'onSubmit',
         defaultValues: selectedProduct || {
-            name: "",
+            brandId: "",
             fullName: "",
             price: 0,
             gst: 18,
@@ -89,6 +88,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
             slug: "",
             active: true,
             description: "",
+            tags: [],
             descriptionPoints: [],
             keyInformation: [],
             categoryId: "",
@@ -98,30 +98,28 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
     const { watch, setValue, control, reset } = form;
 
     useEffect(() => {
-        // Always provide safe fallbacks when resetting from selectedProduct.
-        // This fixes: (a) gst not present -> missing in payload, (b) empty descriptionPoints/keyInformation blocking submit.
         if (selectedProduct) {
             reset({
-                name: selectedProduct?.name ?? "",
+                brandId: selectedProduct?.brandId ?? "",
                 fullName: selectedProduct?.fullName ?? "",
-                // price extraction stays same; fallback to 0 if not present
                 price: selectedProduct?.sellingPrice?.[selectedProduct.sellingPrice?.length - 1]?.price ?? 0,
-                gst: selectedProduct?.gst ?? 18,                          // <- fallback
+                gst: selectedProduct?.gst ?? 18,
                 regularPrice: selectedProduct?.regularPrice ?? 0,
                 basePrice: selectedProduct?.basePrice ?? 0,
                 sku: selectedProduct?.sku ?? "",
                 hsn: selectedProduct?.hsn ?? "",
                 slug: selectedProduct?.slug ?? "",
                 active: selectedProduct?.active ?? true,
+                tags: selectedProduct?.tags ?? [],
                 description: selectedProduct?.description ?? "",
-                descriptionPoints: selectedProduct?.descriptionPoints ?? [], // <- fallback to []
-                keyInformation: selectedProduct?.keyInformation ?? [],       // <- fallback to []
+                descriptionPoints: selectedProduct?.descriptionPoints ?? [],
+                keyInformation: selectedProduct?.keyInformation ?? [],
                 categoryId: selectedProduct?.category?._id ?? "",
-                images: selectedProduct?.images ?? [],                       // <- fallback to []
+                images: selectedProduct?.images ?? [],
             });
         } else {
             reset({
-                name: "",
+                brandId: "",
                 fullName: "",
                 price: 0,
                 gst: 18,
@@ -132,6 +130,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                 slug: "",
                 active: true,
                 description: "",
+                tags: [],
                 descriptionPoints: [],
                 keyInformation: [],
                 categoryId: "",
@@ -158,7 +157,6 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
     }, [watchPrice, watchGst])
 
     const images = watch("images") || [];
-    const [photosDialogOpen, setPhotosDialogOpen] = useState(false);
 
     const { fields, append, remove } = useFieldArray({
         control,
@@ -174,15 +172,24 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
         name: 'keyInformation',
     })
 
-
     async function onSubmit(values) {
-        // values will now contain gst as a number (thanks to preprocess)
-        console.log("Submitting values:", values)
+        const tagsArray = values.tags
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter((tag) => tag.length > 0)
+
+        const finalData = {
+            ...values,
+            tags: tagsArray
+        }
+
+        console.log("Submitting values:", finalData)
+
         if (selectedProduct) {
-            await onUpdate({ id: selectedProduct._id, data: values })
+            await onUpdate({ id: selectedProduct._id, data: finalData })
             onOpenChange(false)
         } else {
-            await onCreate(values)
+            await onCreate(finalData)
             onOpenChange(false)
         }
     }
@@ -199,15 +206,29 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                 <div>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-5'>
-                            {/* name */}
+                            {/* brand name */}
                             <FormField
                                 control={form.control}
-                                name="name"
+                                name="brandId"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Name<span className="text-red-500"> *</span></FormLabel>
+                                        <FormLabel>Brand<span className="text-red-500"> *</span></FormLabel>
                                         <FormControl>
-                                            <Input placeholder="JBL Smartwatch" {...field} />
+                                            <Select
+                                                value={field.value}
+                                                onValueChange={(val) => field.onChange(val)}
+                                            >
+                                                <SelectTrigger className={'w-full flex-1'}>
+                                                    <SelectValue placeholder="Select a brand" />
+                                                </SelectTrigger>
+                                                <SelectContent className={'w-full'}>
+                                                    {brands?.map((brand) => (
+                                                        <SelectItem key={brand._id} value={brand._id}>
+                                                            {brand?.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -254,7 +275,6 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                         <FormItem className={''}>
                                             <FormLabel>Category<span className="text-red-500"> *</span></FormLabel>
                                             <FormControl>
-                                                {/* <-- bind Select as controlled using value (not defaultValue) */}
                                                 <Select
                                                     value={field.value}
                                                     onValueChange={(val) => field.onChange(val)}
@@ -519,6 +539,21 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                         ) : (
                                             <div className="text-gray-500 italic mt-3 border-gray-600 text-center py-8 px-3 rounded-sm border-dashed border">No images yet</div>
                                         )}
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/* Keywords */}
+                            <FormField
+                                control={form.control}
+                                name="tags"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Tags (Enter Comma Separated Values)</FormLabel>
+                                        <FormControl>
+                                            <Textarea placeholder="smartwatch, smartwatch for men, best smartwatch under 5000" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />

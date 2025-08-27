@@ -25,6 +25,7 @@ import {
 import { getPaginationRange } from "@/lib/services/getPaginationRange"
 import { LayoutGroup, motion } from 'framer-motion';
 import NotAuthorizedPage from "@/components/notAuthorized"
+import { useBrands } from "@/hooks/useBrands"
 
 const TABS = [
     { key: '', label: 'ALL PRODUCTS' },
@@ -79,8 +80,12 @@ export default function page() {
         permissions: { canView, canAdd, canDelete, canEdit },
     } = useProducts()
 
-    const { subCategoriesQuery } = useSubCategories()
-    const subCategories = subCategoriesQuery.data?.data || []
+    const { subCategoriesQuery } = useSubCategories();
+    const subCategories = subCategoriesQuery.data?.data || [];
+
+    const { brandsQuery } = useBrands();
+    const brands = brandsQuery?.data?.data || [];
+
     // console.log(subCategories)
     const products = productsPaginationQuery({
         page: page,
@@ -90,7 +95,6 @@ export default function page() {
         type: activeTab,
         filterBy: typeFilter,
     })
-
 
     const allProducts = products.data?.products || []
     const totalPages = products.data?.pagination?.totalPages || 1
@@ -287,6 +291,7 @@ export default function page() {
                     onOpenChange={setIsDialogOpen}
                     selectedProduct={selectedProduct}
                     categories={subCategories}
+                    brands={brands}
                     isSubmitting={creating || updating}
                     error={createError || updateError}
                     onCreate={createProductAsync}
