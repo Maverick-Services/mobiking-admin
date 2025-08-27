@@ -25,6 +25,7 @@ const permissionSections = [
     { id: 'categories', name: 'Categories' },
     { id: 'subCategories', name: 'Sub Categories' },
     { id: 'products', name: 'Products' },
+    { id: 'brands', name: 'Brands' },
     { id: 'design-studio', name: 'Design Studio' },
     { id: 'home-layout', name: 'Home Layout' },
     { id: 'couponCodes', name: 'Coupon Codes' },

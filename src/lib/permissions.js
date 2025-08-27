@@ -12,6 +12,7 @@ export const Resources = {
     CATEGORIES: 'categories',
     SUB_CATEGORIES: 'subCategories',
     PRODUCTS: 'products',
+    BRANDS: 'brands',
     DESIGN_STUDIO: 'design-studio',
     HOME_LAYOUT: 'home-layout',
     COUPON_CODES: 'couponCodes',
