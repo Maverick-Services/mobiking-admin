@@ -74,7 +74,7 @@ export default function CategoriesListView({
                             <TableCell className="py-1">
                                 <div className="flex items-center justify-center min-h-20">
                                     <Image
-                                        src={item.lowerBanner}
+                                        src={item.lowerBanner || '/not-found-img.webp'}
                                         alt={item.name}
                                         width={80}
                                         height={80}

@@ -65,7 +65,7 @@ export default function CategoriesListView({ isLoading, error, categories, onEdi
                                                 height={80}
                                                 width={80}
                                                 quality={100}
-                                                src={item.image}
+                                                src={item.image || '/not-found-img.webp'}
                                                 alt={item.name}
                                                 className="object-contain rounded-sm"
                                             />
