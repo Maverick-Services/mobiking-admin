@@ -26,6 +26,9 @@ import Image from 'next/image';
 import { Textarea } from '@/components/ui/textarea';
 import toast from 'react-hot-toast';
 import { uploadImage } from '@/lib/services/uploadImage';
+import MiniLoaderButton from '@/components/custom/MiniLoaderButton';
+import BrandDialog from '../../brands/components/BrandDialog';
+import { useBrands } from '@/hooks/useBrands';
 
 const formSchema = z.object({
     brandId: z.string().optional(),
@@ -56,10 +59,9 @@ const formSchema = z.object({
     hsn: z.string().optional(),
     slug: z.string().min(1, "Slug is required"),
     active: z.boolean(),
-    tags: z.string().optional(),
+    tags: z.any().optional(),
     description: z.string().min(1, "Description is required"),
 
-    // Make arrays optional so empty (or undefined) doesn't break validation.
     descriptionPoints: z.array(z.string()).optional(),
     keyInformation: z.array(z.object({
         title: z.string(),
@@ -73,6 +75,16 @@ const formSchema = z.object({
 function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate, isSubmitting, error, categories, brands }) {
     console.log(selectedProduct)
     // console.log(brands)
+    const [brandDialog, setBrandDialog] = useState(false)
+    const [image, setImage] = useState(null)
+    const { createBrand } = useBrands();
+    const {
+        mutateAsync: createBrandAsync,
+        isPending: isCreating,
+        error: createError,
+    } = createBrand;
+
+
     const form = useForm({
         resolver: zodResolver(formSchema),
         mode: 'onSubmit',
@@ -100,7 +112,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
     useEffect(() => {
         if (selectedProduct) {
             reset({
-                brandId: selectedProduct?.brandId ?? "",
+                brandId: selectedProduct?.brand ?? "",
                 fullName: selectedProduct?.fullName ?? "",
                 price: selectedProduct?.sellingPrice?.[selectedProduct.sellingPrice?.length - 1]?.price ?? 0,
                 gst: selectedProduct?.gst ?? 18,
@@ -213,23 +225,30 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Brand<span className="text-red-500"> *</span></FormLabel>
-                                        <FormControl>
-                                            <Select
-                                                value={field.value}
-                                                onValueChange={(val) => field.onChange(val)}
+                                        <div className='flex gap-2 items-center justify-center'>
+                                            <FormControl>
+                                                <Select
+                                                    value={field.value}
+                                                    onValueChange={(val) => field.onChange(val)}
+                                                >
+                                                    <SelectTrigger className={'w-full flex-1'}>
+                                                        <SelectValue placeholder="Select a brand" />
+                                                    </SelectTrigger>
+                                                    <SelectContent className={'w-full'}>
+                                                        {brands?.map((brand) => (
+                                                            <SelectItem key={brand._id} value={brand._id}>
+                                                                {brand?.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormControl>
+                                            <MiniLoaderButton
+                                                onClick={() => setBrandDialog(true)}
                                             >
-                                                <SelectTrigger className={'w-full flex-1'}>
-                                                    <SelectValue placeholder="Select a brand" />
-                                                </SelectTrigger>
-                                                <SelectContent className={'w-full'}>
-                                                    {brands?.map((brand) => (
-                                                        <SelectItem key={brand._id} value={brand._id}>
-                                                            {brand?.name}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </FormControl>
+                                                +
+                                            </MiniLoaderButton>
+                                        </div>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -684,6 +703,16 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                         </form>
                     </Form>
                 </div>
+
+                <BrandDialog
+                    open={brandDialog}
+                    onOpenChange={setBrandDialog}
+                    onCreate={createBrandAsync}
+                    isSubmitting={isCreating}
+                    error={createError?.message}
+                    image={image}
+                    setImage={setImage}
+                />
             </DialogContent>
         </Dialog>
     )

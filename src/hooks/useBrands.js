@@ -40,7 +40,7 @@ export const useBrands = () => {
 
     // Update Brand mutation
     const updateBrand = useMutation({
-        mutationFn: ({ id, data }) => api.put(`/brands/${id}`, data),
+        mutationFn: ({ data }) => api.put(`/brands/update`, data),
         onSuccess: () => {
             queryClient.invalidateQueries(['brands']);
             toast.success('Brand updated successfully');

@@ -28,6 +28,7 @@ import {
   FaCamera,
   FaReceipt,
 } from "react-icons/fa";
+import { FaSailboat } from "react-icons/fa6";
 import { FiMessageSquare } from "react-icons/fi";
 
 export const ADMIN_SIDEBAR_LINKS = [
@@ -102,6 +103,12 @@ export const ADMIN_SIDEBAR_LINKS = [
     label: "Products",
     href: "/admin/products",
     icon: <FaBoxOpen />,
+  },
+  {
+    key: "brands",
+    label: "Brands",
+    href: "/admin/brands",
+    icon: <FaSailboat />,
   },
   {
     key: "design-studio",
