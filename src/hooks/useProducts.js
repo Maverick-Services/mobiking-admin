@@ -69,6 +69,24 @@ export const useProducts = () => {
         }
     });
 
+    const getProductByIdQuery = (id) => useQuery({
+        queryKey: ['product', id],
+        queryFn: async () => {
+            const res = await api.get(`/products/${id}`);
+            const data = res.data;
+
+            if (!data || data.message === 'Product not found') {
+                throw new Error('Product not found');
+            }
+
+            return data;
+        },
+        staleTime: 1000 * 60 * 5,
+        onError: (err) => {
+            toast.error(err?.response?.data?.message || 'Failed to fetch service');
+        }
+    });
+
     // Create Product mutation
     const createProduct = useMutation({
         mutationFn: (data) => api.post('/products/createProduct', data),
@@ -135,7 +153,7 @@ export const useProducts = () => {
     return {
         productsQuery, createProduct, getProductQuery, updateProduct, addProductStock,
         // deleteProduct,
-        productsPaginationQuery, updateProductStatus, availableProductsQuery,
+        productsPaginationQuery, updateProductStatus, availableProductsQuery, getProductByIdQuery,
         permissions: {
             canView,
             canAdd,

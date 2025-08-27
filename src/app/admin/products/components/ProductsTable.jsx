@@ -19,6 +19,7 @@ import toast from 'react-hot-toast';
 import { useGroups } from '@/hooks/useGroups';
 import { useProducts } from '@/hooks/useProducts';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function ProductsListView({
     error,
@@ -176,9 +177,11 @@ export default function ProductsListView({
 
                                 {/* 3. full Name */}
                                 <TableCell className="">
-                                    <div className='max-w-52 text-wrap text-xs'>
-                                        {product?.fullName}
-                                    </div>
+                                    <Link href={`/admin/products/${product?._id}`}>
+                                        <div className='max-w-52 text-wrap text-xs'>
+                                            {product?.fullName}
+                                        </div>
+                                    </Link>
                                 </TableCell>
 
                                 {/* 3. category */}
