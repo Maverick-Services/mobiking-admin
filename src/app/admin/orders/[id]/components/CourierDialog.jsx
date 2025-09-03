@@ -23,7 +23,8 @@ export default function CourierDialog({ open, onOpenChange, order }) {
     const [loading, setLoading] = useState(false)
     const [selectedCourier, setSelectedCourier] = useState(null)
     const [formValues, setFormValues] = useState({
-        pickup_postcode: "110065",
+        // pickup_postcode: "110065",
+        pickup_postcode: "201206",
         delivery_postcode: order.pincode || "",
         cod: order.method === "COD" ? 1 : 0,
         weight: 0.5,
@@ -93,7 +94,8 @@ export default function CourierDialog({ open, onOpenChange, order }) {
                                 <Input
                                     name="pickup_postcode"
                                     value={formValues.pickup_postcode}
-                                    readOnly
+                                    onChange={handleChange}
+                                // readOnly
                                 />
                             </div>
                             <div>
