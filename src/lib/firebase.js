@@ -6,13 +6,13 @@ import { getMessaging, getToken, onMessage, isSupported } from "firebase/messagi
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBEYUKlsycfCcvxJ7ZbHFV_J31x10IjaoU",
-  authDomain: "aaaa-769c6.firebaseapp.com",
-  projectId: "aaaa-769c6",
-  storageBucket: "aaaa-769c6.firebasestorage.app",
-  messagingSenderId: "959874165382",
-  appId: "1:959874165382:web:f1d4d7a46b1c7249aaff07",
-  validKey: "AIzaSyBEYUKlsycfCcvxJ7ZbHFV_J31x10IjaoU"
+  apiKey: "AIzaSyC2cD8s816pK1xC_zSI4eGG_Yjro8X_Gm4",
+  authDomain: "mobiking-25fc3.firebaseapp.com",
+  projectId: "mobiking-25fc3",
+  storageBucket: "mobiking-25fc3.firebasestorage.app",
+  messagingSenderId: "397433355252",
+  appId: "1:397433355252:web:cc8c08179b3ad2c10857a1",
+  // validKey: "AIzaSyBEYUKlsycfCcvxJ7ZbHFV_J31x10IjaoU"
 };
 
 const app = initializeApp(firebaseConfig);
