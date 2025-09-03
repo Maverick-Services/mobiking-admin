@@ -1,145 +1,105 @@
 // lib/firebase.js
-"use client"
+"use client";
 
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBEYUKlsycfCcvxJ7ZbHFV_J31x10IjaoU",
-  authDomain: "aaaa-769c6.firebaseapp.com",
-  projectId: "aaaa-769c6",
-  storageBucket: "aaaa-769c6.firebasestorage.app",
-  messagingSenderId: "959874165382",
-  appId: "1:959874165382:web:f1d4d7a46b1c7249aaff07",
-  validKey: "AIzaSyBEYUKlsycfCcvxJ7ZbHFV_J31x10IjaoU"
+  apiKey: "AIzaSyC2cD8s816pK1xC_zSI4eGG_Yjro8X_Gm4",
+  authDomain: "mobiking-25fc3.firebaseapp.com",
+  projectId: "mobiking-25fc3",
+  storageBucket: "mobiking-25fc3.firebasestorage.app",
+  messagingSenderId: "397433355252",
+  appId: "1:397433355252:web:cc8c08179b3ad2c10857a1",
 };
 
 const app = initializeApp(firebaseConfig);
-
 export const db = getFirestore(app);
 
-// Only initialize messaging in browser environment
-let messaging = null;
-if (typeof window !== 'undefined') {
-  // Check if messaging is supported before initializing
-  isSupported().then((supported) => {
-    if (supported) {
-      messaging = getMessaging(app);
-    }
-  });
+// return messaging instance or null (waits for isSupported)
+export async function getMessagingInstance() {
+  if (typeof window === "undefined") return null;
+  const supported = await isSupported().catch(() => false);
+  if (!supported) return null;
+  return getMessaging(app);
 }
 
-export { messaging };
+// Register SW helper (returns registration)
+export async function ensureServiceWorkerRegistered() {
+  if (typeof window === "undefined") return null;
+  if (!("serviceWorker" in navigator)) return null;
+  // try to get existing registration first
+  let registration = await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js');
+  if (!registration) {
+    registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+  }
+  return registration;
+}
 
-export const requestPermissionAndSaveToken = async () => {
-  // Check if we're in browser environment and messaging is available
-  if (typeof window === 'undefined' || !messaging) {
-    console.log('Messaging not available in this environment');
-    return;
+// Request permission, get token and save to Firestore
+export async function requestPermissionAndSaveToken(userId = null) {
+  if (typeof window === "undefined") return null;
+  if (!("Notification" in window)) {
+    console.log("This browser does not support notifications");
+    return null;
+  }
+
+  // Request browser permission
+  const permission = await Notification.requestPermission();
+  if (permission !== "granted") {
+    console.log("Notification permission:", permission);
+    return null;
+  }
+
+  // Ensure SW is registered and messaging instance is ready
+  const registration = await ensureServiceWorkerRegistered();
+  const messaging = await getMessagingInstance();
+  if (!messaging) {
+    console.log("Firebase messaging not supported in this browser.");
+    return null;
+  }
+
+  const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
+  if (!vapidKey) {
+    console.error("VAPID key missing: set NEXT_PUBLIC_FIREBASE_VAPID_KEY");
+    return null;
   }
 
   try {
-    // Check if notifications are supported
-    if (!('Notification' in window)) {
-      console.log('This browser does not support notifications');
-      return;
-    }
-
-    const permission = await Notification.requestPermission();
-    if (permission !== "granted") {
-      console.log('Notification permission denied');
-      return;
-    }
-
-    // Check if VAPID key is available
-    const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
-    if (!vapidKey) {
-      console.error('VAPID key not found in environment variables');
-      return;
-    }
-
     const token = await getToken(messaging, {
-      vapidKey: vapidKey,
+      vapidKey,
+      serviceWorkerRegistration: registration,
     });
 
     if (token) {
+      // Save token to Firestore collection deviceTokens (or send to your backend)
       await addDoc(collection(db, "deviceTokens"), {
         token,
         platform: "web",
-        createdAt: new Date(),
+        createdAt: new Date().toISOString(),
+        userId: userId || null,
       });
-      console.log("Token saved:", token);
+      console.log("Token saved to Firestore:", token);
       return token;
+    } else {
+      console.log("No registration token available.");
+      return null;
     }
   } catch (err) {
-    console.error("Token error:", err);
+    console.error("Error getting token:", err);
+    return null;
   }
-};
+}
 
-export const onMessageListener = () => {
-  if (typeof window === 'undefined' || !messaging) {
-    return Promise.resolve(null);
-  }
+// Foreground messages listener wrapper
+export async function onMessageListener() {
+  const messaging = await getMessagingInstance();
+  if (!messaging) return Promise.resolve(null);
 
   return new Promise((resolve) => {
     onMessage(messaging, (payload) => {
       resolve(payload);
     });
   });
-};
-
-
-
-
-
-// // lib/firebase-client.js
-// "use client"
-
-// import { initializeApp } from "firebase/app";
-// import { getMessaging, getToken, onMessage } from "firebase/messaging";
-// import { getFirestore, collection, addDoc } from "firebase/firestore";
-
-// const firebaseConfig = {
-//   apiKey: "AIzaSyBEYUKlsycfCcvxJ7ZbHFV_J31x10IjaoU",
-//   authDomain: "aaaa-769c6.firebaseapp.com",
-//   projectId: "aaaa-769c6",
-//   storageBucket: "aaaa-769c6.firebasestorage.app",
-//   messagingSenderId: "959874165382",
-//   appId: "1:959874165382:web:f1d4d7a46b1c7249aaff07",
-//   validKey: "AIzaSyBEYUKlsycfCcvxJ7ZbHFV_J31x10IjaoU"
-// };
-
-// const app = initializeApp(firebaseConfig);
-
-// export const db = getFirestore(app);
-// export const messaging = getMessaging(app);
-
-// export const requestPermissionAndSaveToken = async () => {
-//   try {
-//     const permission = await Notification.requestPermission();
-//     if (permission !== "granted") return;
-
-//     const token = await getToken(messaging, {
-//       vapidKey: process.env.FIREBASE_VAPID_KEY,
-//     });
-
-//     if (token) {
-//       await addDoc(collection(db, "deviceTokens"), {
-//         token,
-//         platform: "web",
-//         createdAt: new Date(),
-//       });
-//       console.log("Token saved:", token);
-//     }
-//   } catch (err) {
-//     console.error("Token error:", err);
-//   }
-// };
-
-// export const onMessageListener = () =>
-//   new Promise((resolve) => {
-//     onMessage(messaging, (payload) => {
-//       resolve(payload);
-//     });
-//   });
+}

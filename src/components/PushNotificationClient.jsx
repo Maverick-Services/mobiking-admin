@@ -1,35 +1,41 @@
 // components/PushNotificationClient.jsx
-"use client"
-import { useEffect } from 'react'
+"use client";
+import { useEffect } from "react";
 
-export default function PushNotificationClient() {
+export default function PushNotificationClient({ userId = null }) {
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
-    const initializeFirebase = async () => {
+    const init = async () => {
       try {
-        const { requestPermissionAndSaveToken, onMessageListener } = await import('@/lib/firebase');
-        
-        // Register service worker
-        if ('serviceWorker' in navigator) {
-          await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        // lazy import firebase helpers (to avoid SSR issues)
+        const firebaseHelpers = await import("@/lib/firebase");
+
+        // ensure SW registered (helper will do it too, but registering explicitly gives better logging)
+        if ("serviceWorker" in navigator) {
+          try {
+            const reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+            console.log("Service worker registered:", reg);
+          } catch (e) {
+            console.warn("Service worker register failed (might be already registered):", e);
+          }
         }
 
-        // Request permission and save token
-        await requestPermissionAndSaveToken();
+        const token = await firebaseHelpers.requestPermissionAndSaveToken(userId);
+        console.log("FCM token (or null):", token);
 
-        // Listen for foreground messages
-        const payload = await onMessageListener();
+        const payload = await firebaseHelpers.onMessageListener();
         if (payload) {
-          console.log("Foreground Push Received:", payload);
+          console.log("Foreground message payload:", payload);
+          // TODO: show custom UI/notification in-app
         }
-      } catch (error) {
-        console.error('Firebase initialization error:', error);
+      } catch (err) {
+        console.error("Push init error:", err);
       }
     };
 
-    initializeFirebase();
-  }, []);
+    init();
+  }, [userId]);
 
   return null;
 }

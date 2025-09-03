@@ -28,7 +28,7 @@ export async function POST(req) {
         ...(image && { image })
       },
       data: {
-        ...(redirect && { redirect }) 
+        ...(redirect && { redirect })
       },
       tokens,
     }
