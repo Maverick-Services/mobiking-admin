@@ -12,7 +12,7 @@ const firebaseConfig = {
   storageBucket: "mobiking-25fc3.firebasestorage.app",
   messagingSenderId: "397433355252",
   appId: "1:397433355252:web:cc8c08179b3ad2c10857a1",
-  // validKey: "AIzaSyBEYUKlsycfCcvxJ7ZbHFV_J31x10IjaoU"
+  validKey: "AIzaSyC2cD8s816pK1xC_zSI4eGG_Yjro8X_Gm4"
 };
 
 const app = initializeApp(firebaseConfig);
