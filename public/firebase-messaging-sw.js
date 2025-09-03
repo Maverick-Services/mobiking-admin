@@ -1,7 +1,7 @@
-//public/firebase-messaging-sw.js
-"use client"
-importScripts("https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js");
-importScripts("https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js");
+// public/firebase-messaging-sw.js
+// Use compat libs here because service worker context uses importScripts
+importScripts('https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.22.1/firebase-messaging-compat.js');
 
 firebase.initializeApp({
   apiKey: "AIzaSyC2cD8s816pK1xC_zSI4eGG_Yjro8X_Gm4",
@@ -14,10 +14,12 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage((payload) => {
-  self.registration.showNotification(payload.notification.title, {
-    body: payload.notification.body,
-    icon: "/logo1.png",
-    data: payload.data || {},
-  });
+messaging.onBackgroundMessage(function (payload) {
+  console.log('[firebase-messaging-sw.js] Received background message ', payload);
+  const title = payload.notification?.title || 'New notification';
+  const options = {
+    body: payload.notification?.body || '',
+    // icon: '/icon.png' // optional
+  };
+  self.registration.showNotification(title, options);
 });
