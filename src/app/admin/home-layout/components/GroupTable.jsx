@@ -6,7 +6,7 @@ import GroupSequenceDialog from './GroupSequenceDialog'
 import Image from 'next/image'
 
 export default function GroupTable({ initialData = [], allGroups = [], onSave, canEdit }) {
-    // console.log(initialData)
+    console.log(initialData)
     return (
         <div>
             <div className="flex justify-between items-center w-full mb-5">

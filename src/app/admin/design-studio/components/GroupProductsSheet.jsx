@@ -36,7 +36,7 @@ function GroupProductsSheet({ open, onOpenChange, group, onProductsAdd, updating
     const [visibleProducts, setVisibleProducts] = useState([])
 
     const filteredProducts = allProducts
-        .filter(p => p.fullName?.toLowerCase().includes(searchTerm.toLowerCase()))
+        .filter(p => p.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) && p?.active && p?.totalStock > 0)
 
     // Initialize local state whenever the sheet opens or the group changes
     useEffect(() => {

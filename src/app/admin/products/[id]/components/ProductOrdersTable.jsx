@@ -59,12 +59,12 @@ export default function ProductOrdersTable({ orders = [] }) {
                 <TableBody className={'scrollbar-hide'}>
                     {orders.map((o, i) => {
                         const customerOrderNumber = o?.userId?.orders?.length || 0;
-                        const returnedOrders = o?.userId?.orders?.filter(item => item.status === 'Returned')?.length || 0;
+                        const returnedOrders = o?.userId?.orders?.filter(item => item?.status === 'Returned')?.length || 0;
                         const returnPercent = customerOrderNumber > 0
                             ? ((returnedOrders / customerOrderNumber) * 100).toFixed(1)
                             : '0.0';
 
-                        const cancelledOrders = o?.userId?.orders?.filter(item => item.status === 'Cancelled')?.length || 0;
+                        const cancelledOrders = o?.userId?.orders?.filter(item => item?.status === 'Cancelled')?.length || 0;
                         const cancelPercent = customerOrderNumber > 0
                             ? ((cancelledOrders / customerOrderNumber) * 100).toFixed(1)
                             : '0.0';
@@ -83,12 +83,12 @@ export default function ProductOrdersTable({ orders = [] }) {
 
                                 <TableCell>
                                     <Link href={`/admin/orders/${o._id}`}>
-                                        {o.orderId}
+                                        {o?.orderId}
                                     </Link>
                                 </TableCell>
 
                                 <TableCell className="capitalize flex-col">
-                                    {o.name || '—'}
+                                    {o?.name || '—'}
                                     <div className='flex gap-1 mt-1'>
                                         <span className="bg-purple-100 text-purple-700 px-1 font-medium rounded text-[10px]">
                                             RTO: {returnPercent || 0} %
@@ -101,23 +101,23 @@ export default function ProductOrdersTable({ orders = [] }) {
 
                                 <TableCell >
                                     <div className="flex items-center space-x-2">
-                                        <span>{o.phoneNo}</span>
-                                        {o.phoneNo &&
+                                        <span>{o?.phoneNo}</span>
+                                        {o?.phoneNo &&
                                             <FaWhatsapp
                                                 className="cursor-pointer text-green-500 hover:text-green-600"
                                                 size={18}
-                                                onClick={() => openWhatsApp(o.phoneNo)}
+                                                onClick={() => openWhatsApp(o?.phoneNo)}
                                             />
                                         }
                                     </div>
                                 </TableCell>
-                                <TableCell>₹{o.orderAmount.toFixed(2)}</TableCell>
+                                <TableCell>₹{o?.orderAmount.toFixed(2)}</TableCell>
                                 <TableCell>
                                     <div className='text-xs flex flex-col gap-1 items-start'>
                                         <div className='flex gap-2 items-center justify-between'>
                                             <p className='font-semibold'>{o?.method}</p>
                                         </div>
-                                        {o.paymentStatus == "Paid" ?
+                                        {o?.paymentStatus == "Paid" ?
                                             <Badge className={'bg-emerald-600 text-white'} >Paid</Badge>
                                             : <Badge variant="destructive">Pending</Badge>
                                         }
@@ -132,9 +132,9 @@ export default function ProductOrdersTable({ orders = [] }) {
                                 </TableCell>
 
                                 <TableCell>
-                                    <div>{format(new Date(o.createdAt), 'dd MMM yyyy')}</div>
+                                    <div>{format(new Date(o?.createdAt), 'dd MMM yyyy')}</div>
                                     <div className="text-gray-500">
-                                        {format(new Date(o.createdAt), 'hh:mm a')}
+                                        {format(new Date(o?.createdAt), 'hh:mm a')}
                                     </div>
                                 </TableCell>
 
@@ -145,7 +145,7 @@ export default function ProductOrdersTable({ orders = [] }) {
                                             <Eye />
                                         </Button>
                                     </OrderViewDialog>
-                                    {!o.abondonedOrder &&
+                                    {!o?.abondonedOrder &&
                                         <GSTBillDownload billData={o} />
                                     }
 

@@ -65,7 +65,7 @@ function page() {
                     View Order
                 </h1>
                 <div className="flex gap-2">
-                    {!order.abondonedOrder && !order.shipmentId && isNewOrder() &&
+                    {!order?.abondonedOrder && !order?.shipmentId && isNewOrder() &&
                         <UpdateStatus
                             order={order}
                             orderId={order?._id}
@@ -73,7 +73,7 @@ function page() {
                         />
                     }
 
-                    {isNewOrder() && !order.abondonedOrder &&
+                    {isNewOrder() && !order?.abondonedOrder &&
                         <LoaderButton
                             onClick={handleGetCourierId}
                             variant="outline"
@@ -85,7 +85,7 @@ function page() {
                     }
 
                     {/* track shipment button */}
-                    {order?.scans.length > 0 &&
+                    {order?.scans?.length > 0 &&
                         <Link href={'#scan-section'}>
                             <Button variant="outline" className="gap-2" >
                                 <Truck className="h-4 w-4" />

@@ -89,7 +89,7 @@ export function OrderViewDialog({ order, children }) {
                             {(order.items || []).map((it, i) => (
                                 <TableRow key={i}>
                                     <TableCell>{i + 1}</TableCell>
-                                    <TableCell><p className='max-w-40 text-wrap'>{safe(it?.productId?.name)}</p></TableCell>
+                                    <TableCell><p className='max-w-40 text-wrap'>{safe(it?.productId?.name || it?.name)}</p></TableCell>
                                     <TableCell>{safe(it?.variantName)}</TableCell>
                                     <TableCell>{safe(it?.quantity)}</TableCell>
                                     <TableCell>{it?.price != null ? `₹${it?.price}` : '-'}</TableCell>
