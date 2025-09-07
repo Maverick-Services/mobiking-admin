@@ -213,7 +213,7 @@ export default function page() {
                         </div>
                     </LayoutGroup>
                     {/* Table */}
-                    {(products.isLoading || products.isFetching)
+                    {(products.isLoading)
                         ? <TableSkeleton showHeader={false} />
                         : <>
                             <ProductsListView

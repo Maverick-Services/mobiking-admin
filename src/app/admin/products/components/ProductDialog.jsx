@@ -1,4 +1,3 @@
-// <file top unchanged imports — same as yours>
 import React from 'react'
 import dynamic from 'next/dynamic';
 const RTEFieldGlobal = dynamic(
@@ -15,13 +14,10 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import PCard from '@/components/custom/PCard';
 import { Loader2, Plus, X } from 'lucide-react';
-import MultiImageSelector from '@/components/MultiImageSelector';
 import Image from 'next/image';
 import { Textarea } from '@/components/ui/textarea';
 import toast from 'react-hot-toast';
@@ -57,6 +53,8 @@ const formSchema = z.object({
 
     sku: z.string().optional(),
     hsn: z.string().optional(),
+    rating: z.string().optional(),
+    reviewCount: z.string().optional(),
     slug: z.string().min(1, "Slug is required"),
     active: z.boolean(),
     tags: z.any().optional(),
@@ -73,8 +71,6 @@ const formSchema = z.object({
 });
 
 function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate, isSubmitting, error, categories, brands }) {
-    console.log(selectedProduct)
-    // console.log(brands)
     const [brandDialog, setBrandDialog] = useState(false)
     const [image, setImage] = useState(null)
     const { createBrand } = useBrands();
@@ -83,7 +79,6 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
         isPending: isCreating,
         error: createError,
     } = createBrand;
-
 
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -97,10 +92,12 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
             basePrice: 0,
             sku: "",
             hsn: "",
+            rating: "",
+            reviewCount: "",
             slug: "",
             active: true,
             description: "",
-            tags: [],
+            tags: "",
             descriptionPoints: [],
             keyInformation: [],
             categoryId: "",
@@ -120,9 +117,11 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                 basePrice: selectedProduct?.basePrice ?? 0,
                 sku: selectedProduct?.sku ?? "",
                 hsn: selectedProduct?.hsn ?? "",
+                rating: selectedProduct?.rating ?? "",
+                reviewCount: selectedProduct?.reviewCount ?? "",
                 slug: selectedProduct?.slug ?? "",
                 active: selectedProduct?.active ?? true,
-                tags: selectedProduct?.tags ?? [],
+                tags: selectedProduct?.tags ? selectedProduct.tags.join(", ") : "",
                 description: selectedProduct?.description ?? "",
                 descriptionPoints: selectedProduct?.descriptionPoints ?? [],
                 keyInformation: selectedProduct?.keyInformation ?? [],
@@ -140,18 +139,20 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                 sku: "",
                 hsn: "",
                 slug: "",
+                rating: "",
+                reviewCount: "",
                 active: true,
                 description: "",
-                tags: [],
+                tags: "",
                 descriptionPoints: [],
                 keyInformation: [],
                 categoryId: "",
                 images: [],
             });
         }
-    }, [selectedProduct, reset]);
+    }, [selectedProduct, reset, open]);
 
-    const watchName = form.watch("name");
+    const watchName = form.watch("fullName");
     useEffect(() => {
         const slug = watchName
             ?.toLowerCase()
@@ -185,14 +186,26 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
     })
 
     async function onSubmit(values) {
-        const tagsArray = values.tags
-            .split(",")
-            .map((tag) => tag.trim())
-            .filter((tag) => tag.length > 0)
+        let finalData = { ...values }
 
-        const finalData = {
-            ...values,
-            tags: tagsArray
+        if (values?.tags) {
+            let tagsArray = [];
+
+            if (Array.isArray(values.tags)) {
+                tagsArray = values.tags;
+            } else if (typeof values.tags === "string") {
+                tagsArray = values.tags
+                    .split(",")
+                    .map((tag) => tag.trim())
+                    .filter((tag) => tag.length > 0);
+            }
+
+            finalData = {
+                ...finalData,
+                tags: tagsArray,
+            };
+        } else {
+            finalData.tags = [];
         }
 
         console.log("Submitting values:", finalData)
@@ -253,6 +266,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                     </FormItem>
                                 )}
                             />
+
                             {/* Slug */}
                             <div className='hidden'>
                                 <FormField
@@ -285,7 +299,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                 )}
                             />
 
-                            <div className='grid grid-cols-1 sm:grid-cols-3 gap-2'>
+                            <div className='grid grid-cols-1 sm:grid-cols-5 gap-2'>
                                 {/* category */}
                                 <FormField
                                     control={form.control}
@@ -352,6 +366,44 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                         </FormItem>
                                     )}
                                 />
+
+                                {/* rating */}
+                                <FormField
+                                    control={form.control}
+                                    name='rating'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Rating (4.0 / 4.3)</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type='text'
+                                                    placeholder="Product Rating"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {/* reviewCount */}
+                                <FormField
+                                    control={form.control}
+                                    name='reviewCount'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Total Reviews </FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type='text'
+                                                    placeholder="879 / 2989 / 124"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
 
                             <div className='grid grid-cols-4 gap-2'>
@@ -366,6 +418,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                                 <Input
                                                     type="number"
                                                     placeholder="1699"
+                                                    {...field}
                                                     onChange={(e) => {
                                                         const value = e.target.value;
                                                         field.onChange(value === '' ? '' : Number(value));

@@ -129,7 +129,7 @@ export default function ProductsListView({
 
                                         {/* Trending Products */}
                                         <TrendingUp
-                                            className={`cursor-pointer scale-100 duration-200 transition-all ease-in-out hover:scale-125 ${product.groups?.some(g => g._id === '6878e1fd027b19bf5c7d7d5c') ? 'text-green-500' : 'text-black'
+                                            className={`cursor-pointer scale-100 duration-200 transition-all ease-in-out hover:scale-125 ${product.groups?.some(g => g === '6878e1f1ffe77ca83720210e') ? 'text-green-500' : 'text-black'
                                                 }`}
                                             size={18}
                                             onClick={async () => {
@@ -137,9 +137,9 @@ export default function ProductsListView({
                                                 try {
                                                     const data = {
                                                         productId: product._id,
-                                                        groupId: '6878e1fd027b19bf5c7d7d5c',
+                                                        groupId: '6878e1f1ffe77ca83720210e',
                                                     };
-                                                    if (product?.groups?.some(g => g._id === "6878e1fd027b19bf5c7d7d5c")) {
+                                                    if (product?.groups?.some(g => g._id === "6878e1f1ffe77ca83720210e")) {
                                                         removeProductFromGroup.mutateAsync(data)
                                                     } else {
                                                         await addProductInGroup.mutateAsync(data);
