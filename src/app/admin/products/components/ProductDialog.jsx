@@ -257,6 +257,7 @@ function ProductDialog({ open, onOpenChange, selectedProduct, onCreate, onUpdate
                                                 </Select>
                                             </FormControl>
                                             <MiniLoaderButton
+                                                type='button'
                                                 onClick={() => setBrandDialog(true)}
                                             >
                                                 +

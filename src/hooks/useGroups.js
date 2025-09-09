@@ -21,7 +21,7 @@ export const useGroups = () => {
         queryFn: () => api.get('/groups').then(res => res.data),
         staleTime: 1000 * 60 * 5, // 5 minutes cache
         onError: (err) => {
-            toast.error(err.message || 'Failed to fetch groups');
+            toast.error(err?.response?.data?.message || 'Failed to fetch groups');
         }
     });
 
@@ -39,7 +39,7 @@ export const useGroups = () => {
     //     },
     //     staleTime: 1000 * 60 * 5,
     //     onError: (err) => {
-    //         toast.error(err.message || 'Failed to fetch service');
+    //         toast.error(err?.response?.data?.message || 'Failed to fetch service');
     //     }
     // });
 
@@ -53,7 +53,7 @@ export const useGroups = () => {
             toast.success('Group created successfully');
         },
         onError: (err) => {
-            toast.error(err.message || 'Failed to create Group');
+            toast.error(err?.response?.data?.message || 'Failed to create Group');
         }
     });
 
@@ -67,7 +67,7 @@ export const useGroups = () => {
         },
         onError: (err) => {
             console.log(err)
-            toast.error(err.message || 'Failed to update Group');
+            toast.error(err?.response?.data?.message || 'Failed to update Group');
         }
     });
 
@@ -80,7 +80,7 @@ export const useGroups = () => {
         },
         onError: (err) => {
             console.log(err)
-            toast.error(err.message || 'Failed to update Group');
+            toast.error(err?.response?.data?.message || 'Failed to update Group');
         }
     });
 
@@ -92,7 +92,7 @@ export const useGroups = () => {
         },
         onError: (err) => {
             console.log(err)
-            toast.error(err.message || 'Failed to update Group');
+            toast.error(err?.response?.data?.message || 'Failed to update Group');
         }
     })
 
@@ -104,7 +104,7 @@ export const useGroups = () => {
         },
         onError: (err) => {
             console.log(err)
-            toast.error(err.message || 'Failed to add Product in group');
+            toast.error(err?.response?.data?.message || 'Failed to add Product in group');
         }
     })
 
@@ -116,7 +116,7 @@ export const useGroups = () => {
         },
         onError: (err) => {
             console.log(err)
-            toast.error(err.message || 'Failed to add Product in group');
+            toast.error(err?.response?.data?.message || 'Failed to add Product in group');
         }
     })
 
@@ -129,7 +129,7 @@ export const useGroups = () => {
     //         toast.success('Group deleted successfully');
     //     },
     //     onError: (err) => {
-    //         toast.error(err.message || 'Failed to delete Group');
+    //         toast.error(err?.response?.data?.message || 'Failed to delete Group');
     //     }
     // });
 

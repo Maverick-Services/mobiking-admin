@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import InnerDashboardLayout from "@/components/dashboard/InnerDashboardLayout"
 import { Button } from "@/components/ui/button"
 import {
@@ -28,6 +28,9 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import NotAuthorizedPage from "@/components/notAuthorized"
+import { format, startOfMonth } from "date-fns"
+import DateRangeSelector from "@/components/custom/DateRangeSelector"
+import { flattenOrder } from "@/lib/services/flattenOrder"
 
 // Zod schema
 const reportSchema = z.object({
@@ -40,9 +43,11 @@ const reportSchema = z.object({
         "User",
     ]),
     columns: z.array(z.string()).min(1, "At least one column is required"),
+    startDate: z.string().optional(),
+    endDate: z.string().optional()
 })
 
-// All possible fields per model
+// All possible fields per model (unchanged)
 const columnOptions = {
     User: [
         "name", "email", "phoneNo", "address", "role", "departments",
@@ -81,25 +86,32 @@ const columnOptions = {
 }
 
 export default function Page() {
-    const { reportMutation, permissions: {
-        canView,
-        canAdd,
-        canEdit,
-        canDelete,
-    } } = useReports()
+    const today = new Date()
+    const initialRange = { from: startOfMonth(today), to: today }
+    const [range, setRange] = useState(initialRange)
+
+    // correctly formatted start/end date (always derived from `range`)
+    const startDate = format(range.from, "yyyy-MM-dd")
+    const endDate = format(range.to, "yyyy-MM-dd")
+
+    const { reportMutation,
+        permissions: {
+            canView,
+            canAdd,
+        } } = useReports()
 
     const form = useForm({
         resolver: zodResolver(reportSchema),
         mode: "onSubmit",
         defaultValues: { model: "User", columns: [] },
     })
-    const { control, watch, setValue, handleSubmit, formState: { errors } } = form
+    const { control, watch, setValue, handleSubmit, formState: { errors } } = form;
     const selectedModel = watch("model")
     const selectedCols = watch("columns")
     const [selectAll, setSelectAll] = useState(false)
 
     // Reset selectAll when model changes
-    useEffect(() => {
+    React.useEffect(() => {
         setSelectAll(false)
         setValue("columns", [])
     }, [selectedModel, setValue])
@@ -122,10 +134,37 @@ export default function Page() {
     }
 
     const onSubmit = async (values) => {
-        const res = await reportMutation.mutateAsync(values)
-        const data = res?.data?.data || []
-        exportToExcel(values.columns, data, `${values.model}-report.xlsx`)
-    }
+        try {
+            // include formatted startDate/endDate explicitly
+            const payload = {
+                ...values,
+                startDate,
+                endDate,
+            };
+
+            const res = await reportMutation.mutateAsync(payload);
+            const data = res?.data?.data || [];
+
+            if (!Array.isArray(data) || data.length === 0) {
+                // nothing to export — show a console warning (you can replace with toast)
+                console.warn("No data returned for the selected filters.");
+                return;
+            }
+
+            // Use values.model (was the bug: used `model` which is undefined)
+            if (values.model === "Order") {
+                const orderData = flattenOrder(data);
+                console.log(orderData)
+                exportToExcel(values.columns, orderData, `${values.model}-report.xlsx`);
+            } else {
+                exportToExcel(values.columns, data, `${values.model}-report.xlsx`);
+            }
+        } catch (err) {
+            console.error("Failed to generate report:", err);
+            // optionally show toast here
+        }
+    };
+
 
     if (!canView) {
         return <NotAuthorizedPage />
@@ -155,31 +194,36 @@ export default function Page() {
                 <CardContent>
                     <Form {...form}>
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-                            {/* Model Selection */}
-                            <FormField
-                                control={control}
-                                name="model"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Data Model</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger className="w-full">
-                                                    <SelectValue placeholder="Select a model" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {Object.keys(columnOptions).map((model) => (
-                                                    <SelectItem key={model} value={model}>
-                                                        {model}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                            <div className="flex items-center justify-between gap-2">
+                                {/* Model Selection */}
+                                <FormField
+                                    control={control}
+                                    name="model"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Data Model</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Select a model" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {Object.keys(columnOptions).map((model) => (
+                                                        <SelectItem key={model} value={model}>
+                                                            {model}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <DateRangeSelector onChange={setRange} defaultRange={initialRange} />
+
+                            </div>
 
                             <Separator />
 

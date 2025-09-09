@@ -32,7 +32,6 @@ export default function ProductsListView({
     onEdit,
     setStockEditing,
     setSelectedProduct,
-    onUpdate
 }) {
 
     // console.log(products)
@@ -75,7 +74,7 @@ export default function ProductsListView({
                             <TableHead className="w-[50px]">#</TableHead>
                             <TableHead className="">Quickers</TableHead>
                             <TableHead className="">Image</TableHead>
-                            <TableHead className="">Name</TableHead>
+                            <TableHead className="">Brand</TableHead>
                             <TableHead className="">Full Name</TableHead>
                             <TableHead className="">Category</TableHead>
                             <TableHead className="">Price</TableHead>
@@ -102,23 +101,25 @@ export default function ProductsListView({
                                     <div className='flex gap-2 items-center'>
                                         {/* featured products */}
                                         <Star
-                                            className={`cursor-pointer scale-100 duration-200 transition-all ease-in-out hover:scale-125 ${product.groups?.some(g => g._id === '6878e1f1ffe77ca83720210e') ? 'text-red-500' : 'text-black'
+                                            className={`cursor-pointer scale-100 duration-200 transition-all ease-in-out hover:scale-125 ${product?.groups?.some(g => g === '6878e1f1ffe77ca83720210e') ? 'text-red-500' : 'text-black'
                                                 }`}
                                             size={18}
                                             onClick={async () => {
                                                 const toastId = toast.loading("Updating...");
                                                 try {
                                                     const data = {
-                                                        productId: product._id,
+                                                        productId: product?._id,
                                                         groupId: '6878e1f1ffe77ca83720210e',
                                                     };
-                                                    if (product?.groups?.some(g => g._id === "6878e1f1ffe77ca83720210e")) {
+                                                    if (product?.groups?.some(g => g === "6878e1f1ffe77ca83720210e")) {
                                                         removeProductFromGroup.mutateAsync(data)
+                                                        toast.dismiss(toastId);
+                                                        toast.success("Product successfully removed from Featured")
                                                     } else {
                                                         await addProductInGroup.mutateAsync(data);
+                                                        toast.dismiss(toastId);
+                                                        toast.success("Product successfully added in Featured")
                                                     }
-                                                    toast.dismiss(toastId);
-                                                    // toast.success("Added to Featured group");
                                                 } catch (err) {
                                                     console.error(err);
                                                     toast.dismiss(toastId);
@@ -129,7 +130,7 @@ export default function ProductsListView({
 
                                         {/* Trending Products */}
                                         <TrendingUp
-                                            className={`cursor-pointer scale-100 duration-200 transition-all ease-in-out hover:scale-125 ${product.groups?.some(g => g === '6878e1f1ffe77ca83720210e') ? 'text-green-500' : 'text-black'
+                                            className={`cursor-pointer scale-100 duration-200 transition-all ease-in-out hover:scale-125 ${product?.groups?.some(g => g === '6878e1fd027b19bf5c7d7d5c') ? 'text-green-500' : 'text-black'
                                                 }`}
                                             size={18}
                                             onClick={async () => {
@@ -137,18 +138,22 @@ export default function ProductsListView({
                                                 try {
                                                     const data = {
                                                         productId: product._id,
-                                                        groupId: '6878e1f1ffe77ca83720210e',
+                                                        groupId: '6878e1fd027b19bf5c7d7d5c',
                                                     };
-                                                    if (product?.groups?.some(g => g._id === "6878e1f1ffe77ca83720210e")) {
+                                                    if (product?.groups?.some(g => g === "6878e1fd027b19bf5c7d7d5c")) {
+                                                        console.log('true')
                                                         removeProductFromGroup.mutateAsync(data)
+                                                        toast.dismiss(toastId);
+                                                        toast.success("Product successfully removed from Trending")
                                                     } else {
+                                                        console.log('false')
                                                         await addProductInGroup.mutateAsync(data);
+                                                        toast.dismiss(toastId);
+                                                        toast.success("Product successfully added in Trending")
                                                     }
-                                                    toast.dismiss(toastId);
                                                 } catch (err) {
                                                     console.error(err);
                                                     toast.dismiss(toastId);
-                                                    toast.error("Failed to update group");
                                                 }
                                             }}
                                         />
